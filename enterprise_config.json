@@ -1,0 +1,113 @@
+﻿{
+    "environment":  "production",
+    "companies":  [
+                      {
+                          "id":  "lamoda",
+                          "name":  "Lamoda",
+                          "skills":  "python sql",
+                          "cities":  "Moscow SPB",
+                          "min_score":  70,
+                          "bonus":  120000
+                      },
+                      {
+                          "id":  "skyeng",
+                          "name":  "Skyeng",
+                          "skills":  "node.js react",
+                          "cities":  "Moscow SPB Remote",
+                          "min_score":  75,
+                          "bonus":  180000
+                      },
+                      {
+                          "id":  "ozon",
+                          "name":  "Ozon",
+                          "skills":  "golang",
+                          "cities":  "Moscow",
+                          "min_score":  75,
+                          "bonus":  150000
+                      },
+                      {
+                          "id":  "yandex",
+                          "name":  "Yandex",
+                          "skills":  "c++ java",
+                          "cities":  "Moscow SPB",
+                          "min_score":  80,
+                          "bonus":  200000
+                      },
+                      {
+                          "id":  "vk",
+                          "name":  "VK.com",
+                          "skills":  "c++ rust",
+                          "cities":  "Moscow SPB",
+                          "min_score":  85,
+                          "bonus":  250000
+                      },
+                      {
+                          "id":  "sberbank",
+                          "name":  "Sberbank",
+                          "skills":  "java",
+                          "cities":  "Moscow",
+                          "min_score":  75,
+                          "bonus":  160000
+                      },
+                      {
+                          "id":  "tinkoff",
+                          "name":  "Tinkoff",
+                          "skills":  "golang",
+                          "cities":  "Moscow SPB",
+                          "min_score":  80,
+                          "bonus":  210000
+                      },
+                      {
+                          "id":  "avito",
+                          "name":  "Avito",
+                          "skills":  "python",
+                          "cities":  "Moscow",
+                          "min_score":  75,
+                          "bonus":  170000
+                      },
+                      {
+                          "id":  "2gis",
+                          "name":  "2GIS",
+                          "skills":  "c++",
+                          "cities":  "Novosibirsk Moscow",
+                          "min_score":  70,
+                          "bonus":  140000
+                      },
+                      {
+                          "id":  "kaspersky",
+                          "name":  "Kaspersky",
+                          "skills":  "c++",
+                          "cities":  "Moscow",
+                          "min_score":  80,
+                          "bonus":  190000
+                      },
+                      {
+                          "id":  "mailru",
+                          "name":  "Mail.ru",
+                          "skills":  "python golang",
+                          "cities":  "Moscow",
+                          "min_score":  75,
+                          "bonus":  175000
+                      },
+                      {
+                          "id":  "rostelecom",
+                          "name":  "Rostelecom",
+                          "skills":  "java",
+                          "cities":  "Moscow",
+                          "min_score":  70,
+                          "bonus":  145000
+                      }
+                  ],
+    "version":  "2.0",
+    "anti_spam":  {
+                      "banned_keywords":  [
+                                              "bot",
+                                              "test",
+                                              "fake",
+                                              "spam"
+                                          ],
+                      "min_followers":  30,
+                      "min_repos":  2,
+                      "enabled":  true
+                  }
+}
