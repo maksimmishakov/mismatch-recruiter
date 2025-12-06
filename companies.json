@@ -1,0 +1,62 @@
+{
+  "companies": {
+    "lamoda": {
+      "name": "Lamoda",
+      "bonus_per_hire": 120000,
+      "required_level": ["middle", "senior"],
+      "required_skills": ["python", "sql", "docker"],
+      "preferred_cities": ["Moscow", "SPB"],
+      "salary_from": 250000,
+      "description": "E-commerce platform - Looking for Python devs"
+    },
+    "skyeng": {
+      "name": "Skyeng",
+      "bonus_per_hire": 180000,
+      "required_level": ["middle", "senior"],
+      "required_skills": ["node.js", "react", "postgresql"],
+      "preferred_cities": ["Moscow", "SPB", "Remote"],
+      "salary_from": 300000,
+      "description": "EdTech - Looking for Full Stack developers"
+    },
+    "ozon": {
+      "name": "Ozon",
+      "bonus_per_hire": 150000,
+      "required_level": ["middle"],
+      "required_skills": ["golang", "kafka", "kubernetes"],
+      "preferred_cities": ["Moscow"],
+      "salary_from": 280000,
+      "description": "Marketplace - Looking for Go developers"
+    },
+    "yandex": {
+      "name": "Yandex",
+      "bonus_per_hire": 200000,
+      "required_level": ["senior"],
+      "required_skills": ["c++", "java", "python"],
+      "preferred_cities": ["Moscow", "SPB"],
+      "salary_from": 400000,
+      "description": "Tech giant - Looking for Senior engineers"
+    },
+    "vk": {
+      "name": "VK.com",
+      "bonus_per_hire": 250000,
+      "required_level": ["senior"],
+      "required_skills": ["c++", "rust", "python"],
+      "preferred_cities": ["Moscow", "SPB"],
+      "salary_from": 350000,
+      "description": "Social network - Looking for top engineers"
+    }
+  },
+  "targeting_strategy": {
+    "min_score_for_contact": 75,
+    "min_stars": 150,
+    "min_followers": 75,
+    "max_age_of_projects": 2,
+    "excluded_keywords": ["bot", "spam", "test", "tutorial", "fork"]
+  },
+  "automation": {
+    "search_schedule": "0 9 * * *",
+    "filter_schedule": "0 10 * * *",
+    "send_schedule": "0 11 * * *",
+    "timezone": "Europe/Moscow"
+  }
+}
