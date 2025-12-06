@@ -1,0 +1,41 @@
+{
+  "lamoda_search": {
+    "keywords": ["python", "javascript", "golang", "qa", "data analyst"],
+    "locations": ["Moscow", "Russia"],
+    "min_stars": 100,
+    "min_followers": 50,
+    "excluded_keywords": ["bot", "spam", "test", "tutorial"],
+    "daily_limit": 100
+  },
+  "lamoda_positions": {
+    "python_dev": {
+      "salary_bonus": 120000,
+      "level": "middle",
+      "required_skills": ["Django", "FastAPI", "PostgreSQL"]
+    },
+    "qa": {
+      "salary_bonus": 90000,
+      "level": "middle",
+      "required_skills": ["Selenium", "Python", "Docker"]
+    },
+    "data_analyst": {
+      "salary_bonus": 100000,
+      "level": "middle",
+      "required_skills": ["SQL", "Python", "Analytics"]
+    }
+  },
+  "telegram": {
+    "bot_token": "YOUR_BOT_TOKEN",
+    "chat_id": "YOUR_CHAT_ID"
+  },
+  "automation": {
+    "run_time": "09:00",
+    "timezone": "Europe/Moscow",
+    "retry_on_error": true,
+    "max_retries": 3
+  },
+  "database": {
+    "type": "json",
+    "path": "C:\\recruitment-ai\\db"
+  }
+}

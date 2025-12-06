@@ -1,0 +1,106 @@
+﻿=====================================
+LETTER #1
+Candidate: alexey-goloburdin
+Score: 70/100
+GitHub: https://github.com/alexey-goloburdin
+=====================================
+
+Hello, alexey-goloburdin!
+
+I saw your contributions and they look great.
+
+There's an opportunity that might interest you. Let me know if you want details.
+
+Feel free to check my profile if you'd like: [YOUR_NAME]
+
+Let's talk soon!
+
+Best regards,
+[YOUR_NAME]
+
+---
+=====================================
+LETTER #2
+Candidate: tkhirianov
+Score: 70/100
+GitHub: https://github.com/tkhirianov
+=====================================
+
+Hey, tkhirianov!
+
+Your code quality is excellent.
+
+We're looking for talented developers like you. Got a moment to discuss?
+
+Feel free to check my profile if you'd like: [YOUR_NAME]
+
+Let's talk soon!
+
+Best regards,
+[YOUR_NAME]
+
+---
+=====================================
+LETTER #3
+Candidate: KEV0143
+Score: 70/100
+GitHub: https://github.com/KEV0143
+=====================================
+
+Hi, KEV0143!
+
+I noticed your GitHub profile - impressive work!
+
+I think you could be a great fit for our team. Interested?
+
+Feel free to check my profile if you'd like: [YOUR_NAME]
+
+Looking forward to hearing from you!
+
+Best regards,
+[YOUR_NAME]
+
+---
+=====================================
+LETTER #4
+Candidate: klen
+Score: 70/100
+GitHub: https://github.com/klen
+=====================================
+
+Hey, klen!
+
+Your code quality is excellent.
+
+There's an opportunity that might interest you. Let me know if you want details.
+
+Feel free to check my profile if you'd like: [YOUR_NAME]
+
+Happy to discuss more. Let me know!
+
+Best regards,
+[YOUR_NAME]
+
+---
+=====================================
+LETTER #5
+Candidate: chip-red-pill
+Score: 70/100
+GitHub: https://github.com/chip-red-pill
+=====================================
+
+Hello, chip-red-pill!
+
+I noticed your GitHub profile - impressive work!
+
+There's an opportunity that might interest you. Let me know if you want details.
+
+Feel free to check my profile if you'd like: [YOUR_NAME]
+
+Looking forward to hearing from you!
+
+Best regards,
+[YOUR_NAME]
+
+---
+
