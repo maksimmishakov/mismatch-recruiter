@@ -196,3 +196,7 @@ if __name__ == '__main__':
 @app.route('/')
 def home():
     return '<h1>Hello! RankPO is running!</h1>' 
+
+@app.route('/')
+def home():
+    return '<h1>Hello! RankPO is running!</h1>' 
