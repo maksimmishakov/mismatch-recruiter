@@ -1,4 +1,5 @@
 meta:
+<<<<<<< HEAD
   environment: python
   toolchain:
     name: pip
@@ -9,3 +10,18 @@ run:
   scriptName: app.py
   command: gunicorn app:app --bind 0.0.0.0:80
   containerPort: 80
+=======
+  environment: python311
+  toolchain: pip
+
+build:
+  requirements:
+    - requirements.txt
+
+run:
+  cmd: "gunicorn app:app"
+
+volumes:
+  - mount: /data
+    size: 1Gb
+>>>>>>> bf92ef7458baa6e02f8b2d24df29d304c808207c
