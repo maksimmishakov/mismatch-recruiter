@@ -192,3 +192,7 @@ def get_letters():
 
 if __name__ == '__main__':
     app.run(debug=False, host='0.0.0.0', port=80)
+
+@app.route('/')
+def home():
+    return '<h1>Hello! RankPO is running!</h1>' 
