@@ -1,11 +1,14 @@
 meta:
-  version: '3.11'
+  environment: python311
+  toolchain: pip
 
 build:
-  requirementsPath: requirements.txt
-  useCache: true
+  requirements:
+    - requirements.txt
 
 run:
-  scriptName: app.py
-  command: gunicorn app:app
-  containerPort: 5000
+  cmd: "gunicorn app:app"
+
+volumes:
+  - mount: /data
+    size: 1Gb
