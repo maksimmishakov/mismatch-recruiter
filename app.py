@@ -190,5 +190,3 @@ def get_letters():
     
     return jsonify({"status": "error", "message": "No letters found"})
 
-if __name__ == '__main__':
-    app.run(debug=False, host='0.0.0.0', port=5000)
