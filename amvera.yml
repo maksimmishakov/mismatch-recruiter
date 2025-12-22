@@ -1,14 +1,15 @@
-﻿meta:
-  environment: python311
-  toolchain: pip
-
+---
+version: null
+meta:
+  environment: python
+  toolchain:
+    name: pip
+    version: 3.11
 build:
-  requirements:
-    - requirements.txt
-
+  requirementsPath: requirements.txt
+  useCache: true
 run:
-  cmd: "gunicorn app:app"
-
-volumes:
-  - mount: /data
-    size: 1Gb
+  scriptName: app.py
+  persistenceMount: /data
+  containerPort: 80
+serviceType: compute
