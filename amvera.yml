@@ -6,6 +6,5 @@ build:
   useCache: true
 
 run:
-  scriptName: app.py
   command: gunicorn app:app --bind 0.0.0.0:80
   containerPort: 80
