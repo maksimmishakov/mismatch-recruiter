@@ -1,24 +1,23 @@
-п»їimport os
+import os
 from flask import Flask, jsonify, request, render_template
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 from datetime import datetime
 from werkzeug.utils import secure_filename
+from twilio.rest import Client
 
-# Р—Р°РіСЂСѓР¶Р°РµРј РїРµСЂРµРјРµРЅРЅС‹Рµ РѕРєСЂСѓР¶РµРЅРёСЏ
 load_dotenv()
 
 app = Flask(__name__)
 
-# ==================== РљРћРќР¤РР“РЈР РђР¦РРЇ ====================
+# ==================== КОНФИГУРАЦИЯ ====================
 
-DATABASE_URL = os.getenv('DATABASE_URL', 'sqlite:///rankpo.db')
-
+DATABASE_URL = os.getenv('DATABASE_URL', 'sqlite:///MisMatch.db')
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-key-change-in-prod')
 
-# РљРѕРЅС„РёРіСѓСЂР°С†РёСЏ Р·Р°РіСЂСѓР·РѕРє
+# Конфигурация загрузок
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'pdf', 'docx', 'doc', 'txt'}
 
@@ -27,20 +26,28 @@ if not os.path.exists(UPLOAD_FOLDER):
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+# Twilio для WhatsApp
+TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID', 'test')
+TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN', 'test')
+TWILIO_WHATSAPP_NUMBER = os.getenv('TWILIO_WHATSAPP_NUMBER', '+14155552671')
+
 db = SQLAlchemy(app)
 
-# ==================== РњРћР”Р•Р›Р ====================
+# ==================== МОДЕЛИ ====================
 
 class Candidate(db.Model):
-    '''РњРѕРґРµР»СЊ РєР°РЅРґРёРґР°С‚Р°'''
+    '''Модель кандидата'''
     __tablename__ = 'candidates'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
     email = db.Column(db.String(255))
+    phone = db.Column(db.String(20))
     position = db.Column(db.String(255))
     skills = db.Column(db.JSON, default=list)
     score = db.Column(db.Float, default=0.0)
+    status = db.Column(db.String(50), default='pending')
+    red_flags = db.Column(db.JSON, default=list)
     date_added = db.Column(db.DateTime, default=datetime.utcnow)
 
     def to_dict(self):
@@ -48,43 +55,111 @@ class Candidate(db.Model):
             'id': self.id,
             'name': self.name,
             'email': self.email,
+            'phone': self.phone,
             'position': self.position,
             'skills': self.skills,
             'score': self.score,
+            'status': self.status,
+            'red_flags': self.red_flags,
             'date_added': self.date_added.isoformat() if self.date_added else None
         }
 
-# ==================== Р’РЎРџРћРњРћР“РђРўР•Р›Р¬РќР«Р• Р¤РЈРќРљР¦РР ====================
+# ==================== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ====================
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def detect_red_flags(candidate):
+    '''Выявляет подозрительные сигналы в резюме'''
+    red_flags = []
+    
+    if not candidate.email or '@' not in str(candidate.email):
+        red_flags.append('invalid_email')
+    
+    if not candidate.position or candidate.position == 'На рассмотрении':
+        red_flags.append('no_position_specified')
+    
+    if candidate.score > 90:
+        red_flags.append('suspiciously_high_score')
+    
+    if not candidate.phone:
+        red_flags.append('no_phone_provided')
+    
+    return {
+        'has_flags': len(red_flags) > 0,
+        'flags': red_flags,
+        'risk_level': 'HIGH' if len(red_flags) > 2 else 'MEDIUM' if len(red_flags) > 0 else 'LOW'
+    }
+
+def find_duplicate_candidates(candidate_id):
+    '''Находит дубликаты резюме'''
+    candidate = Candidate.query.get(candidate_id)
+    if not candidate:
+        return []
+    
+    similar_candidates = Candidate.query.filter(
+        Candidate.name.ilike(f'%{candidate.name.split()[0] if candidate.name else ""}%'),
+        Candidate.id != candidate_id
+    ).all()
+    
+    duplicates = []
+    for similar in similar_candidates:
+        if (similar.email and candidate.email and similar.email == candidate.email) or \
+           (similar.skills == candidate.skills and len(similar.skills) > 0):
+            duplicates.append(similar.to_dict())
+    
+    return duplicates
+
+def send_whatsapp_notification(phone, candidate_name, status):
+    '''Отправляет WhatsApp уведомление'''
+    try:
+        if not TWILIO_ACCOUNT_SID or TWILIO_ACCOUNT_SID == 'test':
+            return {'status': 'demo_mode', 'message': 'WhatsApp (demo mode)'}
+        
+        client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+        
+        if status == 'approved':
+            text = f'Привет {candidate_name}! ?? Твоё резюме прошло первый тур! Подробности по почте.'
+        elif status == 'rejected':
+            text = f'Спасибо {candidate_name}! Мы рассмотрели твоё резюме. Удачи! ??'
+        else:
+            text = f'Привет {candidate_name}! Твоё резюме в обработке.'
+        
+        message = client.messages.create(
+            from_=f'whatsapp:{TWILIO_WHATSAPP_NUMBER}',
+            body=text,
+            to=f'whatsapp:{phone}'
+        )
+        return {'status': 'sent', 'message_id': message.sid}
+    except Exception as e:
+        return {'status': 'error', 'error': str(e)}
 
 # ==================== ROUTES ====================
 
 @app.route('/')
 def index():
-    '''Р“Р»Р°РІРЅР°СЏ СЃС‚СЂР°РЅРёС†Р° API'''
     return jsonify({
-        'message': 'RankPO API is running!',
-        'version': '1.0.0',
+        'message': 'MisMatch API is running!',
+        'version': '1.0.1',
+        'features': ['upload', 'red_flags', 'duplicates', 'whatsapp_notify'],
         'endpoints': {
             'ui': '/upload',
             'health': '/api/health',
             'candidates': '/api/candidates',
             'candidate': '/api/candidate/<id>',
-            'create_candidate': 'POST /api/candidate',
+            'red_flags': '/api/candidate/<id>/red-flags',
+            'duplicates': '/api/candidates/find-duplicates/<id>',
+            'notify': '/api/candidate/<id>/notify',
             'upload': 'POST /api/upload'
         }
     })
 
 @app.route('/api/status')
 def status():
-    '''Status endpoint (РґР»СЏ СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё)'''
     return {'status': 'ok', 'timestamp': datetime.now().isoformat()}
 
 @app.route('/api/health', methods=['GET'])
 def health():
-    '''Health check РґР»СЏ Amvera'''
     try:
         db.session.execute('SELECT 1')
         return jsonify({
@@ -101,7 +176,6 @@ def health():
 
 @app.route('/api/candidates', methods=['GET'])
 def get_candidates():
-    '''РџРѕР»СѓС‡РёС‚СЊ РІСЃРµС… РєР°РЅРґРёРґР°С‚РѕРІ'''
     try:
         candidates = Candidate.query.order_by(Candidate.score.desc()).all()
         return jsonify({
@@ -113,7 +187,6 @@ def get_candidates():
 
 @app.route('/api/candidate/<int:candidate_id>', methods=['GET'])
 def get_candidate(candidate_id):
-    '''РџРѕР»СѓС‡РёС‚СЊ РєР°РЅРґРёРґР°С‚Р° РїРѕ ID'''
     try:
         candidate = Candidate.query.get(candidate_id)
         if not candidate:
@@ -122,19 +195,81 @@ def get_candidate(candidate_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/candidate/<int:candidate_id>/red-flags', methods=['GET'])
+def get_candidate_flags(candidate_id):
+    '''Получить красные флаги кандидата'''
+    try:
+        candidate = Candidate.query.get(candidate_id)
+        if not candidate:
+            return jsonify({'error': 'Candidate not found'}), 404
+        
+        flags = detect_red_flags(candidate)
+        return jsonify({
+            'candidate_id': candidate.id,
+            'candidate_name': candidate.name,
+            'red_flags': flags
+        }), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/candidates/find-duplicates/<int:candidate_id>', methods=['GET'])
+def find_duplicates(candidate_id):
+    '''Найти дубликаты резюме'''
+    try:
+        duplicates = find_duplicate_candidates(candidate_id)
+        candidate = Candidate.query.get(candidate_id)
+        
+        return jsonify({
+            'candidate_id': candidate_id,
+            'candidate_name': candidate.name if candidate else 'Unknown',
+            'duplicates_found': len(duplicates),
+            'duplicates': duplicates
+        }), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/candidate/<int:candidate_id>/notify', methods=['POST'])
+def notify_candidate(candidate_id):
+    '''Отправить WhatsApp уведомление'''
+    try:
+        data = request.get_json()
+        candidate = Candidate.query.get(candidate_id)
+        
+        if not candidate:
+            return jsonify({'error': 'Candidate not found'}), 404
+        
+        phone = data.get('phone') or candidate.phone
+        status = data.get('status', 'pending')
+        
+        if not phone:
+            return jsonify({'error': 'Phone number required'}), 400
+        
+        result = send_whatsapp_notification(phone, candidate.name, status)
+        
+        return jsonify({
+            'success': result.get('status') in ['sent', 'demo_mode'],
+            'result': result,
+            'candidate': candidate.to_dict()
+        }), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/candidate', methods=['POST'])
 def create_candidate():
-    '''РЎРѕР·РґР°С‚СЊ РєР°РЅРґРёРґР°С‚Р°'''
     try:
         data = request.get_json()
 
         candidate = Candidate(
             name=data.get('name'),
             email=data.get('email'),
+            phone=data.get('phone'),
             position=data.get('position'),
             skills=data.get('skills', []),
-            score=data.get('score', 0.0)
+            score=data.get('score', 0.0),
+            status='pending'
         )
+
+        candidate.red_flags = detect_red_flags(candidate).get('flags', [])
 
         db.session.add(candidate)
         db.session.commit()
@@ -150,12 +285,10 @@ def create_candidate():
 
 @app.route('/upload')
 def upload_page():
-    '''HTML СЃС‚СЂР°РЅРёС†Р° РґР»СЏ Р·Р°РіСЂСѓР·РєРё СЂРµР·СЋРјРµ'''
     return render_template('index.html')
 
 @app.route('/api/upload', methods=['POST'])
 def upload_resume():
-    '''API endpoint РґР»СЏ Р·Р°РіСЂСѓР·РєРё Рё РѕР±СЂР°Р±РѕС‚РєРё СЂРµР·СЋРјРµ'''
     try:
         if 'file' not in request.files:
             return jsonify({'error': 'No file provided'}), 400
@@ -166,23 +299,24 @@ def upload_resume():
             return jsonify({'error': 'Empty filename'}), 400
 
         if not allowed_file(file.filename):
-            return jsonify({'error': 'File type not allowed. Use: pdf, docx, doc, txt'}), 400
+            return jsonify({'error': 'File type not allowed'}), 400
 
-        # РЎРѕС…СЂР°РЅСЏРµРј С„Р°Р№Р»
         filename = secure_filename(file.filename)
         timestamp = datetime.utcnow().strftime('%Y%m%d_%H%M%S_')
         filename = timestamp + filename
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
 
-        # РЎРѕР·РґР°С‘Рј РєР°РЅРґРёРґР°С‚Р° РІ Р‘Р”
         candidate_name = file.filename.rsplit('.', 1)[0]
         candidate = Candidate(
             name=candidate_name,
-            position='РќР° СЂР°СЃСЃРјРѕС‚СЂРµРЅРёРё',
+            position='На рассмотрении',
             skills=['python', 'javascript'],
-            score=75.0
+            score=75.0,
+            status='pending'
         )
+
+        candidate.red_flags = detect_red_flags(candidate).get('flags', [])
 
         db.session.add(candidate)
         db.session.commit()
@@ -190,15 +324,13 @@ def upload_resume():
         return jsonify({
             'success': True,
             'candidate_id': candidate.id,
-            'message': f'РљР°РЅРґРёРґР°С‚ {candidate_name} РґРѕР±Р°РІР»РµРЅ',
+            'message': f'Кандидат {candidate_name} добавлен',
             'candidate': candidate.to_dict()
         }), 201
 
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
-
-# ==================== ERROR HANDLERS ====================
 
 @app.errorhandler(404)
 def not_found(error):
@@ -208,12 +340,8 @@ def not_found(error):
 def server_error(error):
     return jsonify({'error': 'Internal server error'}), 500
 
-# ==================== INITIALIZATION ====================
-
 with app.app_context():
     db.create_all()
-
-# ==================== MAIN ====================
 
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))
