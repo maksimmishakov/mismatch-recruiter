@@ -711,3 +711,64 @@ def export_candidates_excel():
         }
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+# ==================== EXTENSION #4: CUSTOM SCORING ====================
+@app.route('/api/scoring/configure', methods=['POST'])
+def configure_scoring():
+    """Configure custom scoring weights for a company."""
+    try:
+        from utils.scoring_engine import ScoringEngine
+        
+        data = request.get_json()
+        company_id = data.get('company_id')
+        weights = data.get('weights')
+        
+        if not weights:
+            return jsonify({'error': 'weights parameter required'}), 400
+        
+        engine = ScoringEngine(company_id)
+        result = engine.configure_weights(weights)
+        
+        return jsonify({
+            'success': True,
+            'company_id': company_id,
+            'weights': result['weights']
+        }), 200
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/scoring/calculate', methods=['POST'])
+def calculate_candidate_score():
+    """Calculate custom score for a candidate."""
+    try:
+        from utils.scoring_engine import ScoringEngine
+        
+        data = request.get_json()
+        company_id = data.get('company_id')
+        candidate_data = data.get('candidate_data', {})
+        
+        if not candidate_data:
+            return jsonify({'error': 'candidate_data required'}), 400
+        
+        engine = ScoringEngine(company_id)
+        scores = engine.calculate_overall_score(candidate_data)
+        
+        # Generate recommendation
+        recommendation = engine.get_recommendation(scores.get('overall_score', 0))
+        
+        # Identify missing skills
+        missing_skills = engine.identify_missing_skills(
+            candidate_data.get('required_skills', []),
+            candidate_data.get('skills', [])
+        )
+        
+        return jsonify({
+            'success': True,
+            'scores': scores,
+            'recommendation': recommendation,
+            'missing_skills': missing_skills
+        }), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
