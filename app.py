@@ -6,18 +6,27 @@ from datetime import datetime
 from werkzeug.utils import secure_filename
 from twilio.rest import Client
 
+from llm_client import LLMClient
+
+# РРЅРёС†РёР°Р»РёР·РёСЂСѓР№ РєР»РёРµРЅС‚ РїСЂРё СЃС‚Р°СЂС‚Рµ
+try:
+    llm_client = LLMClient()
+except RuntimeError as e:
+    print(f"Warning: LLM client initialization failed: {e}")
+    llm_client = None
+
 load_dotenv()
 
 app = Flask(__name__)
 
-# ==================== КОНФИГУРАЦИЯ ====================
+# ==================== ГЉГЋГЌГ”Г€ГѓГ“ГђГЂГ–Г€Гџ ====================
 
 DATABASE_URL = os.getenv('DATABASE_URL', 'sqlite:///MisMatch.db')
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-key-change-in-prod')
 
-# Конфигурация загрузок
+# ГЉГ®Г­ГґГЁГЈГіГ°Г Г¶ГЁГї Г§Г ГЈГ°ГіГ§Г®ГЄ
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'pdf', 'docx', 'doc', 'txt'}
 
@@ -26,17 +35,17 @@ if not os.path.exists(UPLOAD_FOLDER):
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# Twilio для WhatsApp
+# Twilio Г¤Г«Гї WhatsApp
 TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID', 'test')
 TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN', 'test')
 TWILIO_WHATSAPP_NUMBER = os.getenv('TWILIO_WHATSAPP_NUMBER', '+14155552671')
 
 db = SQLAlchemy(app)
 
-# ==================== МОДЕЛИ ====================
+# ==================== ГЊГЋГ„Г…Г‹Г€ ====================
 
 class Candidate(db.Model):
-    '''Модель кандидата'''
+    '''ГЊГ®Г¤ГҐГ«Гј ГЄГ Г­Г¤ГЁГ¤Г ГІГ '''
     __tablename__ = 'candidates'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -64,19 +73,19 @@ class Candidate(db.Model):
             'date_added': self.date_added.isoformat() if self.date_added else None
         }
 
-# ==================== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ====================
+# ==================== Г‚Г‘ГЏГЋГЊГЋГѓГЂГ’Г…Г‹ГњГЌГ›Г… Г”Г“ГЌГЉГ–Г€Г€ ====================
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def detect_red_flags(candidate):
-    '''Выявляет подозрительные сигналы в резюме'''
+    '''Г‚Г»ГїГўГ«ГїГҐГІ ГЇГ®Г¤Г®Г§Г°ГЁГІГҐГ«ГјГ­Г»ГҐ Г±ГЁГЈГ­Г Г«Г» Гў Г°ГҐГ§ГѕГ¬ГҐ'''
     red_flags = []
     
     if not candidate.email or '@' not in str(candidate.email):
         red_flags.append('invalid_email')
     
-    if not candidate.position or candidate.position == 'На рассмотрении':
+    if not candidate.position or candidate.position == 'ГЌГ  Г°Г Г±Г±Г¬Г®ГІГ°ГҐГ­ГЁГЁ':
         red_flags.append('no_position_specified')
     
     if candidate.score > 90:
@@ -92,7 +101,7 @@ def detect_red_flags(candidate):
     }
 
 def find_duplicate_candidates(candidate_id):
-    '''Находит дубликаты резюме'''
+    '''ГЌГ ГµГ®Г¤ГЁГІ Г¤ГіГЎГ«ГЁГЄГ ГІГ» Г°ГҐГ§ГѕГ¬ГҐ'''
     candidate = Candidate.query.get(candidate_id)
     if not candidate:
         return []
@@ -111,7 +120,7 @@ def find_duplicate_candidates(candidate_id):
     return duplicates
 
 def send_whatsapp_notification(phone, candidate_name, status):
-    '''Отправляет WhatsApp уведомление'''
+    '''ГЋГІГЇГ°Г ГўГ«ГїГҐГІ WhatsApp ГіГўГҐГ¤Г®Г¬Г«ГҐГ­ГЁГҐ'''
     try:
         if not TWILIO_ACCOUNT_SID or TWILIO_ACCOUNT_SID == 'test':
             return {'status': 'demo_mode', 'message': 'WhatsApp (demo mode)'}
@@ -119,11 +128,11 @@ def send_whatsapp_notification(phone, candidate_name, status):
         client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
         
         if status == 'approved':
-            text = f'Привет {candidate_name}! ?? Твоё резюме прошло первый тур! Подробности по почте.'
+            text = f'ГЏГ°ГЁГўГҐГІ {candidate_name}! ?? Г’ГўГ®Вё Г°ГҐГ§ГѕГ¬ГҐ ГЇГ°Г®ГёГ«Г® ГЇГҐГ°ГўГ»Г© ГІГіГ°! ГЏГ®Г¤Г°Г®ГЎГ­Г®Г±ГІГЁ ГЇГ® ГЇГ®Г·ГІГҐ.'
         elif status == 'rejected':
-            text = f'Спасибо {candidate_name}! Мы рассмотрели твоё резюме. Удачи! ??'
+            text = f'Г‘ГЇГ Г±ГЁГЎГ® {candidate_name}! ГЊГ» Г°Г Г±Г±Г¬Г®ГІГ°ГҐГ«ГЁ ГІГўГ®Вё Г°ГҐГ§ГѕГ¬ГҐ. Г“Г¤Г Г·ГЁ! ??'
         else:
-            text = f'Привет {candidate_name}! Твоё резюме в обработке.'
+            text = f'ГЏГ°ГЁГўГҐГІ {candidate_name}! Г’ГўГ®Вё Г°ГҐГ§ГѕГ¬ГҐ Гў Г®ГЎГ°Г ГЎГ®ГІГЄГҐ.'
         
         message = client.messages.create(
             from_=f'whatsapp:{TWILIO_WHATSAPP_NUMBER}',
@@ -197,7 +206,7 @@ def get_candidate(candidate_id):
 
 @app.route('/api/candidate/<int:candidate_id>/red-flags', methods=['GET'])
 def get_candidate_flags(candidate_id):
-    '''Получить красные флаги кандидата'''
+    '''ГЏГ®Г«ГіГ·ГЁГІГј ГЄГ°Г Г±Г­Г»ГҐ ГґГ«Г ГЈГЁ ГЄГ Г­Г¤ГЁГ¤Г ГІГ '''
     try:
         candidate = Candidate.query.get(candidate_id)
         if not candidate:
@@ -214,7 +223,7 @@ def get_candidate_flags(candidate_id):
 
 @app.route('/api/candidates/find-duplicates/<int:candidate_id>', methods=['GET'])
 def find_duplicates(candidate_id):
-    '''Найти дубликаты резюме'''
+    '''ГЌГ Г©ГІГЁ Г¤ГіГЎГ«ГЁГЄГ ГІГ» Г°ГҐГ§ГѕГ¬ГҐ'''
     try:
         duplicates = find_duplicate_candidates(candidate_id)
         candidate = Candidate.query.get(candidate_id)
@@ -230,7 +239,7 @@ def find_duplicates(candidate_id):
 
 @app.route('/api/candidate/<int:candidate_id>/notify', methods=['POST'])
 def notify_candidate(candidate_id):
-    '''Отправить WhatsApp уведомление'''
+    '''ГЋГІГЇГ°Г ГўГЁГІГј WhatsApp ГіГўГҐГ¤Г®Г¬Г«ГҐГ­ГЁГҐ'''
     try:
         data = request.get_json()
         candidate = Candidate.query.get(candidate_id)
@@ -310,7 +319,7 @@ def upload_resume():
         candidate_name = file.filename.rsplit('.', 1)[0]
         candidate = Candidate(
             name=candidate_name,
-            position='На рассмотрении',
+            position='ГЌГ  Г°Г Г±Г±Г¬Г®ГІГ°ГҐГ­ГЁГЁ',
             skills=['python', 'javascript'],
             score=75.0,
             status='pending'
@@ -324,10 +333,46 @@ def upload_resume():
         return jsonify({
             'success': True,
             'candidate_id': candidate.id,
-            'message': f'Кандидат {candidate_name} добавлен',
+            'message': f'ГЉГ Г­Г¤ГЁГ¤Г ГІ {candidate_name} Г¤Г®ГЎГ ГўГ«ГҐГ­',
             'candidate': candidate.to_dict()
         }), 201
 
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/analyze-resume-ai/<int:candidate_id>', methods=['POST'])
+def analyze_resume_with_ai(candidate_id):
+    """РђРЅР°Р»РёР·РёСЂСѓРµС‚ СЂРµР·СЋРјРµ СЃ РїРѕРјРѕС‰СЊСЋ AI С‡РµСЂРµР· ProxyAPI."""
+    try:
+        if llm_client is None:
+            return jsonify({'error': 'LLM service not available'}), 503
+        
+        candidate = Candidate.query.get(candidate_id)
+        if not candidate:
+            return jsonify({'error': 'Candidate not found'}), 404
+        
+        # РџРѕР»СѓС‡РёС‚СЊ С‚РµРєСЃС‚ СЂРµР·СЋРјРµ
+        resume_text = f"РРјСЏ: {candidate.name}\nР”РѕР»Р¶РЅРѕСЃС‚СЊ: {candidate.position}\nРќР°РІС‹РєРё: {', '.join(candidate.skills) if candidate.skills else 'N/A'}"
+        
+        # РђРЅР°Р»РёР·РёСЂРѕРІР°С‚СЊ С‡РµСЂРµР· LLM
+        ai_data = llm_client.analyze_resume(resume_text)
+        
+        # РћР±РЅРѕРІРёС‚СЊ score Рё skills
+        candidate.score = ai_data.get('score', candidate.score)
+        candidate.skills = ai_data.get('skills', candidate.skills)
+        
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'candidate_id': candidate_id,
+            'ai_analysis': ai_data,
+            'candidate': candidate.to_dict()
+        }), 200
+        
+    except RuntimeError as e:
+        return jsonify({'error': f'AI analysis error: {str(e)}'}), 500
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
