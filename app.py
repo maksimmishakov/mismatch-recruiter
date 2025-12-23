@@ -546,3 +546,41 @@ def job_matcher_endpoint():
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+
+# ==================== ANALYTICS DASHBOARD ====================
+@app.route('/api/analytics', methods=['GET'])
+def get_analytics():
+        """Get analytics data for dashboard"""
+        try:
+                    candidates = Candidate.query.all()
+                    total_candidates = len(candidates)
+                    approved = len([c for c in candidates if c.status == 'approved'])
+                    rejected = len([c for c in candidates if c.status == 'rejected'])
+                    pending = len([c for c in candidates if c.status == 'pending'])
+                    avg_score = sum([c.score for c in candidates]) / total_candidates if total_candidates > 0 else 0
+                    all_skills = []
+                    for c in candidates:
+                                    if c.skills:
+                                                        all_skills.extend(c.skills)
+                                                skills_count = {}
+                                for skill in all_skills:
+                                                skills_count[skill] = skills_count.get(skill, 0) + 1
+                                            return jsonify({
+                                    'success': True,
+                                    'total_candidates': total_candidates,
+                                    'status_breakdown': {
+                                                        'approved': approved,
+                                                        'rejected': rejected,
+                                                        'pending': pending
+                                                    },
+                                    'average_score': round(avg_score, 2),
+                                    'top_skills': sorted(skills_count.items(), key=lambda x: x[1], reverse=True)[:10],
+                                    'timestamp': datetime.utcnow().isoformat()
+                                }), 200
+                except Exception as e:
+                            return jsonify({'error': str(e)}), 500
+
+@app.route('/analytics-dashboard')
+def analytics_dashboard():
+        """Render analytics dashboard page"""
+        return render_template('analytics.html')
