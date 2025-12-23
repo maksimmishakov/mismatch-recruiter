@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batch Upload - LAMODA Recruiter</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/batch.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Batch Job Upload</h1>
+            <p class="subtitle">Upload multiple job postings and resumes for matching</p>
+        </header>
+
+        <main>
+            <!-- Upload Section -->
+            <section class="upload-section">
+                <div class="upload-box">
+                    <div class="upload-icon">📁</div>
+                    <h2>Upload Files</h2>
+                    <p>Drag and drop PDF/DOCX files or click to select</p>
+                    
+                    <input type="file" id="fileInput" multiple accept=".pdf,.docx,.doc" 
+                           style="display: none;">
+                    <button id="uploadBtn" class="btn btn-primary">Choose Files</button>
+                </div>
+            </section>
+
+            <!-- File List Section -->
+            <section class="files-section" id="filesSection" style="display: none;">
+                <h2>Selected Files</h2>
+                <div id="fileList" class="file-list"></div>
+                <button id="clearBtn" class="btn btn-secondary">Clear All</button>
+            </section>
+
+            <!-- Preview Section -->
+            <section class="preview-section" id="previewSection" style="display: none;">
+                <h2>File Preview</h2>
+                <div id="previewContent" class="preview-content"></div>
+            </section>
+
+            <!-- Upload Progress Section -->
+            <section class="progress-section" id="progressSection" style="display: none;">
+                <h2>Upload Progress</h2>
+                <div class="progress-bar-container">
+                    <div id="progressBar" class="progress-bar"></div>
+                </div>
+                <p id="progressText" class="progress-text">0%</p>
+            </section>
+
+            <!-- Results Section -->
+            <section class="results-section" id="resultsSection" style="display: none;">
+                <h2>Upload Results</h2>
+                <div id="resultsList" class="results-list"></div>
+            </section>
+
+            <!-- Submit Button -->
+            <div class="submit-section">
+                <button id="submitBtn" class="btn btn-success" disabled>
+                    Process Files
+                </button>
+                <p class="help-text">Submit files to match jobs with candidates</p>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2024 LAMODA Recruiter. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/batch.js') }}"></script>
+</body>
+</html>
