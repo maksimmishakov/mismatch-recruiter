@@ -1,5 +1,5 @@
 ---
-version: null
+version: '1.0'
 meta:
   environment: python
   toolchain:
@@ -9,12 +9,10 @@ build:
   requirementsPath: requirements.txt
   useCache: false
 run:
-<<<<<<< HEAD
   scriptName: app.py
   persistenceMount: /data
   containerPort: 80
 serviceType: compute
-=======
-  command: gunicorn app:app --bind 0.0.0.0:80
-  containerPort: 80
->>>>>>> bf92ef7458baa6e02f8b2d24df29d304c808207c
+---
+command: gunicorn app:app -bind 0.0.0.0:80
+containerPort: 80
