@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Questions Generator - MisMatch</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .interview-container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        .questions-form {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        .form-group textarea, .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        .btn-generate {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .btn-generate:hover {
+            background-color: #218838;
+        }
+        .questions-results {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #17a2b8;
+        }
+        .question-card {
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            background: #f9f9f9;
+        }
+        .question-level {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .level-basic {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .level-intermediate {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .level-advanced {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .question-text {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="interview-container">
+        <h1>❓ Interview Questions Generator</h1>
+        <p>Generate tailored interview questions based on the job and candidate profile</p>
+        
+        <div class="questions-form">
+            <form id="questionForm">
+                <div class="form-group">
+                    <label for="jobTitle">Job Position *</label>
+                    <input type="text" id="jobTitle" name="jobTitle" placeholder="e.g., Senior Backend Developer" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="jobDescription">Job Description *</label>
+                    <textarea id="jobDescription" name="jobDescription" placeholder="Paste the job description..." required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="resumeAnalysis">Resume Summary *</label>
+                    <textarea id="resumeAnalysis" name="resumeAnalysis" placeholder="Paste resume or candidate summary..." required></textarea>
+                </div>
+                
+                <button type="submit" class="btn-generate">Generate Questions</button>
+            </form>
+        </div>
+        
+        <div id="resultsSection" style="display:none;">
+            <div class="questions-results">
+                <h2>📚 Interview Questions</h2>
+                <p id="jobInfo" style="color: #666; margin-bottom: 20px;"></p>
+                <div id="questionsList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('questionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const jobTitle = document.getElementById('jobTitle').value;
+            const jobDescription = document.getElementById('jobDescription').value;
+            const resumeAnalysis = JSON.stringify({summary: document.getElementById('resumeAnalysis').value});
+            
+            try {
+                const response = await fetch('/api/generate-interview-questions', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        job_title: jobTitle,
+                        job_description: jobDescription,
+                        resume_analysis: resumeAnalysis
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('jobInfo').textContent = `Position: ${data.job_title} | Total Questions: ${data.total}`;
+                    
+                    const questionsList = document.getElementById('questionsList');
+                    questionsList.innerHTML = '';
+                    
+                    data.questions.forEach((q, index) => {
+                        const card = document.createElement('div');
+                        card.className = 'question-card';
+                        const levelClass = `level-${q.level}`;
+                        
+                        card.innerHTML = `
+                            <span class="question-level ${levelClass}">${q.level.toUpperCase()}</span>
+                            <p class="question-text"><strong>Q${index + 1}:</strong> ${q.question}</p>
+                        `;
+                        questionsList.appendChild(card);
+                    });
+                    
+                    document.getElementById('resultsSection').style.display = 'block';
+                } else {
+                    alert('Error: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>
