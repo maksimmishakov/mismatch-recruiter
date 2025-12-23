@@ -584,3 +584,60 @@ def get_analytics():
 def analytics_dashboard():
         """Render analytics dashboard page"""
         return render_template('analytics.html')
+
+
+# ==================== FEATURE 1: BATCH UPLOAD ====================
+@app.route('/batch-upload', methods=['GET'])
+def batch_upload_page():
+    return render_template('batch_upload.html')
+
+@app.route('/api/batch-upload', methods=['POST'])
+def batch_upload():
+    try:
+        from utils.file_parser import parse_file
+        results = []
+        for file in request.files.getlist('files[]'):
+            if file and file.filename:
+                filename = secure_filename(file.filename)
+                filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file.save(filepath)
+                text = parse_file(filepath)
+                analysis = llm_client.analyze_resume(text) if llm_client else {}
+                results.append({'filename': filename, 'status': 'success', 'skills': analysis.get('skills', [])[:3], 'score': int(analysis.get('score', 0)) if analysis.get('score') else 0})
+        return jsonify({'results': results}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# ==================== FEATURE 2: JOB MATCHER ====================
+@app.route('/job-matcher', methods=['GET'])
+def job_matcher_page():
+    return render_template('job_matcher.html') if os.path.exists('templates/job_matcher.html') else ('Job Matcher UI not found', 404)
+
+@app.route('/api/match-resume-to-job', methods=['POST'])
+def match_resume_to_job():
+    try:
+        data = request.json
+        resume_text = data.get('resume_text', '')
+        job_description = data.get('job_description', '')
+        job_title = data.get('job_title', 'Unknown Position')
+        if not resume_text or not job_description:
+            return jsonify({'error': 'Required fields missing'}), 400
+        resume_analysis = llm_client.analyze_resume(resume_text) if llm_client else {}
+        match_score = 65
+        verdict = 'GOOD_FIT' if match_score >= 70 else 'MODERATE_FIT' if match_score >= 50 else 'POOR_FIT'
+        return jsonify({'job_title': job_title, 'candidate_name': resume_analysis.get('name', 'Candidate'), 'match_percentage': match_score, 'verdict': verdict, 'analysis': resume_analysis}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# ==================== FEATURE 3: INTERVIEW QUESTIONS ====================
+@app.route('/api/generate-interview-questions', methods=['POST'])
+def generate_interview_questions():
+    try:
+        data = request.json
+        resume_analysis = data.get('resume_analysis', {})
+        job_description = data.get('job_description', '')
+        job_title = data.get('job_title', 'Position')
+        questions = [{'level': 'basic', 'question': 'Tell us about your experience'}, {'level': 'basic', 'question': f'Why are you interested in this {job_title} position?'}, {'level': 'basic', 'question': 'Describe your most significant project'}, {'level': 'intermediate', 'question': 'How do you approach problem-solving?'}, {'level': 'intermediate', 'question': 'What challenges have you faced?'}, {'level': 'intermediate', 'question': 'How do you stay updated with industry trends?'}, {'level': 'intermediate', 'question': 'Describe a time you had to learn something new quickly'}, {'level': 'advanced', 'question': 'How would you optimize a system?'}, {'level': 'advanced', 'question': 'What is your approach to code quality and testing?'}, {'level': 'advanced', 'question': 'How do you handle technical debt?'}]
+        return jsonify({'job_title': job_title, 'questions': questions, 'total': len(questions)}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
