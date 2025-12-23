@@ -391,3 +391,158 @@ with app.app_context():
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))
     app.run(debug=False, host='0.0.0.0', port=port)
+
+
+# ==================== BATCH UPLOAD & JOB MATCHING ====================
+
+@app.route('/batch', methods=['GET'])
+def batch_upload_page():
+    """Render batch upload page"""
+    return render_template('batch_upload.html')
+
+
+@app.route('/api/batch/upload', methods=['POST'])
+def batch_upload_files():
+    """Handle batch file upload and parsing"""
+    try:
+        if 'files' not in request.files:
+            return jsonify({'error': 'No files provided'}), 400
+        
+        files = request.files.getlist('files')
+        results = []
+        
+        for file in files:
+            if file and file.filename:
+                filename = secure_filename(file.filename)
+                ext = os.path.splitext(filename)[1].lower()
+                
+                if ext not in ['.pdf', '.docx', '.doc']:
+                    results.append({
+                        'filename': filename,
+                        'success': False,
+                        'error': 'Unsupported file format'
+                    })
+                    continue
+                
+                filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file.save(filepath)
+                
+                try:
+                    from utils.file_parser import parse_file
+                    content = parse_file(filepath)
+                    results.append({
+                        'filename': filename,
+                        'success': True,
+                        'content_preview': content[:200] if content else 'No content extracted'
+                    })
+                except Exception as e:
+                    results.append({
+                        'filename': filename,
+                        'success': False,
+                        'error': str(e)
+                    })
+        
+        return jsonify({
+            'success': True,
+            'total_files': len(files),
+            'successful': len([r for r in results if r['success']]),
+            'results': results
+        }), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/batch/process', methods=['POST'])
+def batch_process_files():
+    """Process batch files with AI analysis and embeddings"""
+    try:
+        data = request.get_json()
+        files_data = data.get('files', [])
+        results = []
+        
+        for file_data in files_data:
+            filename = file_data.get('filename')
+            content = file_data.get('content')
+            
+            if not content:
+                continue
+            
+            try:
+                ai_analysis = llm_client.analyze_resume(content)
+                
+                try:
+                    from sentence_transformers import SentenceTransformer
+                    model = SentenceTransformer('all-MiniLM-L6-v2')
+                    embeddings = model.encode(content).tolist()
+                except:
+                    embeddings = []
+                
+                results.append({
+                    'filename': filename,
+                    'analysis': ai_analysis,
+                    'embeddings': embeddings
+                })
+            except Exception as e:
+                results.append({
+                    'filename': filename,
+                    'error': str(e)
+                })
+        
+        return jsonify({
+            'success': True,
+            'total_files': len(files_data),
+            'processed': len(results),
+            'results': results
+        }), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/job-matcher', methods=['POST'])
+def job_matcher_endpoint():
+    """Match jobs with candidates based on skills and experience"""
+    try:
+        data = request.get_json()
+        job_description = data.get('job_description')
+        candidates = data.get('candidates', [])
+        
+        if not job_description:
+            return jsonify({'error': 'Job description is required'}), 400
+        
+        try:
+            job_analysis = llm_client.analyze_job(job_description)
+        except:
+            job_analysis = {'skills': [], 'requirements': []}
+        
+        matches = []
+        
+        for candidate in candidates:
+            candidate_id = candidate.get('id')
+            candidate_data = candidate.get('data', {})
+            
+            try:
+                score = llm_client.match_candidate(job_analysis, candidate_data)
+            except:
+                score = 0.0
+            
+            if score >= 0.7:
+                matches.append({
+                    'candidate_id': candidate_id,
+                    'match_score': round(score, 2),
+                    'match_percentage': f"{score * 100:.1f}%"
+                })
+        
+        matches.sort(key=lambda x: x['match_score'], reverse=True)
+        
+        return jsonify({
+            'success': True,
+            'job_analysis': job_analysis,
+            'total_candidates': len(candidates),
+            'matched_count': len(matches),
+            'matches': matches[:10]
+        }), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
