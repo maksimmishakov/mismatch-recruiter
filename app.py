@@ -641,3 +641,73 @@ def generate_interview_questions():
         return jsonify({'job_title': job_title, 'questions': questions, 'total': len(questions)}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+# ==================== EXTENSION #2: EXCEL EXPORT ====================
+@app.route('/api/export/analytics', methods=['GET'])
+def export_analytics_excel():
+    """Export analytics data to Excel file"""
+    try:
+        from utils.excel_exporter import export_analytics_to_excel
+        
+        # Get analytics data
+        candidates = Candidate.query.all()
+        total_candidates = len(candidates)
+        approved = len([c for c in candidates if c.status == 'approved'])
+        rejected = len([c for c in candidates if c.status == 'rejected'])
+        pending = len([c for c in candidates if c.status == 'pending'])
+        avg_score = sum([c.score for c in candidates]) / total_candidates if total_candidates > 0 else 0
+        all_skills = []
+        for c in candidates:
+            if c.skills:
+                all_skills.extend(c.skills)
+        skills_count = {}
+        for skill in all_skills:
+            skills_count[skill] = skills_count.get(skill, 0) + 1
+        
+        analytics_data = {
+            'total_candidates': total_candidates,
+            'status_breakdown': {
+                'approved': approved,
+                'rejected': rejected,
+                'pending': pending
+            },
+            'average_score': round(avg_score, 2),
+            'top_skills': sorted(skills_count.items(), key=lambda x: x[1], reverse=True)[:10]
+        }
+        
+        # Export to Excel
+        excel_bytes = export_analytics_to_excel(analytics_data)
+        
+        if excel_bytes is None:
+            return jsonify({'error': 'openpyxl library not installed'}), 500
+        
+        return excel_bytes, 200, {
+            'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition': 'attachment; filename="analytics_report.xlsx"'
+        }
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/export/candidates', methods=['GET'])
+def export_candidates_excel():
+    """Export candidates data to Excel file"""
+    try:
+        from utils.excel_exporter import export_candidates_to_excel
+        
+        # Get candidates
+        candidates = Candidate.query.all()
+        candidates_list = [c.to_dict() for c in candidates]
+        
+        # Export to Excel
+        excel_bytes = export_candidates_to_excel(candidates_list)
+        
+        if excel_bytes is None:
+            return jsonify({'error': 'openpyxl library not installed'}), 500
+        
+        return excel_bytes, 200, {
+            'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition': 'attachment; filename="candidates_export.xlsx"'
+        }
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
