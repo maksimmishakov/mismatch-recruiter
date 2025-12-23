@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Matcher - MisMatch</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .job-matcher-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        .matcher-form {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        .form-group textarea, .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+        .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        .btn-match {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .btn-match:hover {
+            background-color: #0056b3;
+        }
+        .results {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #28a745;
+        }
+        .match-item {
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .match-score {
+            background-color: #28a745;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        .match-score.high {
+            background-color: #28a745;
+        }
+        .match-score.medium {
+            background-color: #ffc107;
+            color: black;
+        }
+        .match-score.low {
+            background-color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="job-matcher-container">
+        <h1>🎯 Job Matcher</h1>
+        <p>Match resumes with job positions and see compatibility scores</p>
+        
+        <div class="matcher-form">
+            <form id="matcherForm">
+                <div class="form-group">
+                    <label for="jobTitle">Job Title *</label>
+                    <input type="text" id="jobTitle" name="jobTitle" placeholder="e.g., Senior Python Developer" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="jobDescription">Job Description *</label>
+                    <textarea id="jobDescription" name="jobDescription" placeholder="Paste the job description here..." required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="resumeText">Resume Text *</label>
+                    <textarea id="resumeText" name="resumeText" placeholder="Paste the resume text here..." required></textarea>
+                </div>
+                
+                <button type="submit" class="btn-match">Find Match</button>
+            </form>
+        </div>
+        
+        <div id="results" style="display:none;">
+            <div class="results">
+                <h2>📊 Matching Results</h2>
+                <div id="matchResults"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('matcherForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const jobTitle = document.getElementById('jobTitle').value;
+            const jobDescription = document.getElementById('jobDescription').value;
+            const resumeText = document.getElementById('resumeText').value;
+            
+            try {
+                const response = await fetch('/api/match-resume-to-job', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({job_title: jobTitle, job_description: jobDescription, resume_text: resumeText})
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    const matchPercentage = data.match_percentage;
+                    const verdict = data.verdict;
+                    let scoreClass = 'low';
+                    if (matchPercentage >= 70) scoreClass = 'high';
+                    else if (matchPercentage >= 50) scoreClass = 'medium';
+                    
+                    document.getElementById('matchResults').innerHTML = `
+                        <div class="match-item">
+                            <div>
+                                <strong>${data.candidate_name}</strong><br>
+                                Position: ${data.job_title}<br>
+                                Verdict: ${verdict}
+                            </div>
+                            <div class="match-score ${scoreClass}">${matchPercentage}%</div>
+                        </div>
+                    `;
+                    document.getElementById('results').style.display = 'block';
+                } else {
+                    alert('Error: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>
