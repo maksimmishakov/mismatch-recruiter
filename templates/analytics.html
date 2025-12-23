@@ -165,10 +165,10 @@
                 const data = await response.json();
 
                 // Update cards
-                document.getElementById('totalResumes').textContent = data.total_resumes || 0;
-                document.getElementById('avgScore').textContent = (data.avg_score || 0).toFixed(1);
-                document.getElementById('uniqueSkills').textContent = data.unique_skills || 0;
-                document.getElementById('successMatches').textContent = data.successful_matches || 0;
+                document.getElementById('totalResumes').textContent = data.total_candidates || 0;
+                document.getElementById('avgScore').textContent = (data.average_score || 0).toFixed(1);
+                document.getElementById('uniqueSkills').textContent = data.top_skills.length || 0;
+                document.getElementById('successMatches').textContent = data.status_breakdown.approved || 0;
 
                 // Update skills
                 const skillsList = document.getElementById('skillsList');
