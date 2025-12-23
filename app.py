@@ -772,3 +772,99 @@ def calculate_candidate_score():
         }), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+# ==================== EXTENSION #3: RESUME DATABASE ====================
+@app.route('/api/resume/save', methods=['POST'])
+def save_resume():
+    """Save a resume to the database."""
+    try:
+        from models import ResumeRecord, ResumeDatabase
+        
+        data = request.get_json()
+        candidate_id = data.get('candidate_id')
+        name = data.get('name')
+        email = data.get('email')
+        phone = data.get('phone')
+        position = data.get('position')
+        skills = data.get('skills', [])
+        experience = data.get('experience', 0)
+        education = data.get('education', '')
+        file_path = data.get('file_path')
+        
+        if not all([candidate_id, name]):
+            return jsonify({'error': 'candidate_id and name required'}), 400
+        
+        # Create resume record
+        resume = ResumeRecord(candidate_id, name, email, phone, position, skills, experience, education, file_path)
+        
+        # Save to database
+        db = ResumeDatabase()
+        result = db.add_resume(resume)
+        
+        return jsonify({
+            'success': True,
+            'candidate_id': candidate_id,
+            'message': f'Resume for {name} saved successfully'
+        }), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/resume/search', methods=['POST'])
+def search_resumes():
+    """Search resumes by query."""
+    try:
+        from models import ResumeDatabase
+        
+        data = request.get_json()
+        query = data.get('query', '')
+        
+        if not query:
+            return jsonify({'error': 'query parameter required'}), 400
+        
+        db = ResumeDatabase()
+        results = db.search_resumes(query)
+        
+        return jsonify({
+            'success': True,
+            'query': query,
+            'count': len(results),
+            'results': results
+        }), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/resume/all', methods=['GET'])
+def get_all_resumes():
+    """Get all resumes in database."""
+    try:
+        from models import ResumeDatabase
+        
+        db = ResumeDatabase()
+        resumes = db.get_all_resumes()
+        
+        return jsonify({
+            'success': True,
+            'total': len(resumes),
+            'resumes': resumes
+        }), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/resume/<int:candidate_id>', methods=['GET'])
+def get_resume(candidate_id):
+    """Get a specific resume by candidate ID."""
+    try:
+        from models import ResumeDatabase
+        
+        db = ResumeDatabase()
+        resume = db.get_resume(candidate_id)
+        
+        if not resume:
+            return jsonify({'error': 'Resume not found'}), 404
+        
+        return jsonify({
+            'success': True,
+            'resume': resume
+        }), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
