@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batch Resume Upload</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/batch.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/dropzone@5.9.3/dist/min/dropzone.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/dropzone@5.9.3/dist/min/dropzone.min.css">
+</head>
+<body>
+    <div class="batch-container">
+        <h1>Batch Resume Analysis</h1>
+        <div class="upload-area">
+            <form id="uploadForm" class="dropzone" action="/api/batch-upload" method="post" enctype="multipart/form-data">
+                <div class="dz-message">
+                    <p>Drag and drop files here or click to select</p>
+                </div>
+            </form>
+        </div>
+        <button id="analyzeBtn" class="btn-primary">Analyze Resumes</button>
+        <div id="results" class="results-container">
+            <table id="resultsTable" class="results-table" style="display:none;">
+                <thead>
+                    <tr>
+                        <th>File Name</th>
+                        <th>Status</th>
+                        <th>Skills</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        const myDropzone = new Dropzone("#uploadForm", {
+            maxFilesize: 5,
+            acceptedFiles: ".pdf,.docx,.txt"
+        });
+        
+        document.getElementById('analyzeBtn').addEventListener('click', async () => {
+            const files = myDropzone.getAcceptedFiles();
+            if (files.length === 0) {
+                alert('Please upload at least one file');
+                return;
+            }
+            // Analysis will be handled by the form submission
+            document.getElementById('uploadForm').submit();
+        });
+    </script>
+</body>
+</html>
