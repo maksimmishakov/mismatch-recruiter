@@ -1,0 +1,294 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RankPO - AI Recruitment Platform</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background:#f5f7fa;color:#333;}
+        header{background:#fff;padding:20px 40px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.1);}
+        .logo{font-size:24px;font-weight:700;color:#4a5fc1;display:flex;align-items:center;gap:8px;}
+        nav a{margin:0 16px;text-decoration:none;color:#666;font-weight:500;}
+        nav a:hover{color:#4a5fc1;}
+        .btn-primary{background:#4a5fc1;color:#fff;padding:10px 20px;border:none;border-radius:6px;cursor:pointer;font-weight:600;}
+        .btn-primary:hover{background:#3a4fa1;}
+        .hero{background:linear-gradient(135deg,#2c3e7f 0%,#4a5fc1 100%);color:#fff;padding:80px 40px;text-align:center;}
+        .hero h1{font-size:44px;margin-bottom:16px;}
+        .hero p{font-size:18px;margin-bottom:32px;opacity:.9;}
+        .btn-group{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;}
+        .btn-upload,.btn-demo{display:flex;align-items:center;gap:8px;padding:12px 28px;border-radius:6px;font-weight:600;font-size:15px;cursor:pointer;border:none;}
+        .btn-upload{background:#fff;color:#4a5fc1;}
+        .btn-upload:hover{background:#f0f0f0;}
+        .btn-demo{background:transparent;color:#fff;border:2px solid #fff;}
+        .btn-demo:hover{background:rgba(255,255,255,.1);}
+        .container{max-width:1200px;margin:0 auto;padding:48px 40px;}
+        .features{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:48px;}
+        .feature-card{background:#fff;padding:28px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.06);text-align:center;}
+        .feature-icon{font-size:36px;margin-bottom:12px;}
+        .feature-card h3{margin-bottom:8px;color:#2c3e7f;}
+        .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:48px;}
+        .stat-card{background:#fff;padding:26px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.06);text-align:center;border-left:4px solid #4a5fc1;}
+        .stat-value{font-size:30px;font-weight:700;color:#4a5fc1;margin-bottom:6px;}
+        .stat-label{color:#666;font-size:13px;}
+        .candidates-section{background:#fff;padding:32px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.06);}
+        .candidates-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+        table{width:100%;border-collapse:collapse;}
+        th{background:#f5f7fa;padding:12px 10px;text-align:left;font-size:13px;font-weight:600;border-bottom:2px solid #e0e0e0;}
+        td{padding:12px 10px;border-bottom:1px solid #e0e0e0;font-size:14px;}
+        tr:hover{background:#f5f7fa;}
+        .badge{display:inline-block;padding:4px 12px;background:#e8f0fe;color:#4a5fc1;border-radius:999px;font-size:12px;font-weight:600;}
+        .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;justify-content:center;align-items:center;}
+        .modal.active{display:flex;}
+        .modal-content{background:#fff;padding:28px;border-radius:8px;max-width:440px;width:90%;}
+        .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+        .close{background:none;border:none;font-size:26px;cursor:pointer;color:#999;}
+        .form-group{margin-bottom:12px;}
+        label{display:block;margin-bottom:4px;font-weight:600;font-size:13px;}
+        input,textarea{width:100%;padding:8px 9px;border:1px solid #ddd;border-radius:6px;font-family:inherit;font-size:14px;}
+        input:focus,textarea:focus{outline:none;border-color:#4a5fc1;box-shadow:0 0 0 2px rgba(74,95,193,.15);}
+        .alert{padding:10px 12px;border-radius:6px;margin-bottom:12px;display:none;font-size:13px;}
+        .alert.show{display:block;}
+        .alert-success{background:#d4edda;color:#155724;border:1px solid #c3e6cb;}
+        .alert-error{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb;}
+        footer{background:#2c3e7f;color:#fff;text-align:center;padding:22px;margin-top:48px;font-size:13px;}
+        @media(max-width:900px){.features,.stats{grid-template-columns:1fr;}header{flex-direction:column;gap:12px;padding:16px 20px;}.hero{padding:56px 20px;}.hero h1{font-size:30px;}}
+    </style>
+</head>
+<body>
+<header>
+    <div class="logo">🚀 <span>RankPO</span></div>
+    <nav>
+        <a href="#features">Возможности</a>
+        <a href="#candidates">Загрузка</a>
+    </nav>
+    <button class="btn-primary" onclick="openCandidateModal()">Добавить кандидата</button>
+</header>
+
+<section class="hero">
+    <h1>Из мисматча в идеальный матч</h1>
+    <p>Продвинутые алгоритмы анализируют навыки, опыт и культурное соответствие для идеального подбора.</p>
+    <div class="btn-group">
+        <button class="btn-upload" onclick="document.getElementById('resume-input').click()">📄 Загрузить резюме</button>
+        <input id="resume-input" type="file" accept=".pdf,.doc,.docx" style="display:none" onchange="uploadResume(event)">
+        <button class="btn-demo" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">📊 Смотреть демо</button>
+    </div>
+    <div id="resume-alert" class="alert" style="max-width:420px;margin:20px auto 0;"></div>
+</section>
+
+<div class="container">
+    <section id="features">
+        <h2 style="text-align:center;margin-bottom:28px;color:#2c3e7f;">Почему RankPO?</h2>
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3>70% быстрее</h3>
+                <p>Сокращение времени найма на 70% благодаря AI-анализу резюме и вакансий.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3>Идеальный матч</h3>
+                <p>Высокая точность подбора по навыкам, опыту и культурному соответствию.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Аналитика</h3>
+                <p>Детальные отчёты и метрики по каждому кандидату и вакансии.</p>
+            </div>
+        </div>
+    </section>
+
+    <h2 style="text-align:center;margin:32px 0 20px;color:#2c3e7f;">Статистика платформы</h2>
+    <div class="stats">
+        <div class="stat-card">
+            <div class="stat-value" id="stat-candidates">0</div>
+            <div class="stat-label">Всего кандидатов</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="stat-jobs">0</div>
+            <div class="stat-label">Вакансий</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="stat-match">0%</div>
+            <div class="stat-label">Средний матч</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="stat-hired">0</div>
+            <div class="stat-label">Успешные наймы</div>
+        </div>
+    </div>
+
+    <section id="candidates">
+        <div class="candidates-section">
+            <div class="candidates-header">
+                <h2 style="color:#2c3e7f;">Кандидаты</h2>
+                <button class="btn-primary" style="font-size:13px;padding:7px 14px;" onclick="openCandidateModal()">+ Добавить</button>
+            </div>
+            <div id="alert" class="alert"></div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Имя</th>
+                        <th>Email</th>
+                        <th>Опыт</th>
+                        <th>Матч %</th>
+                        <th>Действие</th>
+                    </tr>
+                </thead>
+                <tbody id="candidates-table">
+                    <tr>
+                        <td colspan="5" style="text-align:center;padding:28px;">
+                            Кандидаты не добавлены. 
+                            <button class="btn-primary" style="margin-left:8px;padding:6px 12px;font-size:13px;" onclick="openCandidateModal()">Загрузить первого</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+
+<div class="modal" id="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Добавить кандидата</h2>
+            <button class="close" onclick="closeCandidateModal()">&times;</button>
+        </div>
+        <form onsubmit="submitCandidate(event)">
+            <div class="form-group">
+                <label>Имя</label>
+                <input id="name" type="text" required placeholder="Иван Иванов">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input id="email" type="email" required placeholder="ivan@example.com">
+            </div>
+            <div class="form-group">
+                <label>Телефон</label>
+                <input id="phone" type="tel" required placeholder="+79991234567">
+            </div>
+            <div class="form-group">
+                <label>Навыки</label>
+                <input id="skills" type="text" required placeholder="Python, FastAPI, SQL">
+            </div>
+            <div class="form-group">
+                <label>Опыт (лет)</label>
+                <input id="experience" type="number" required min="0" max="70" placeholder="5">
+            </div>
+            <div class="form-group" style="margin-top:8px;">
+                <button type="submit" class="btn-primary" style="width:100%;">Добавить кандидата</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<footer>
+    &copy; 2025 RankPO — AI Recruitment Platform
+</footer>
+
+<script>
+const API_URL = "http://localhost:8000/api";
+
+function openCandidateModal(){ document.getElementById("modal").classList.add("active"); }
+function closeCandidateModal(){
+    document.getElementById("modal").classList.remove("active");
+    const f=document.querySelector("#modal form"); if(f) f.reset();
+}
+function setAlert(id,msg,type){
+    const el=document.getElementById(id);
+    el.textContent=msg;
+    el.className="alert show "+(type==="success"?"alert-success":"alert-error");
+    setTimeout(()=>{el.className="alert";},4000);
+}
+async function uploadResume(e){
+    const file=e.target.files[0];
+    if(!file) return;
+    const form=new FormData();
+    form.append("file",file);
+    try{
+        const res=await fetch("/api/upload-resume",{method:"POST",body:form});
+        if(res.ok){
+            const data=await res.json();
+            setAlert("resume-alert","Резюме загружено: "+data.filename+" ("+data.size+" байт)","success");
+        }else{
+            setAlert("resume-alert","Ошибка при загрузке резюме","error");
+        }
+    }catch(err){
+        setAlert("resume-alert","Ошибка сети при загрузке резюме","error");
+    }finally{
+        e.target.value="";
+    }
+}
+async function submitCandidate(ev){
+    ev.preventDefault();
+    const candidate={
+        name:document.getElementById("name").value,
+        email:document.getElementById("email").value,
+        phone:document.getElementById("phone").value,
+        skills:document.getElementById("skills").value,
+        experience:parseInt(document.getElementById("experience").value)
+    };
+    try{
+        const res=await fetch(API_URL+"/candidates",{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify(candidate)
+        });
+        if(res.ok){
+            setAlert("alert","Кандидат успешно добавлен","success");
+            closeCandidateModal();
+            loadCandidates();
+            loadStats();
+        }else{
+            const err=await res.json();
+            setAlert("alert",err.detail || "Ошибка при добавлении","error");
+        }
+    }catch(err){
+        setAlert("alert","Ошибка сети при добавлении кандидата","error");
+    }
+}
+async function loadCandidates(){
+    try{
+        const res=await fetch(API_URL+"/candidates");
+        const data=await res.json();
+        const tbody=document.getElementById("candidates-table");
+        if(!Array.isArray(data) || data.length===0){
+            tbody.innerHTML='<tr><td colspan="5" style="text-align:center;padding:28px;">Кандидаты не добавлены</td></tr>';
+            return;
+        }
+        tbody.innerHTML=data.map(c=>
+            <tr>
+                <td><strong></strong></td>
+                <td></td>
+                <td> лет</td>
+                <td><span class="badge">%</span></td>
+                <td><button class="btn-primary" style="padding:4px 10px;font-size:12px;" onclick="deleteCandidate()">Удалить</button></td>
+            </tr>
+        ).join("");
+    }catch(err){ console.error(err); }
+}
+async function deleteCandidate(id){
+    if(!confirm("Удалить кандидата?")) return;
+    try{
+        await fetch(API_URL+"/candidates/"+id,{method:"DELETE"});
+        loadCandidates();
+        loadStats();
+    }catch(err){
+        setAlert("alert","Ошибка при удалении","error");
+    }
+}
+async function loadStats(){
+    try{
+        const res=await fetch(API_URL+"/stats");
+        const s=await res.json();
+        document.getElementById("stat-candidates").textContent=s.total_candidates;
+        document.getElementById("stat-jobs").textContent=s.total_job_postings;
+        document.getElementById("stat-match").textContent=s.avg_match_score+"%";
+        document.getElementById("stat-hired").textContent=s.candidates_hired;
+    }catch(err){ console.error(err); }
+}
+window.addEventListener("load",()=>{ loadCandidates(); loadStats(); });
+document.getElementById("modal").addEventListener("click",e=>{ if(e.target.id==="modal") closeCandidateModal(); });
+</script>
+</body>
+</html>
