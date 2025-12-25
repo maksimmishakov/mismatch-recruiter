@@ -47,8 +47,6 @@ def require_auth(f):
 # ============= HEALTH CHECK =============
 @api_bp.route('/health', methods=['GET'])
 def health_check():
-    health_data = {'status': 'healthy', 'timestamp': datetime.utcnow().isoformat()}
-    return jsonify(health_data), 200
     health_status = health_check_service.check_all(user_id=request.headers.get('User-ID'))
     return jsonify(health_status), 200
 # ============= AUTHENTICATION =============
