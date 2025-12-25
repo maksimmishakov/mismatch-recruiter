@@ -169,3 +169,70 @@ class HealthCheck(db.Model):
     
     def to_dict(self):
         return {'id': self.id, 'service_name': self.service_name, 'status': self.status, 'response_time': self.response_time}
+
+
+class Webhook(db.Model):
+    __tablename__ = 'webhooks'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, index=True)
+    url = db.Column(db.String(2048), nullable=False)
+    events = db.Column(db.JSON, default=[], nullable=False)
+    is_active = db.Column(db.Boolean, default=True, index=True)
+    secret = db.Column(db.String(255), nullable=False)
+    retry_count = db.Column(db.Integer, default=3)
+    timeout = db.Column(db.Integer, default=30)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    user = db.relationship('User', backref='webhooks', lazy=True)
+    events_log = db.relationship('WebhookEvent', backref='webhook', lazy=True, cascade='all, delete-orphan')
+
+    __table_args__ = (
+        db.Index('idx_webhook_user_active', 'user_id', 'is_active'),
+    )
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'url': self.url,
+            'events': self.events,
+            'is_active': self.is_active,
+            'retry_count': self.retry_count,
+            'timeout': self.timeout,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
+        }
+
+
+class WebhookEvent(db.Model):
+    __tablename__ = 'webhook_events'
+
+    id = db.Column(db.Integer, primary_key=True)
+    webhook_id = db.Column(db.Integer, db.ForeignKey('webhooks.id'), nullable=False, index=True)
+    event_type = db.Column(db.String(100), nullable=False)
+    payload = db.Column(db.JSON, nullable=False)
+    status = db.Column(db.String(50), default='pending', index=True)
+    response_code = db.Column(db.Integer)
+    response_body = db.Column(db.Text)
+    attempts = db.Column(db.Integer, default=0)
+    next_retry = db.Column(db.DateTime)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    __table_args__ = (
+        db.Index('idx_webhook_event_status', 'webhook_id', 'status'),
+        db.Index('idx_webhook_event_type', 'event_type'),
+    )
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'webhook_id': self.webhook_id,
+            'event_type': self.event_type,
+            'status': self.status,
+            'response_code': self.response_code,
+            'attempts': self.attempts,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
+        }
