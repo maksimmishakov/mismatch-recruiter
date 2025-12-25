@@ -8,6 +8,12 @@ from twilio.rest import Client
 
 from llm_client import LLMClient
 
+# === NEW IMPORTS ===
+from services.embedding_service import EmbeddingService
+from services.salary_predictor import SalaryPredictor
+from services.cache_service import CacheService
+# ==================
+
 # Инициализируй клиент при старте
 try:
     llm_client = LLMClient()
@@ -25,6 +31,13 @@ DATABASE_URL = os.getenv('DATABASE_URL', 'sqlite:///MisMatch.db')
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-key-change-in-prod')
+
+# === Initialize new services ===
+redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379')
+embedding_service = EmbeddingService()
+salary_predictor = SalaryPredictor()
+cache_service = CacheService(redis_url)
+# ===============================
 
 # Êîíôèãóðàöèÿ çàãðóçîê
 UPLOAD_FOLDER = 'uploads'
@@ -384,6 +397,141 @@ def not_found(error):
 @app.errorhandler(500)
 def server_error(error):
     return jsonify({'error': 'Internal server error'}), 500
+
+# ========== NEW ENDPOINTS ==========
+
+@app.post('/api/match-resume-to-job/<resume_id>/<job_id>')
+def match_resume_to_job(resume_id, job_id):
+    try:
+        data = request.get_json()
+        job_description = data.get('job_description', '')
+        
+        if not job_description:
+            return jsonify({"error": "job_description required"}), 400
+        
+        # Check cache first
+        cache_key = f"match:{resume_id}:{job_id}"
+        cached = cache_service.get(cache_key)
+        if cached:
+            return jsonify({**cached, "from_cache": True})
+        
+        # Get resume from database (or file)
+        resume_text = get_resume_text(resume_id)
+        
+        if not resume_text:
+            return jsonify({"error": "Resume not found"}), 404
+        
+        # Use embedding service for semantic matching
+        match_result = embedding_service.match_resume_to_job(
+            resume_text, 
+            job_description
+        )
+        
+        # Cache for 24 hours
+        cache_service.set(cache_key, match_result, ttl=86400)
+        
+        return jsonify(match_result), 200
+        
+    except Exception as e:
+        print(f"Error in match_resume_to_job: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.post('/api/salary-prediction/<resume_id>')
+def predict_salary(resume_id):
+    try:
+        data = request.get_json() or {}
+        location = data.get('location', 'Russia')
+        
+        # Check cache first
+        cache_key = f"salary:{resume_id}:{location}"
+        cached = cache_service.get(cache_key)
+        if cached:
+            return jsonify({**cached, "from_cache": True})
+        
+        # Get resume analysis from database
+        resume_data = get_resume_analysis(resume_id)
+        
+        if not resume_data:
+            return jsonify({"error": "Resume not found"}), 404
+        
+        # Predict salary
+        prediction = salary_predictor.predict(resume_data, location)
+        
+        # Cache for 7 days
+        cache_service.set(cache_key, prediction, ttl=604800)
+        
+        return jsonify(prediction), 200
+        
+    except Exception as e:
+        print(f"Error in predict_salary: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.get('/admin-dashboard')
+def admin_dashboard():
+    try:
+        return render_template('admin_dashboard.html')
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.get('/api/admin/dashboard-data')
+def get_dashboard_data():
+    try:
+        # Check cache first (5 minute TTL for dashboard)
+        cache_key = "dashboard:metrics"
+        cached = cache_service.get(cache_key)
+        if cached:
+            return jsonify({**cached, "from_cache": True}), 200
+        
+        # Get mock data
+        dashboard_data = {
+            "total_resumes": 1250,
+            "avg_score": 78.5,
+            "total_matches": 450,
+            "monthly_revenue": 9200000,
+            "last_updated": datetime.now().isoformat()
+        }
+        
+        # Cache for 5 minutes
+        cache_service.set(cache_key, dashboard_data, ttl=300)
+        
+        return jsonify(dashboard_data), 200
+        
+    except Exception as e:
+        print(f"Error in get_dashboard_data: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+# ====================================
+
+# ========== HELPER FUNCTIONS ==========
+
+def get_resume_text(resume_id):
+    try:
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], f"{resume_id}.txt")
+        if os.path.exists(filepath):
+            with open(filepath, 'r', encoding='utf-8') as f:
+                return f.read()
+        return None
+    except Exception as e:
+        print(f"Error getting resume text: {e}")
+        return None
+
+
+def get_resume_analysis(resume_id):
+    try:
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], f"{resume_id}_analysis.json")
+        if os.path.exists(filepath):
+            with open(filepath, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        return None
+    except Exception as e:
+        print(f"Error getting resume analysis: {e}")
+        return None
+
+# ====================================
+
 
 with app.app_context():
     db.create_all()
