@@ -236,3 +236,125 @@ class WebhookEvent(db.Model):
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()
         }
+
+
+
+# Resume Parsing Models
+class ParsedResume(db.Model):
+    __tablename__ = 'parsed_resume'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    job_id = db.Column(db.Integer, db.ForeignKey('job.id'), nullable=False)
+    raw_text = db.Column(db.Text(), nullable=True)
+    parsing_status = db.Column(db.String(20), nullable=True)
+    parsing_metadata = db.Column(JSON, nullable=True)
+    error_message = db.Column(db.String(500), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationships
+    skills = db.relationship('ResumeSkill', backref='resume', lazy=True, cascade='all, delete-orphan')
+    education = db.relationship('ResumeEducation', backref='resume', lazy=True, cascade='all, delete-orphan')
+    experience = db.relationship('ResumeExperience', backref='resume', lazy=True, cascade='all, delete-orphan')
+    
+    __table_args__ = (
+        db.Index('ix_parsed_resume_job_id', 'job_id'),
+        db.Index('ix_parsed_resume_status', 'parsing_status'),
+    )
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'job_id': self.job_id,
+            'parsing_status': self.parsing_status,
+            'skills': [s.to_dict() for s in self.skills],
+            'education': [e.to_dict() for e in self.education],
+            'experience': [ex.to_dict() for ex in self.experience],
+            'error_message': self.error_message,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
+        }
+
+
+class ResumeSkill(db.Model):
+    __tablename__ = 'resume_skill'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    resume_id = db.Column(db.Integer, db.ForeignKey('parsed_resume.id'), nullable=False)
+    skill_name = db.Column(db.String(100), nullable=False)
+    skill_category = db.Column(db.String(50), nullable=True)
+    proficiency_level = db.Column(db.String(20), nullable=True)
+    years_experience = db.Column(db.Float(), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    
+    __table_args__ = (
+        db.Index('ix_resume_skill_resume_id', 'resume_id'),
+        db.Index('ix_resume_skill_name', 'skill_name'),
+    )
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'skill_name': self.skill_name,
+            'skill_category': self.skill_category,
+            'proficiency_level': self.proficiency_level,
+            'years_experience': self.years_experience
+        }
+
+
+class ResumeEducation(db.Model):
+    __tablename__ = 'resume_education'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    resume_id = db.Column(db.Integer, db.ForeignKey('parsed_resume.id'), nullable=False)
+    school_name = db.Column(db.String(200), nullable=True)
+    degree = db.Column(db.String(100), nullable=True)
+    field_of_study = db.Column(db.String(100), nullable=True)
+    start_date = db.Column(db.String(20), nullable=True)
+    end_date = db.Column(db.String(20), nullable=True)
+    gpa = db.Column(db.Float(), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    
+    __table_args__ = (
+        db.Index('ix_resume_education_resume_id', 'resume_id'),
+    )
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'school_name': self.school_name,
+            'degree': self.degree,
+            'field_of_study': self.field_of_study,
+            'start_date': self.start_date,
+            'end_date': self.end_date,
+            'gpa': self.gpa
+        }
+
+
+class ResumeExperience(db.Model):
+    __tablename__ = 'resume_experience'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    resume_id = db.Column(db.Integer, db.ForeignKey('parsed_resume.id'), nullable=False)
+    company_name = db.Column(db.String(200), nullable=True)
+    job_title = db.Column(db.String(100), nullable=True)
+    start_date = db.Column(db.String(20), nullable=True)
+    end_date = db.Column(db.String(20), nullable=True)
+    description = db.Column(db.Text(), nullable=True)
+    duration_months = db.Column(db.Integer(), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    
+    __table_args__ = (
+        db.Index('ix_resume_experience_resume_id', 'resume_id'),
+    )
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'company_name': self.company_name,
+            'job_title': self.job_title,
+            'start_date': self.start_date,
+            'end_date': self.end_date,
+            'description': self.description,
+            'duration_months': self.duration_months
+        }
