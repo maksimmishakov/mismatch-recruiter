@@ -1,0 +1,31 @@
+# MisMatch API - Base Dependencies (Lightweight)
+# No ML/GPU dependencies - suitable for PR builds
+
+# Core Framework
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+python-multipart>=0.0.6
+Flask>=2.3.0
+
+# PDF Processing
+pdfplumber>=0.10.0
+
+# HTTP Client
+requests>=2.31.0
+httpx>=0.25.0
+
+# Data Processing
+numpy>=1.24.0
+pandas>=2.0.0
+
+# JSON/Serialization
+python-dotenv>=1.0.0
+
+# Async support
+aiofiles>=23.2.0
+
+# Caching
+redis>=5.0.0
+
+# Document Processing
+python-docx>=0.8.11
