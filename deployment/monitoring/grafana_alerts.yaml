@@ -1,0 +1,153 @@
+# Grafana Alert Rules Configuration
+# Comprehensive monitoring for production SaaS system
+
+groups:
+  - name: application_alerts
+    interval: 1m
+    rules:
+      - alert: HighErrorRate
+        expr: |
+          (
+            sum(rate(http_requests_total{status=~"5.."}[5m]))
+            /
+            sum(rate(http_requests_total[5m]))
+          ) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value | humanizePercentage }} for the last 5 minutes"
+          
+      - alert: DatabaseConnectionPoolExhausted
+        expr: |
+          db_connection_pool_usage > 0.9
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Database connection pool nearly exhausted"
+          description: "Connection pool usage is {{ $value | humanizePercentage }}"
+          
+      - alert: CacheMissRateHigh
+        expr: |
+          (
+            sum(rate(cache_misses_total[5m]))
+            /
+            (
+              sum(rate(cache_hits_total[5m]))
+              +
+              sum(rate(cache_misses_total[5m]))
+            )
+          ) > 0.3
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High cache miss rate"
+          description: "Cache miss rate is {{ $value | humanizePercentage }}"
+          
+      - alert: CeleryTaskQueueDepth
+        expr: |
+          celery_queue_length > 1000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Celery task queue backlog increasing"
+          description: "Queue depth: {{ $value }} tasks pending"
+          
+      - alert: ResponseTimeHigh
+        expr: |
+          histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "P95 response time elevated"
+          description: "P95 response time: {{ $value | humanizeDuration }}"
+          
+      - alert: DiskUsageHigh
+        expr: |
+          (
+            node_filesystem_avail_bytes{fstype="ext4"}
+            /
+            node_filesystem_size_bytes{fstype="ext4"}
+          ) < 0.1
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Disk usage critical"
+          description: "Available disk space: {{ $value | humanizePercentage }}"
+          
+      - alert: MemoryUsageHigh
+        expr: |
+          (
+            1 - (
+              node_memory_MemAvailable_bytes
+              /
+              node_memory_MemTotal_bytes
+            )
+          ) > 0.85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory utilization: {{ $value | humanizePercentage }}"
+          
+      - alert: CPUUsageHigh
+        expr: |
+          rate(node_cpu_seconds_total{mode="idle"}[5m]) < 0.2
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage sustained"
+          description: "CPU idle time: {{ $value | humanizePercentage }}"
+          
+      - alert: InstanceDown
+        expr: |
+          up{job="application"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Instance is down"
+          description: "Instance {{ $labels.instance }} is unreachable"
+
+contact_points:
+  - name: slack_notifications
+    type: slack
+    settings:
+      url: "${SLACK_WEBHOOK_URL}"
+      recipient: "#alerts"
+      
+  - name: email_critical
+    type: email
+    settings:
+      addresses: "devops@company.com"
+      
+  - name: pagerduty
+    type: pagerduty
+    settings:
+      integrationKey: "${PAGERDUTY_KEY}"
+
+notification_policies:
+  - group_by: [severity, alertname]
+    receiver: slack_notifications
+    continue: false
+    routes:
+      - matchers:
+          - severity: critical
+        receiver: pagerduty
+        group_wait: 0s
+        group_interval: 5m
+        repeat_interval: 4h
+      - matchers:
+          - severity: warning
+        receiver: slack_notifications
+        group_wait: 5m
+        group_interval: 10m
+        repeat_interval: 24h
