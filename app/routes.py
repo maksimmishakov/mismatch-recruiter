@@ -15,6 +15,7 @@ from services.analytics_service import AnalyticsService
 from services.notification_service import NotificationService
 from services.payment_service import PaymentService
 from services.data_validation_service import DataValidationService
+from services.health_check import HealthCheckService
 
 logger = logging.getLogger(__name__)
 api_bp = Blueprint('api', __name__, url_prefix='/api')
@@ -30,6 +31,7 @@ analytics_service = AnalyticsService()
 notification_service = NotificationService()
 payment_service = PaymentService()
 data_validator = DataValidationService()
+health_check_service = HealthCheckService()
 
 # Auth decorator
 def require_auth(f):
@@ -47,7 +49,8 @@ def require_auth(f):
 def health_check():
     health_data = {'status': 'healthy', 'timestamp': datetime.utcnow().isoformat()}
     return jsonify(health_data), 200
-
+    health_status = health_check_service.check_all(user_id=request.headers.get('User-ID'))
+    return jsonify(health_status), 200
 # ============= AUTHENTICATION =============
 @api_bp.route('/auth/register', methods=['POST'])
 def register():
