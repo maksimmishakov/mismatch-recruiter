@@ -96,3 +96,35 @@ def not_found(error):
 @api_bp.errorhandler(500)
 def server_error(error):
     return jsonify({'error': 'Internal server error'}), 500
+
+# ==================== INTERVIEW GENERATOR ENDPOINT ====================
+from services.interview_generator import InterviewGenerator
+
+@api_bp.route('/generate-interview-questions', methods=['POST'])
+def generate_interview_questions():
+    """Generate interview questions using AI"""
+    try:
+        data = request.get_json()
+        resume_id = data.get('resume_id')
+        
+        if not resume_id:
+            return jsonify({'error': 'resume_id is required'}), 400
+        
+        # Initialize interview generator
+        generator = InterviewGenerator()
+        
+        # Generate questions
+        questions = generator.generate_questions(resume_id)
+        
+        return jsonify({
+            'success': True,
+            'resume_id': resume_id,
+            'questions': questions,
+            'total': len(questions)
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'Interview generation failed: {str(e)}'
+        }), 500
