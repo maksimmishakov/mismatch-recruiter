@@ -68,3 +68,67 @@ class WebhookService:
             hashlib.sha256
         ).hexdigest()
         return hmac.compare_digest(signature, expected_signature)
+
+
+    def log_webhook_event(self, webhook_id: int, event_type: str, payload: Dict, response: Dict):
+        """Log webhook event delivery to database."""
+        from app.models import WebhookEvent, db
+        from datetime import datetime
+        
+        try:
+            event = WebhookEvent(
+                webhook_id=webhook_id,
+                event_type=event_type,
+                payload=payload,
+                status='success' if response.get('success') else 'failed',
+                response_code=response.get('status_code'),
+                response_body=response.get('response'),
+                attempts=1,
+                created_at=datetime.utcnow()
+            )
+            db.session.add(event)
+            db.session.commit()
+            logger.info(f"Logged webhook event {event_type} for webhook {webhook_id}")
+            return event.id
+        except Exception as e:
+            logger.error(f"Failed to log webhook event: {e}")
+            db.session.rollback()
+            return None
+    
+    def get_webhook_events(self, webhook_id: int, status: str = None):
+        """Get webhook event history."""
+        from app.models import WebhookEvent
+        
+        query = WebhookEvent.query.filter_by(webhook_id=webhook_id)
+        if status:
+            query = query.filter_by(status=status)
+        
+        return query.order_by(WebhookEvent.created_at.desc()).all()
+    
+    def retry_webhook_event(self, event_id: int, webhook, payload: Dict):
+        """Retry failed webhook delivery."""
+        from app.models import WebhookEvent, db
+        
+        try:
+            event = WebhookEvent.query.get(event_id)
+            if not event:
+                logger.warning(f"Webhook event {event_id} not found")
+                return False
+            
+            # Resend webhook
+            response = self.send_webhook(webhook, payload)
+            
+            # Update event
+            event.attempts += 1
+            event.status = 'success' if response.get('success') else 'failed'
+            event.response_code = response.get('status_code')
+            event.response_body = response.get('response')
+            event.updated_at = datetime.utcnow()
+            
+            db.session.commit()
+            logger.info(f"Retried webhook event {event_id}")
+            return True
+        except Exception as e:
+            logger.error(f"Failed to retry webhook event: {e}")
+            db.session.rollback()
+            return False
