@@ -1,0 +1,10 @@
+[MASTER]
+max-line-length=120
+disable=
+    C0114,  # Missing module docstring
+    C0115,  # Missing class docstring
+    C0116,  # Missing function docstring
+    R0913,  # Too many arguments
+    R0914,  # Too many local variables
+    W0212,  # Protected access
+    C0302,  # Too many lines
