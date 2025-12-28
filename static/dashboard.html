@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <style>
+        body { background-color: #f8f9fa; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        .card { border: none; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .card:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+        .card-header { background-color: #f8f9fa; border-bottom: 2px solid #dee2e6; font-weight: 600; }
+        .card-text { font-size: 24px; font-weight: bold; color: #007bff; margin: 0; }
+        .navbar { box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        canvas { max-height: 300px; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1">📊 Analytics Dashboard</span>
+            <button class="btn btn-light" onclick="refreshData()">🔄 Refresh</button>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Matches</h5>
+                        <p class="card-text" id="total_matches">-</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Success Rate</h5>
+                        <p class="card-text" id="success_rate">-</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Avg Match Score</h5>
+                        <p class="card-text" id="avg_score">-</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Time-to-Hire</h5>
+                        <p class="card-text" id="time_to_hire">-</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">Pipeline Metrics</div>
+                    <div class="card-body">
+                        <canvas id="pipelineChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">Match Distribution</div>
+                    <div class="card-body">
+                        <canvas id="matchChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">Export Report</div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label>Date Range:</label>
+                                <input type="date" id="startDate" class="form-control">
+                                <input type="date" id="endDate" class="form-control mt-2">
+                            </div>
+                            <div class="col-md-6">
+                                <label>Format:</label>
+                                <button class="btn btn-primary w-100 mb-2" onclick="exportReport('json')">📄 JSON</button>
+                                <button class="btn btn-success w-100 mb-2" onclick="exportReport('csv')">📊 CSV</button>
+                                <button class="btn btn-warning w-100 mb-2" onclick="exportReport('xlsx')">📈 Excel</button>
+                                <button class="btn btn-danger w-100" onclick="exportReport('pdf')">📋 PDF</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let pipelineChart = null, matchChart = null;
+
+        async function initDashboard() {
+            await loadOverviewMetrics();
+            await loadPipelineMetrics();
+            initCharts();
+            setInterval(refreshData, 300000);
+        }
+
+        async function loadOverviewMetrics() {
+            try {
+                const response = await fetch('/api/analytics/overview');
+                const data = await response.json();
+                document.getElementById('total_matches').textContent = data.total_matches || 0;
+                document.getElementById('success_rate').textContent = ((data.success_rate || 0) * 100).toFixed(1) + '%';
+                document.getElementById('avg_score').textContent = (data.avg_score || 0).toFixed(2);
+                document.getElementById('time_to_hire').textContent = (data.time_to_hire_days || 0) + ' days';
+            } catch (error) {
+                console.error('Error loading metrics:', error);
+            }
+        }
+
+        async function loadPipelineMetrics() {
+            try {
+                const response = await fetch('/api/analytics/pipeline');
+                const data = await response.json();
+                if (pipelineChart) {
+                    pipelineChart.data.datasets[0].data = [data.sourced || 0, data.screened || 0, data.matched || 0];
+                    pipelineChart.update();
+                }
+            } catch (error) {
+                console.error('Error loading pipeline:', error);
+            }
+        }
+
+        function initCharts() {
+            const pipelineCtx = document.getElementById('pipelineChart').getContext('2d');
+            pipelineChart = new Chart(pipelineCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Sourced', 'Screened', 'Matched'],
+                    datasets: [{
+                        label: 'Candidates',
+                        data: [0, 0, 0],
+                        backgroundColor: ['#007bff', '#28a745', '#ffc107']
+                    }]
+                },
+                options: { responsive: true, scales: { y: { beginAtZero: true } } }
+            });
+
+            const matchCtx = document.getElementById('matchChart').getContext('2d');
+            matchChart = new Chart(matchCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Perfect', 'Good', 'Possible', 'Not Suitable'],
+                    datasets: [{
+                        data: [0, 0, 0, 0],
+                        backgroundColor: ['#28a745', '#007bff', '#ffc107', '#dc3545']
+                    }]
+                },
+                options: { responsive: true }
+            });
+        }
+
+        async function exportReport(format) {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            if (!startDate || !endDate) {
+                alert('Please select date range');
+                return;
+            }
+            const url = `/api/analytics/report?start_date=${startDate}&end_date=${endDate}&format=${format}`;
+            if (format === 'json') {
+                const response = await fetch(url);
+                const data = await response.json();
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = `report-${format}.json`;
+                a.click();
+            } else {
+                window.location.href = url;
+            }
+        }
+
+        async function refreshData() {
+            await loadOverviewMetrics();
+            await loadPipelineMetrics();
+        }
+
+        document.addEventListener('DOMContentLoaded', initDashboard);
+    </script>
+</body>
+</html>
