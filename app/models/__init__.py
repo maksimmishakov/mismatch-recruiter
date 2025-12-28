@@ -1,18 +1,18 @@
 """Models module."""
-from app.models.lamoda import (
-    LamodaJob,
-    LamodaCandidate,
-    LamodaPlacement,
-    LamodaSync,
-    LamodoIntegrationConfig,
+from app.models.mismatch import (
+    MismatchJob,
+    MismatchCandidate,
+    MismatchPlacement,
+    MismatchSync,
+    MismatchIntegrationConfig,
     Base
 )
 
 __all__ = [
-    "LamodaJob",
-    "LamodaCandidate",
-    "LamodaPlacement",
-    "LamodaSync",
-    "LamodoIntegrationConfig",
+    "MismatchJob",
+    "MismatchCandidate",
+    "MismatchPlacement",
+    "MismatchSync",
+    "MismatchIntegrationConfig",
     "Base"
 ]
