@@ -1,26 +1,26 @@
 """Configuration module."""
-from app.config.lamoda import (
-    LamodaSettings,
+from app.config.mismatch import (
+    MismatchSettings,
     get_settings,
-    get_lamoda_config,
-    LAMODA_JOB_STATUS_OPTIONS,
-    LAMODA_EXPERIENCE_LEVELS,
-    LAMODA_EMPLOYMENT_TYPES,
-    LAMODA_PLACEMENT_STATUSES,
-    LAMODA_SYNC_TYPES,
+    get_mismatch_config,
+    MISMATCH_JOB_STATUS_OPTIONS,
+    MISMATCH_EXPERIENCE_LEVELS,
+    MISMATCH_EMPLOYMENT_TYPES,
+    MISMATCH_PLACEMENT_STATUSES,
+    MISMATCH_SYNC_TYPES,
     MATCHING_WEIGHTS,
-    LAMODA_ERROR_CODES,
+    MISMATCH_ERROR_CODES,
 )
 
 __all__ = [
-    "LamodaSettings",
+    "MismatchSettings",
     "get_settings",
-    "get_lamoda_config",
-    "LAMODA_JOB_STATUS_OPTIONS",
-    "LAMODA_EXPERIENCE_LEVELS",
-    "LAMODA_EMPLOYMENT_TYPES",
-    "LAMODA_PLACEMENT_STATUSES",
-    "LAMODA_SYNC_TYPES",
+    "get_mismatch_config",
+    "MISMATCH_JOB_STATUS_OPTIONS",
+    "MISMATCH_EXPERIENCE_LEVELS",
+    "MISMATCH_EMPLOYMENT_TYPES",
+    "MISMATCH_PLACEMENT_STATUSES",
+    "MISMATCH_SYNC_TYPES",
     "MATCHING_WEIGHTS",
-    "LAMODA_ERROR_CODES",
+    "MISMATCH_ERROR_CODES",
 ]
