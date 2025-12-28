@@ -1,5 +1,4 @@
-lamoda.py
-"""Lamoda Integration Database Models
+""Lamoda Integration Database Models
 
 Defines SQLAlchemy ORM models for Lamoda API data persistence,
 including jobs, candidates, placements, and sync tracking.
