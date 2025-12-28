@@ -1,0 +1,26 @@
+name: Replace lamoda with mismatch in all files
+
+on:
+  workflow_dispatch:
+
+jobs:
+  replace:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Replace all lamoda references
+        run: |
+          find . -type f \( -name "*.py" -o -name "*.md" -o -name "*.yml" -o -name "*.yaml" -o -name "*.json" -o -name "*.txt" \) ! -path "./.git/*" ! -path "./.*" -exec sed -i 's/lamoda/mismatch/g' {} \;
+          find . -type f \( -name "*.py" -o -name "*.md" -o -name "*.yml" -o -name "*.yaml" -o -name "*.json" -o -name "*.txt" \) ! -path "./.git/*" ! -path "./.*" -exec sed -i 's/Lamoda/Mismatch/g' {} \;
+          find . -type f \( -name "*.py" -o -name "*.md" -o -name "*.yml" -o -name "*.yaml" -o -name "*.json" -o -name "*.txt" \) ! -path "./.git/*" ! -path "./.*" -exec sed -i 's/LAMODA/MISMATCH/g' {} \;
+          echo "✅ All replacements completed!"
+      
+      - name: Commit changes
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add -A
+          git commit -m "refactor: Replace all lamoda references with mismatch globally" || echo "No changes to commit"
+          git push
