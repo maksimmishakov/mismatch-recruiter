@@ -1,7 +1,4 @@
-__init__.py"""Models package for Lamoda AI Recruiter
-
-Contains SQLAlchemy ORM models for data persistence.
-"""
+"""Models module."""
 from app.models.lamoda import (
     LamodaJob,
     LamodaCandidate,
