@@ -1,7 +1,4 @@
-__init__.py"""Configuration package for Lamoda AI Recruiter
-
-Contains settings, constants, and configuration management.
-"""
+"""Configuration module."""
 from app.config.lamoda import (
     LamodaSettings,
     get_settings,
