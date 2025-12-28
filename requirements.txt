@@ -34,7 +34,6 @@ pytest-asyncio>=0.21.0
 python-docx>=0.8.11
 
 # AI/ML - Embeddings
-torch>=2.0.0
-sentence-transformers>=2.2.2
+
 
 
