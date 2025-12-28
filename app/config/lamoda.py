@@ -1,8 +1,4 @@
-lamoda.py"""Lamoda Integration Configuration
-
-Configuration settings, constants, and environment variables
-for Lamoda API integration.
-"""
+"""Lamoda Integration Configuration."""
 from typing import Optional, Dict, Any
 from pydantic import BaseSettings, SecretStr, AnyUrl
 import os
