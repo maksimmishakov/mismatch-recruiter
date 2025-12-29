@@ -1,0 +1,20 @@
+[33m01c9d9e[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeature/job-enrichment-ml-matching[m[33m, [m[1;32mfeature/advanced-resume-parsing[m[33m)[m docs: 3-day development report - baseline fixes + feature 1 resume parser complete
+[33mc850caa[m feat: Advanced Resume Parsing service with skill extraction - feature/advanced-resume-parsing
+[33m195f4e9[m[33m ([m[1;32mmaster[m[33m)[m fix: Repair syntax errors in mismatch.py models
+[33m47d9612[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m Rename lamoda_* files to mismatch_* for consistency
+[33mb63079f[m refactor: Complete lamoda→mismatch replacement (all variants)
+[33m787c939[m Add: Complete lamoda→mismatch replacement workflow v2
+[33md58e302[m Add workflow: Automated lamoda→mismatch replacement
+[33mbac002e[m Rename test_lamoda_routes.py to test_mismatch_routes.py
+[33m8406153[m Rename test_lamoda_models.py to test_mismatch_models.py
+[33m4a9ead5[m Rename test_lamoda_api_client.py to test_mismatch_api_client.py
+[33m79279e1[m Fix: Remove undefined lamoda reference from mismatch.py
+[33m68ae29b[m Fix: Restructure .flake8 config with proper exclude and per-file-ignores sections
+[33m20c78ee[m Fix: Correct flake8 extend-ignore error codes (E305 instead of E3BSude)
+[33m96116ae[m Update .flake8
+[33m2235d59[m Update imports in models __init__.py
+[33m5262be7[m Update imports in config __init__.py
+[33m1c1f201[m Rename lamoda.py to mismatch.py in routes
+[33m903ba89[m Rename lamoda_api_client.py to mismatch_api_client.py
+[33md86e216[m Rename lamoda.py to mismatch.py in models
+[33m9a46452[m Rename lamoda.py to mismatch.py in config
