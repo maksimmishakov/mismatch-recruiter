@@ -1,0 +1,69 @@
+name: Complete Lamoda → Mismatch Replacement v2
+
+on:
+  workflow_dispatch:
+
+jobs:
+  replace:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Replace all lamoda references (CamelCase + Title + lowercase + UPPERCASE)
+        run: |
+          echo "🔄 Starting complete replacement process..."
+          
+          # REPLACEMENT 1: CamelCase класс имена (LamodaJob, LamodaCandidate, etc)
+          echo "1️⃣ Replacing LamodaJob → MismatchJob"
+          find . -type f \( -name "*.py" -o -name "*.md" -o -name "*.yml" -o -name "*.yaml" -o -name "*.json" -o -name "*.txt" \) ! -path "./.git/*" ! -path "./.*" -exec sed -i 's/LamodaJob/MismatchJob/g' {} \;
+          
+          echo "2️⃣ Replacing LamodaCandidate → MismatchCandidate"
+          find . -type f \( -name "*.py" -o -name "*.md" -o -name "*.yml" -o -name "*.yaml" -o -name "*.json" -o -name "*.txt" \) ! -path "./.git/*" ! -path "./.*" -exec sed -i 's/LamodaCandidate/MismatchCandidate/g' {} \;
+          
+          echo "3️⃣ Replacing LamodaPlacement → MismatchPlacement"
+          find . -type f \( -name "*.py" -o -name "*.md" -o -name "*.yml" -o -name "*.yaml" -o -name "*.json" -o -name "*.txt" \) ! -path "./.git/*" ! -path "./.*" -exec sed -i 's/LamodaPlacement/MismatchPlacement/g' {} \;
+          
+          echo "4️⃣ Replacing LamodaSync → MismatchSync"
+          find . -type f \( -name "*.py" -o -name "*.md" -o -name "*.yml" -o -name "*.yaml" -o -name "*.json" -o -name "*.txt" \) ! -path "./.git/*" ! -path "./.*" -exec sed -i 's/LamodaSync/MismatchSync/g' {} \;
+          
+          echo "5️⃣ Replacing LamodaClient → MismatchClient"
+          find . -type f \( -name "*.py" -o -name "*.md" -o -name "*.yml" -o -name "*.yaml" -o -name "*.json" -o -name "*.txt" \) ! -path "./.git/*" ! -path "./.*" -exec sed -i 's/LamodaClient/MismatchClient/g' {} \;
+          
+          # REPLACEMENT 2: Title Case (Lamoda → Mismatch)
+          echo "6️⃣ Replacing Lamoda → Mismatch (Title Case)"
+          find . -type f \( -name "*.py" -o -name "*.md" -o -name "*.yml" -o -name "*.yaml" -o -name "*.json" -o -name "*.txt" \) ! -path "./.git/*" ! -path "./.*" -exec sed -i 's/Lamoda/Mismatch/g' {} \;
+          
+          # REPLACEMENT 3: lowercase (lamoda → mismatch)
+          echo "7️⃣ Replacing lamoda → mismatch (lowercase)"
+          find . -type f \( -name "*.py" -o -name "*.md" -o -name "*.yml" -o -name "*.yaml" -o -name "*.json" -o -name "*.txt" \) ! -path "./.git/*" ! -path "./.*" -exec sed -i 's/lamoda/mismatch/g' {} \;
+          
+          # REPLACEMENT 4: UPPERCASE (LAMODA → MISMATCH)
+          echo "8️⃣ Replacing LAMODA → MISMATCH (UPPERCASE)"
+          find . -type f \( -name "*.py" -o -name "*.md" -o -name "*.yml" -o -name "*.yaml" -o -name "*.json" -o -name "*.txt" \) ! -path "./.git/*" ! -path "./.*" -exec sed -i 's/LAMODA/MISMATCH/g' {} \;
+          
+          echo "✅ All replacements completed!"
+          
+          # Show summary
+          echo ""
+          echo "📊 SUMMARY OF CHANGES:"
+          git diff --stat || echo "Checking for changes..."
+      
+      - name: Commit and push all changes
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          
+          # Add all changes
+          git add -A
+          
+          # Check if there are changes to commit
+          if git diff --cached --quiet; then
+            echo "ℹ️  No changes to commit"
+          else
+            echo "📝 Committing changes..."
+            git commit -m "refactor: Complete lamoda → mismatch replacement (CamelCase + Title + lowercase + UPPERCASE variants)"
+            echo "🚀 Pushing to master..."
+            git push
+            echo "✅ Push successful!"
+          fi
