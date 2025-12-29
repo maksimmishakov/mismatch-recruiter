@@ -12,7 +12,7 @@
 ### Monitor Deployment
 
 **GitHub Actions:**
-- Go to: https://github.com/maksimmishakov/lamoda-ai-recruiter/actions
+- Go to: https://github.com/maksimmishakov/Mismatch-ai-recruiter/actions
 - Watch workflow progress
 - Should see ✅ green check in 2-3 min
 

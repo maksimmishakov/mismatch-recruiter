@@ -1,4 +1,4 @@
-# Lamoda AI Recruiter - Investor Demo
+# Mismatch AI Recruiter - Investor Demo
 
 ## System Overview
 

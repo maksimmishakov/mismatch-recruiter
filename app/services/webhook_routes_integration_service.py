@@ -1,7 +1,7 @@
 webhook_routes_integration_service.py"""Webhook Routes Integration Service
 
 Handles webhook endpoint registration, verification, and routing for:
-- Lamoda job updates
+- Mismatch job updates
 - Candidate profile changes
 - Placement status updates
 - External system events

@@ -93,7 +93,7 @@ pip install -r requirements.txt
 
 1. **Prepare Repository**
 ```bash
-cd /path/to/lamoda-ai-recruiter
+cd /path/to/Mismatch-ai-recruiter
 git add .
 git commit -m "Deploy MisMatch to Railway"
 git push origin master
@@ -114,7 +114,7 @@ pip freeze > requirements.txt
 - Sign up with GitHub
 - Click "New Project"
 - Select "Deploy from GitHub"
-- Choose "maksimmishakov/lamoda-ai-recruiter"
+- Choose "maksimmishakov/Mismatch-ai-recruiter"
 
 5. **Configure Environment Variables**
 - In Railway Dashboard → Variables
@@ -403,7 +403,7 @@ git log --oneline         # View history
 ## 📞 Support & Next Steps
 
 **Questions?**
-- Check GitHub Issues: https://github.com/maksimmishakov/lamoda-ai-recruiter/issues
+- Check GitHub Issues: https://github.com/maksimmishakov/Mismatch-ai-recruiter/issues
 - Review attached guides
 - Test locally first (Path 1)
 - Monitor logs during deployment (Path 2)

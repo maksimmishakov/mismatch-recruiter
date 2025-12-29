@@ -1,12 +1,12 @@
-"""Test Lamoda Routes Integration"""
+"""Test Mismatch Routes Integration"""
 import pytest
 from fastapi.testclient import TestClient
 from unittest.mock import Mock, patch, MagicMock
 from datetime import datetime
 
 
-class TestLamodaJobsRoute:
-    """Test /api/v1/lamoda/jobs endpoint"""
+class TestMismatchJobsRoute:
+    """Test /api/v1/Mismatch/jobs endpoint"""
     
     @pytest.fixture
     def client(self):
@@ -15,8 +15,8 @@ class TestLamodaJobsRoute:
         return TestClient(app)
     
     def test_get_jobs_success(self, client):
-        """Test successful job retrieval from Lamoda"""
-        with patch('app.routes.lamoda.lamoda_client') as mock_client:
+        """Test successful job retrieval from Mismatch"""
+        with patch('app.routes.Mismatch.Mismatch_client') as mock_client:
             mock_client.get_jobs.return_value = {
                 "jobs": [
                     {
@@ -31,7 +31,7 @@ class TestLamodaJobsRoute:
                 "total": 1
             }
             
-            response = client.get("/api/v1/lamoda/jobs")
+            response = client.get("/api/v1/Mismatch/jobs")
             
             assert response.status_code == 200
             data = response.json()
@@ -41,7 +41,7 @@ class TestLamodaJobsRoute:
     
     def test_get_jobs_with_filters(self, client):
         """Test job retrieval with filters"""
-        with patch('app.routes.lamoda.lamoda_client') as mock_client:
+        with patch('app.routes.Mismatch.Mismatch_client') as mock_client:
             mock_client.get_jobs.return_value = {
                 "jobs": [
                     {
@@ -55,7 +55,7 @@ class TestLamodaJobsRoute:
             }
             
             response = client.get(
-                "/api/v1/lamoda/jobs",
+                "/api/v1/Mismatch/jobs",
                 params={"min_salary": "200000", "experience": "senior"}
             )
             
@@ -65,12 +65,12 @@ class TestLamodaJobsRoute:
     
     def test_get_jobs_unauthorized(self, client):
         """Test unauthorized access"""
-        response = client.get("/api/v1/lamoda/jobs")
+        response = client.get("/api/v1/Mismatch/jobs")
         assert response.status_code == 401
 
 
-class TestLamodaCandidatesRoute:
-    """Test /api/v1/lamoda/candidates endpoint"""
+class TestMismatchCandidatesRoute:
+    """Test /api/v1/Mismatch/candidates endpoint"""
     
     @pytest.fixture
     def client(self):
@@ -79,7 +79,7 @@ class TestLamodaCandidatesRoute:
     
     def test_get_candidates_success(self, client):
         """Test successful candidate retrieval"""
-        with patch('app.routes.lamoda.lamoda_client') as mock_client:
+        with patch('app.routes.Mismatch.Mismatch_client') as mock_client:
             mock_client.get_candidates.return_value = {
                 "candidates": [
                     {
@@ -92,7 +92,7 @@ class TestLamodaCandidatesRoute:
                 "total": 1
             }
             
-            response = client.get("/api/v1/lamoda/candidates")
+            response = client.get("/api/v1/Mismatch/candidates")
             
             assert response.status_code == 200
             data = response.json()
@@ -101,7 +101,7 @@ class TestLamodaCandidatesRoute:
     
     def test_create_candidate(self, client):
         """Test candidate creation"""
-        with patch('app.routes.lamoda.lamoda_client') as mock_client:
+        with patch('app.routes.Mismatch.Mismatch_client') as mock_client:
             mock_client.create_candidate.return_value = {
                 "id": "cand-new",
                 "name": "Maria Smirnova",
@@ -115,15 +115,15 @@ class TestLamodaCandidatesRoute:
                 "phone": "+7 999 123 45 67"
             }
             
-            response = client.post("/api/v1/lamoda/candidates", json=payload)
+            response = client.post("/api/v1/Mismatch/candidates", json=payload)
             
             assert response.status_code == 201
             data = response.json()
             assert data["id"] == "cand-new"
 
 
-class TestLamodaMatchingRoute:
-    """Test /api/v1/lamoda/match endpoint"""
+class TestMismatchMatchingRoute:
+    """Test /api/v1/Mismatch/match endpoint"""
     
     @pytest.fixture
     def client(self):
@@ -132,7 +132,7 @@ class TestLamodaMatchingRoute:
     
     def test_match_candidate_to_job(self, client):
         """Test matching candidates to jobs"""
-        with patch('app.routes.lamoda.matching_service') as mock_service:
+        with patch('app.routes.Mismatch.matching_service') as mock_service:
             mock_service.calculate_match_score.return_value = {
                 "candidate_id": "cand-789",
                 "job_id": "job-123",
@@ -145,15 +145,15 @@ class TestLamodaMatchingRoute:
             }
             
             payload = {"candidate_id": "cand-789", "job_id": "job-123"}
-            response = client.post("/api/v1/lamoda/match", json=payload)
+            response = client.post("/api/v1/Mismatch/match", json=payload)
             
             assert response.status_code == 200
             data = response.json()
             assert data["match_score"] > 0.8
 
 
-class TestLamodaSyncRoute:
-    """Test /api/v1/lamoda/sync endpoint"""
+class TestMismatchSyncRoute:
+    """Test /api/v1/Mismatch/sync endpoint"""
     
     @pytest.fixture
     def client(self):
@@ -162,10 +162,10 @@ class TestLamodaSyncRoute:
     
     def test_trigger_sync(self, client):
         """Test manual sync trigger"""
-        with patch('app.routes.lamoda.lamoda_sync_task') as mock_task:
+        with patch('app.routes.Mismatch.Mismatch_sync_task') as mock_task:
             mock_task.delay.return_value = MagicMock(id="task-sync-001")
             
-            response = client.post("/api/v1/lamoda/sync", json={"sync_type": "full"})
+            response = client.post("/api/v1/Mismatch/sync", json={"sync_type": "full"})
             
             assert response.status_code in [200, 202]
             data = response.json()
@@ -173,7 +173,7 @@ class TestLamodaSyncRoute:
     
     def test_sync_status(self, client):
         """Test sync status endpoint"""
-        with patch('app.services.lamoda_sync.get_sync_status') as mock_status:
+        with patch('app.services.Mismatch_sync.get_sync_status') as mock_status:
             mock_status.return_value = {
                 "status": "running",
                 "progress": 45,
@@ -182,15 +182,15 @@ class TestLamodaSyncRoute:
                 "errors": 2
             }
             
-            response = client.get("/api/v1/lamoda/sync/status")
+            response = client.get("/api/v1/Mismatch/sync/status")
             
             assert response.status_code == 200
             data = response.json()
             assert data["status"] in ["running", "completed", "error"]
 
 
-class TestLamodaPlacementsRoute:
-    """Test /api/v1/lamoda/placements endpoint"""
+class TestMismatchPlacementsRoute:
+    """Test /api/v1/Mismatch/placements endpoint"""
     
     @pytest.fixture
     def client(self):
@@ -199,7 +199,7 @@ class TestLamodaPlacementsRoute:
     
     def test_create_placement(self, client):
         """Test placement creation"""
-        with patch('app.routes.lamoda.placement_service') as mock_service:
+        with patch('app.routes.Mismatch.placement_service') as mock_service:
             mock_service.create_placement.return_value = {
                 "id": "plac-123",
                 "candidate_id": "cand-789",
@@ -214,7 +214,7 @@ class TestLamodaPlacementsRoute:
                 "notes": "Strong match, recommended"
             }
             
-            response = client.post("/api/v1/lamoda/placements", json=payload)
+            response = client.post("/api/v1/Mismatch/placements", json=payload)
             
             assert response.status_code == 201
             data = response.json()
@@ -222,7 +222,7 @@ class TestLamodaPlacementsRoute:
     
     def test_get_placements(self, client):
         """Test placement retrieval"""
-        with patch('app.routes.lamoda.placement_service') as mock_service:
+        with patch('app.routes.Mismatch.placement_service') as mock_service:
             mock_service.get_placements.return_value = {
                 "placements": [
                     {
@@ -235,7 +235,7 @@ class TestLamodaPlacementsRoute:
                 "total": 1
             }
             
-            response = client.get("/api/v1/lamoda/placements")
+            response = client.get("/api/v1/Mismatch/placements")
             
             assert response.status_code == 200
             data = response.json()

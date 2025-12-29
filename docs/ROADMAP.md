@@ -1,4 +1,4 @@
-# Lamoda AI Recruiter - Product Roadmap
+# Mismatch AI Recruiter - Product Roadmap
 
 ## Vision
 Build the most intelligent and user-friendly AI-powered recruitment platform that helps enterprises hire faster, smarter, and fairer.
@@ -259,7 +259,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 - **Feature Requests**: Use GitHub Discussions
 - **Bug Reports**: Use GitHub Issues
-- **General Feedback**: Email: feedback@lamoda-recruiter.com
+- **General Feedback**: Email: feedback@Mismatch-recruiter.com
 
 ---
 

@@ -20,8 +20,8 @@ Comprehensive guide for deploying the MisMatch Recruitment Bot to production env
 
 ```bash
 # Clone the repository
-git clone https://github.com/maksimmishakov/lamoda-ai-recruiter.git
-cd lamoda-ai-recruiter
+git clone https://github.com/maksimmishakov/Mismatch-ai-recruiter.git
+cd Mismatch-ai-recruiter
 
 # Create virtual environment
 python -m venv venv
@@ -33,7 +33,7 @@ pip install -r requirements.txt
 # Setup PostgreSQL locally
 sudo docker run -d --name postgres -p 5432:5432 \
   -e POSTGRES_PASSWORD=password \
-  -e POSTGRES_DB=lamoda \
+  -e POSTGRES_DB=Mismatch \
   postgres:14
 
 # Setup Redis locally
@@ -54,7 +54,7 @@ uvicorn app.main:app --reload --port 8000
 
 ```bash
 # Database Configuration
-DATABASE_URL=postgresql://user:password@localhost:5432/lamoda
+DATABASE_URL=postgresql://user:password@localhost:5432/Mismatch
 DATABASE_POOL_SIZE=10
 DATABASE_MAX_OVERFLOW=20
 
@@ -94,10 +94,10 @@ CORS_ORIGINS=http://localhost:3000,https://yourdomain.com
 
 ```bash
 # Build image
-docker build -t lamoda-recruiter:latest .
+docker build -t Mismatch-recruiter:latest .
 
 # Tag for registry
-docker tag lamoda-recruiter:latest registry.yandex.cloud/lamoda/recruiter:latest
+docker tag Mismatch-recruiter:latest registry.yandex.cloud/Mismatch/recruiter:latest
 ```
 
 ### 2. Docker Compose for Local Development
@@ -110,7 +110,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql://postgres:password@db:5432/lamoda
+      - DATABASE_URL=postgresql://postgres:password@db:5432/Mismatch
       - REDIS_URL=redis://redis:6379
     depends_on:
       - db
@@ -122,7 +122,7 @@ services:
     image: postgres:14
     environment:
       - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=lamoda
+      - POSTGRES_DB=Mismatch
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -154,7 +154,7 @@ export YANDEX_CLOUD_ID="your-cloud-id"
 export YANDEX_FOLDER_ID="your-folder-id"
 
 # Push image to registry
-docker push registry.yandex.cloud/lamoda/recruiter:latest
+docker push registry.yandex.cloud/Mismatch/recruiter:latest
 
 # Deploy using Terraform
 cd terraform
@@ -167,13 +167,13 @@ terraform apply
 
 ```hcl
 resource "yandex_serverless_container" "recruiter" {
-  name               = "lamoda-recruiter"
+  name               = "Mismatch-recruiter"
   memory             = 512
   cpu                = 100
   execution_timeout  = "30s"
 
   image {
-    url = "registry.yandex.cloud/lamoda/recruiter:latest"
+    url = "registry.yandex.cloud/Mismatch/recruiter:latest"
   }
 
   environment = {
@@ -205,7 +205,7 @@ OPENAI_API_KEY=sk-...
 ### 3. Amvera Configuration (amvera.yml)
 
 ```yaml
-name: lamoda-recruiter
+name: Mismatch-recruiter
 type: python
 runtime: python311
 
@@ -248,20 +248,20 @@ amvera deploy
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: lamoda-recruiter
+  name: Mismatch-recruiter
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: lamoda-recruiter
+      app: Mismatch-recruiter
   template:
     metadata:
       labels:
-        app: lamoda-recruiter
+        app: Mismatch-recruiter
     spec:
       containers:
       - name: recruiter
-        image: registry.yandex.cloud/lamoda/recruiter:latest
+        image: registry.yandex.cloud/Mismatch/recruiter:latest
         ports:
         - containerPort: 8000
         env:
@@ -306,10 +306,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: lamoda-recruiter
+  name: Mismatch-recruiter
 spec:
   selector:
-    app: lamoda-recruiter
+    app: Mismatch-recruiter
   ports:
   - protocol: TCP
     port: 80
@@ -320,15 +320,15 @@ spec:
 ### 2. Deploy to Kubernetes
 
 ```bash
-kubectl create namespace lamoda
+kubectl create namespace Mismatch
 kubectl create secret generic app-secrets \
   --from-literal=database-url=$DATABASE_URL \
   --from-literal=redis-url=$REDIS_URL \
   --from-literal=openai-api-key=$OPENAI_API_KEY \
-  -n lamoda
+  -n Mismatch
 
-kubectl apply -f deployment.yaml -n lamoda
-kubectl apply -f service.yaml -n lamoda
+kubectl apply -f deployment.yaml -n Mismatch
+kubectl apply -f service.yaml -n Mismatch
 ```
 
 ## CI/CD Pipeline (GitHub Actions)
@@ -364,8 +364,8 @@ jobs:
       - uses: actions/checkout@v3
       - name: Build and push Docker image
         run: |
-          docker build -t registry.yandex.cloud/lamoda/recruiter:${{ github.sha }} .
-          docker push registry.yandex.cloud/lamoda/recruiter:${{ github.sha }}
+          docker build -t registry.yandex.cloud/Mismatch/recruiter:${{ github.sha }} .
+          docker push registry.yandex.cloud/Mismatch/recruiter:${{ github.sha }}
       - name: Deploy to Amvera
         run: amvera deploy
 ```
@@ -407,7 +407,7 @@ alembic current
 amvera logs
 
 # Local logs
-journalctl -u lamoda-recruiter -f
+journalctl -u Mismatch-recruiter -f
 ```
 
 ### 2. Performance Monitoring
@@ -493,6 +493,6 @@ engine = create_engine(
 ## Support and Documentation
 
 For issues and questions:
-- GitHub Issues: https://github.com/maksimmishakov/lamoda-ai-recruiter/issues
-- Email: support@lamoda.ru
-- Documentation: https://docs.lamoda.ru
+- GitHub Issues: https://github.com/maksimmishakov/Mismatch-ai-recruiter/issues
+- Email: support@Mismatch.ru
+- Documentation: https://docs.Mismatch.ru

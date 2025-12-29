@@ -107,7 +107,7 @@ celery -A app.celery flower
    - Network in/out
    - Process metrics
 
-3. **alerts/lamoda-alerts.yml** (100 lines)
+3. **alerts/Mismatch-alerts.yml** (100 lines)
    - High error rate (>5%)
    - Slow responses (p95 > 1s)
    - Low cache hits (<70%)

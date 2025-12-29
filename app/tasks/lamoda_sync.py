@@ -1,50 +1,50 @@
-"""Lamoda Synchronization Tasks - Phase 5 Step 4.3
+"""Mismatch Synchronization Tasks - Phase 5 Step 4.3
 Celery periodic tasks for job import, candidate submission, and result tracking
 """
 import logging
 from datetime import datetime, timedelta
 from celery import shared_task
 from celery.schedules import crontab
-from app.services.lamoda_api_client import LamodaAPIClient
+from app.services.Mismatch_api_client import MismatchAPIClient
 
 logger = logging.getLogger(__name__)
 
-# Initialize Lamoda client (would be injected from config)
-lamoda_client = None
+# Initialize Mismatch client (would be injected from config)
+Mismatch_client = None
 
 
-def init_lamoda_client(api_key: str, api_secret: str, api_url: str, environment: str = "sandbox"):
-    """Initialize Lamoda client"""
-    global lamoda_client
-    lamoda_client = LamodaAPIClient(
+def init_Mismatch_client(api_key: str, api_secret: str, api_url: str, environment: str = "sandbox"):
+    """Initialize Mismatch client"""
+    global Mismatch_client
+    Mismatch_client = MismatchAPIClient(
         api_key=api_key,
         api_secret=api_secret,
         api_url=api_url,
         environment=environment
     )
-    logger.info(f"Lamoda client initialized for {environment} environment")
+    logger.info(f"Mismatch client initialized for {environment} environment")
 
 
-@shared_task(name="tasks.sync_lamoda_jobs")
-def sync_lamoda_jobs():
+@shared_task(name="tasks.sync_Mismatch_jobs")
+def sync_Mismatch_jobs():
     """
-    Periodic task: Sync new jobs from Lamoda
+    Periodic task: Sync new jobs from Mismatch
     Schedule: Every 2 hours (0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22)
     Triggered by: celery beat
     """
-    if not lamoda_client:
-        logger.error("Lamoda client not initialized")
+    if not Mismatch_client:
+        logger.error("Mismatch client not initialized")
         return {
             "status": "failed",
-            "error": "Lamoda client not initialized",
+            "error": "Mismatch client not initialized",
             "timestamp": datetime.utcnow().isoformat()
         }
     
     try:
-        logger.info("🔄 Starting Lamoda job sync task...")
+        logger.info("🔄 Starting Mismatch job sync task...")
         
-        # Get jobs from Lamoda
-        jobs = sync_lamoda_jobs.apply_async(
+        # Get jobs from Mismatch
+        jobs = sync_Mismatch_jobs.apply_async(
             kwargs={},
             retry=True,
             max_retries=3
@@ -57,13 +57,13 @@ def sync_lamoda_jobs():
         
         # Simulated job processing
         # In production, this would:
-        # 1. Fetch jobs from Lamoda API
-        # 2. Check if job exists in database (by lamoda_job_id)
+        # 1. Fetch jobs from Mismatch API
+        # 2. Check if job exists in database (by Mismatch_job_id)
         # 3. If new: save to database, enrich, notify admin
         # 4. If existing: update record
         
         logger.info(
-            f"✅ Lamoda job sync completed: "
+            f"✅ Mismatch job sync completed: "
             f"total={job_count}, new={new_jobs_count}, updated={updated_jobs_count}"
         )
         
@@ -75,7 +75,7 @@ def sync_lamoda_jobs():
             "timestamp": datetime.utcnow().isoformat()
         }
     except Exception as e:
-        logger.error(f"❌ Lamoda job sync failed: {str(e)}", exc_info=True)
+        logger.error(f"❌ Mismatch job sync failed: {str(e)}", exc_info=True)
         return {
             "status": "failed",
             "error": str(e),
@@ -83,22 +83,22 @@ def sync_lamoda_jobs():
         }
 
 
-@shared_task(name="tasks.sync_candidates_to_lamoda")
-def sync_candidates_to_lamoda():
+@shared_task(name="tasks.sync_candidates_to_Mismatch")
+def sync_candidates_to_Mismatch():
     """
-    Periodic task: Sync matched candidates to Lamoda
+    Periodic task: Sync matched candidates to Mismatch
     Schedule: Daily at 10:00 AM MSK
     Triggered by: celery beat
     """
-    if not lamoda_client:
-        logger.error("Lamoda client not initialized")
+    if not Mismatch_client:
+        logger.error("Mismatch client not initialized")
         return {
             "status": "failed",
-            "error": "Lamoda client not initialized"
+            "error": "Mismatch client not initialized"
         }
     
     try:
-        logger.info("🔄 Starting candidate submission to Lamoda...")
+        logger.info("🔄 Starting candidate submission to Mismatch...")
         
         yesterday = datetime.now() - timedelta(days=1)
         
@@ -115,8 +115,8 @@ def sync_candidates_to_lamoda():
         
         for job_id, candidates in submissions.items():
             try:
-                # Submit to Lamoda
-                result = sync_candidates_to_lamoda.apply_async(
+                # Submit to Mismatch
+                result = sync_candidates_to_Mismatch.apply_async(
                     kwargs={"job_id": job_id, "candidates": candidates},
                     retry=True,
                     max_retries=3
@@ -149,25 +149,25 @@ def sync_candidates_to_lamoda():
         }
 
 
-@shared_task(name="tasks.fetch_lamoda_results")
-def fetch_lamoda_results():
+@shared_task(name="tasks.fetch_Mismatch_results")
+def fetch_Mismatch_results():
     """
-    Periodic task: Fetch placement results from Lamoda
+    Periodic task: Fetch placement results from Mismatch
     Schedule: Daily at 5:00 PM MSK
     Triggered by: celery beat
     """
-    if not lamoda_client:
-        logger.error("Lamoda client not initialized")
+    if not Mismatch_client:
+        logger.error("Mismatch client not initialized")
         return {
             "status": "failed",
-            "error": "Lamoda client not initialized"
+            "error": "Mismatch client not initialized"
         }
     
     try:
-        logger.info("🔄 Starting Lamoda results fetch...")
+        logger.info("🔄 Starting Mismatch results fetch...")
         
-        # Get placements from Lamoda
-        # placements = await lamoda_client.get_placements()
+        # Get placements from Mismatch
+        # placements = await Mismatch_client.get_placements()
         
         # Process placements
         updated_count = 0
@@ -177,7 +177,7 @@ def fetch_lamoda_results():
         # Update in database
         # for placement in placements:
         #     db_placement = db.query(Placement).filter_by(
-        #         lamoda_placement_id=placement['id']
+        #         Mismatch_placement_id=placement['id']
         #     ).first()
         #     
         #     if db_placement:
@@ -194,7 +194,7 @@ def fetch_lamoda_results():
         #         new_placement = Placement(
         #             job_id=placement['job_id'],
         #             candidate_id=placement['candidate_id'],
-        #             lamoda_placement_id=placement['id'],
+        #             Mismatch_placement_id=placement['id'],
         #             status=placement['status']
         #         )
         #         db.add(new_placement)
@@ -224,23 +224,23 @@ def fetch_lamoda_results():
 
 # Celery Beat schedule configuration
 CELERY_BEAT_SCHEDULE = {
-    "sync-lamoda-jobs-every-2-hours": {
-        "task": "tasks.sync_lamoda_jobs",
+    "sync-Mismatch-jobs-every-2-hours": {
+        "task": "tasks.sync_Mismatch_jobs",
         "schedule": crontab(minute=0, hour="*/2"),  # Every 2 hours
-        "options": {"queue": "lamoda"}
+        "options": {"queue": "Mismatch"}
     },
-    "sync-candidates-to-lamoda-daily-10am": {
-        "task": "tasks.sync_candidates_to_lamoda",
+    "sync-candidates-to-Mismatch-daily-10am": {
+        "task": "tasks.sync_candidates_to_Mismatch",
         "schedule": crontab(hour=10, minute=0),  # 10:00 AM MSK
-        "options": {"queue": "lamoda"}
+        "options": {"queue": "Mismatch"}
     },
-    "fetch-lamoda-results-daily-5pm": {
-        "task": "tasks.fetch_lamoda_results",
+    "fetch-Mismatch-results-daily-5pm": {
+        "task": "tasks.fetch_Mismatch_results",
         "schedule": crontab(hour=17, minute=0),  # 5:00 PM MSK
-        "options": {"queue": "lamoda"}
+        "options": {"queue": "Mismatch"}
     }
 }
 
 
 if __name__ == "__main__":
-    logger.info("Lamoda sync tasks initialized")
+    logger.info("Mismatch sync tasks initialized")

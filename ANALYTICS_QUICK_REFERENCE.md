@@ -4,11 +4,11 @@
 
 ### Dashboard UI
 - **Local:** `http://localhost:5000/analytics-dashboard`
-- **Cloud:** `https://lamoda-recruiter-maksmisakov.amvera.io/analytics-dashboard`
+- **Cloud:** `https://Mismatch-recruiter-maksmisakov.amvera.io/analytics-dashboard`
 
 ### API Endpoint
 - **Local:** `http://localhost:5000/api/analytics`
-- **Cloud:** `https://lamoda-recruiter-maksmisakov.amvera.io/api/analytics`
+- **Cloud:** `https://Mismatch-recruiter-maksmisakov.amvera.io/api/analytics`
 
 ---
 

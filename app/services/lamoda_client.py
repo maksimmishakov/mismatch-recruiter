@@ -7,21 +7,21 @@ from enum import Enum
 logger = logging.getLogger(__name__)
 
 
-class LamodaClient:
-    """Client for Lamoda API integration"""
+class MismatchClient:
+    """Client for Mismatch API integration"""
     
     def __init__(
         self,
         api_key: str,
         api_secret: str,
-        api_url: str = "https://api.lamoda.ru"
+        api_url: str = "https://api.Mismatch.ru"
     ):
-        """Initialize Lamoda client
+        """Initialize Mismatch client
         
         Args:
-            api_key: Lamoda API key
-            api_secret: Lamoda API secret
-            api_url: Base API URL (default: Lamoda production)
+            api_key: Mismatch API key
+            api_secret: Mismatch API secret
+            api_url: Base API URL (default: Mismatch production)
         """
         self.api_key = api_key
         self.api_secret = api_secret
@@ -47,7 +47,7 @@ class LamodaClient:
         filters: Optional[Dict] = None,
         limit: int = 100
     ) -> List[Dict]:
-        """Get jobs from Lamoda
+        """Get jobs from Mismatch
         
         Args:
             filters: Optional filters (category, region, etc.)
@@ -70,7 +70,7 @@ class LamodaClient:
             
             if response.status_code == 200:
                 jobs = response.json().get("data", [])
-                logger.info(f"Retrieved {len(jobs)} jobs from Lamoda")
+                logger.info(f"Retrieved {len(jobs)} jobs from Mismatch")
                 return jobs
             else:
                 logger.error(f"Failed to get jobs: {response.text}")
@@ -88,7 +88,7 @@ class LamodaClient:
         """Submit candidates for a job
         
         Args:
-            job_id: Lamoda job ID
+            job_id: Mismatch job ID
             candidates: List of candidate/resume IDs
             
         Returns:
@@ -125,7 +125,7 @@ class LamodaClient:
         start_date: Optional[str] = None,
         end_date: Optional[str] = None
     ) -> List[Dict]:
-        """Get placement results from Lamoda
+        """Get placement results from Mismatch
         
         Args:
             start_date: Start date for filtering (ISO format)
@@ -208,7 +208,7 @@ class LamodaClient:
         job_id: int,
         matches: List[Dict]
     ) -> Dict:
-        """Sync matching results to Lamoda
+        """Sync matching results to Mismatch
         
         Args:
             job_id: Job ID
@@ -218,7 +218,7 @@ class LamodaClient:
             Sync result
         """
         try:
-            # Format matches for Lamoda
+            # Format matches for Mismatch
             candidates = [
                 {
                     "candidate_id": match.get("candidate_id"),
@@ -254,7 +254,7 @@ class LamodaClient:
             return {"status": "error", "message": str(e)}
     
     def test_connection(self) -> bool:
-        """Test Lamoda API connection
+        """Test Mismatch API connection
         
         Returns:
             True if connection successful
@@ -267,12 +267,12 @@ class LamodaClient:
             )
             
             if response.status_code == 200:
-                logger.info("Lamoda API connection successful")
+                logger.info("Mismatch API connection successful")
                 return True
             else:
-                logger.error(f"Lamoda API error: {response.status_code}")
+                logger.error(f"Mismatch API error: {response.status_code}")
                 return False
                 
         except Exception as e:
-            logger.error(f"Failed to connect to Lamoda API: {str(e)}")
+            logger.error(f"Failed to connect to Mismatch API: {str(e)}")
             return False

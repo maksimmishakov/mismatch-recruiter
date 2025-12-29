@@ -176,10 +176,10 @@ curl -X POST http://localhost:8000/api/match-job \
 - [ ] Candidate tracking
 - [ ] Interview scheduling
 - [ ] Feedback learning system
-- [ ] LAMODA integration
+- [ ] Mismatch integration
 
 ## Support
 
 For issues or questions about integration, check:
 - API Docs: http://localhost:8000/docs
-- GitHub Issues: github.com/maksimmishakov/lamoda-ai-recruiter/issues
+- GitHub Issues: github.com/maksimmishakov/Mismatch-ai-recruiter/issues

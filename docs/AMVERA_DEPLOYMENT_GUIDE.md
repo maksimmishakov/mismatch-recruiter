@@ -10,15 +10,15 @@
 
 ### 1. Create Amvera Project
 ```bash
-amvera project create lamoda-recruiter --region eu-central-1
-amvera project select lamoda-recruiter
+amvera project create Mismatch-recruiter --region eu-central-1
+amvera project select Mismatch-recruiter
 ```
 
 ### 2. Configure Database
 ```bash
 # Create PostgreSQL database on Amvera
 amvera db create postgres \
-  --name lamoda_recruiter \
+  --name Mismatch_recruiter \
   --version 15 \
   --size small \
   --backup enabled
@@ -45,7 +45,7 @@ amvera cache credentials redis
 ### 4. Set Environment Secrets
 ```bash
 # Set all required secrets
-amvera secret set DATABASE_URL "postgresql://user:pass@db.amvera:5432/lamoda_recruiter"
+amvera secret set DATABASE_URL "postgresql://user:pass@db.amvera:5432/Mismatch_recruiter"
 amvera secret set REDIS_URL "redis://cache.amvera:6379/0"
 amvera secret set JWT_SECRET_KEY "your-secret-key"
 amvera secret set STRIPE_API_KEY "sk_live_xxxxx"
@@ -62,10 +62,10 @@ amvera secret list
 
 # Option B: Manual deployment
 # Build Docker image
-docker build -t ghcr.io/maksimmishakov/lamoda-recruiter:latest .
+docker build -t ghcr.io/maksimmishakov/Mismatch-recruiter:latest .
 
 # Push to registry
-docker push ghcr.io/maksimmishakov/lamoda-recruiter:latest
+docker push ghcr.io/maksimmishakov/Mismatch-recruiter:latest
 
 # Deploy
 amvera deploy -f .amvera/deployment.yaml
@@ -80,7 +80,7 @@ amvera get pods -n production
 amvera get services -n production
 
 # Get application URL
-amvera service info lamoda-recruiter-service
+amvera service info Mismatch-recruiter-service
 
 # Test health endpoint
 curl http://YOUR_APP_URL/api/health
@@ -116,7 +116,7 @@ memoryThreshold: 80%
 ### Manual Scaling
 ```bash
 # Scale to N replicas
-amvera scale deployment/lamoda-recruiter --replicas 5
+amvera scale deployment/Mismatch-recruiter --replicas 5
 ```
 
 ## Monitoring & Logging
@@ -124,22 +124,22 @@ amvera scale deployment/lamoda-recruiter --replicas 5
 ### View Logs
 ```bash
 # Real-time logs
-amvera logs -f deployment/lamoda-recruiter
+amvera logs -f deployment/Mismatch-recruiter
 
 # Historical logs
-amvera logs --since 1h deployment/lamoda-recruiter
+amvera logs --since 1h deployment/Mismatch-recruiter
 ```
 
 ### Metrics
 ```bash
 # View CPU usage
-amvera metrics cpu deployment/lamoda-recruiter
+amvera metrics cpu deployment/Mismatch-recruiter
 
 # View memory usage
-amvera metrics memory deployment/lamoda-recruiter
+amvera metrics memory deployment/Mismatch-recruiter
 
 # View request count
-amvera metrics requests deployment/lamoda-recruiter
+amvera metrics requests deployment/Mismatch-recruiter
 ```
 
 ## Troubleshooting
@@ -147,10 +147,10 @@ amvera metrics requests deployment/lamoda-recruiter
 ### Pod not starting
 ```bash
 # Check pod events
-amvera describe pod lamoda-recruiter-xxxxx
+amvera describe pod Mismatch-recruiter-xxxxx
 
 # Check logs
-amvera logs deployment/lamoda-recruiter
+amvera logs deployment/Mismatch-recruiter
 ```
 
 ### Database connection issues
@@ -168,8 +168,8 @@ amvera secret get DATABASE_URL
 ### Out of memory
 ```bash
 # Check memory usage
-amvera metrics memory deployment/lamoda-recruiter
+amvera metrics memory deployment/Mismatch-recruiter
 
 # Increase memory limit
-amvera set deployment/lamoda-recruiter memory 1Gi
+amvera set deployment/Mismatch-recruiter memory 1Gi
 ```

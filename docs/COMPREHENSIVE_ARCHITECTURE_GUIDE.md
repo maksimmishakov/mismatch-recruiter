@@ -1,4 +1,4 @@
-# Lamoda AI Recruiter - Comprehensive Architecture Guide
+# Mismatch AI Recruiter - Comprehensive Architecture Guide
 
 ## Table of Contents
 1. System Overview
@@ -17,7 +17,7 @@
 ## 1. System Overview
 
 ### Purpose
-The Lamoda AI Recruiter is an intelligent recruitment automation system that leverages AI to streamline the hiring process, from candidate screening to interview question generation.
+The Mismatch AI Recruiter is an intelligent recruitment automation system that leverages AI to streamline the hiring process, from candidate screening to interview question generation.
 
 ### Core Objectives
 - Automate initial candidate screening
@@ -411,4 +411,4 @@ The Lamoda AI Recruiter is an intelligent recruitment automation system that lev
 
 ## Conclusion
 
-The Lamoda AI Recruiter architecture is designed to be scalable, secure, and maintainable. As the system grows, we will progressively enhance the architecture to support increasing demands while maintaining code quality and system reliability.
+The Mismatch AI Recruiter architecture is designed to be scalable, secure, and maintainable. As the system grows, we will progressively enhance the architecture to support increasing demands while maintaining code quality and system reliability.

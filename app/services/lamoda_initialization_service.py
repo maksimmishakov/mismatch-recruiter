@@ -1,25 +1,25 @@
-lamoda_initialization_service.py"""Lamoda Integration Initialization Service
+Mismatch_initialization_service.py"""Mismatch Integration Initialization Service
 
-Handles setup, configuration, and initialization of Lamoda integration.
+Handles setup, configuration, and initialization of Mismatch integration.
 Responsible for initializing database models, configuring clients, and scheduling tasks.
 """
 import logging
 from typing import Dict, Any, Optional
 from datetime import datetime
 
-from app.config.lamoda import get_settings, LamodaSettings
-from app.models.lamoda import Base, LamodaSync, LamodoIntegrationConfig
+from app.config.Mismatch import get_settings, MismatchSettings
+from app.models.Mismatch import Base, MismatchSync, LamodoIntegrationConfig
 
 
 logger = logging.getLogger(__name__)
 
 
-class LamodaInitializationService:
-    """Service for initializing and setting up Lamoda integration"""
+class MismatchInitializationService:
+    """Service for initializing and setting up Mismatch integration"""
     
     def __init__(self):
         """Initialize the service with settings"""
-        self.settings: LamodaSettings = get_settings()
+        self.settings: MismatchSettings = get_settings()
         self.is_initialized: bool = False
         self.initialization_time: Optional[datetime] = None
     
@@ -50,10 +50,10 @@ class LamodaInitializationService:
         try:
             # Store initial configuration
             config_values = {
-                "api_base_url": str(self.settings.lamoda_api_base_url),
-                "sync_enabled": str(self.settings.lamoda_sync_enabled),
-                "min_match_score": str(self.settings.lamoda_min_match_score),
-                "webhook_enabled": str(self.settings.lamoda_webhook_enabled),
+                "api_base_url": str(self.settings.Mismatch_api_base_url),
+                "sync_enabled": str(self.settings.Mismatch_sync_enabled),
+                "min_match_score": str(self.settings.Mismatch_min_match_score),
+                "webhook_enabled": str(self.settings.Mismatch_webhook_enabled),
             }
             
             logger.info("Configuration storage initialized")
@@ -63,20 +63,20 @@ class LamodaInitializationService:
             return False
     
     def verify_api_credentials(self) -> bool:
-        """Verify Lamoda API credentials
+        """Verify Mismatch API credentials
         
         Returns:
             bool: True if credentials are present, False otherwise
         """
         try:
-            api_key = self.settings.lamoda_api_key.get_secret_value()
-            api_secret = self.settings.lamoda_api_secret.get_secret_value()
+            api_key = self.settings.Mismatch_api_key.get_secret_value()
+            api_secret = self.settings.Mismatch_api_secret.get_secret_value()
             
             if not api_key or not api_secret:
-                logger.warning("Lamoda API credentials not configured")
+                logger.warning("Mismatch API credentials not configured")
                 return False
             
-            logger.info("Lamoda API credentials verified")
+            logger.info("Mismatch API credentials verified")
             return True
         except Exception as e:
             logger.error(f"Error verifying API credentials: {e}")
@@ -122,9 +122,9 @@ class LamodaInitializationService:
         
         if self.is_initialized:
             self.initialization_time = datetime.utcnow()
-            logger.info("Lamoda integration initialization completed successfully")
+            logger.info("Mismatch integration initialization completed successfully")
         else:
-            logger.error("Lamoda integration initialization failed")
+            logger.error("Mismatch integration initialization failed")
         
         results["overall_status"] = "initialized" if self.is_initialized else "failed"
         return results
@@ -138,33 +138,33 @@ class LamodaInitializationService:
         return {
             "is_initialized": self.is_initialized,
             "initialization_time": self.initialization_time.isoformat() if self.initialization_time else None,
-            "api_key_configured": bool(self.settings.lamoda_api_key.get_secret_value()),
-            "sync_enabled": self.settings.lamoda_sync_enabled,
-            "webhook_enabled": self.settings.lamoda_webhook_enabled,
+            "api_key_configured": bool(self.settings.Mismatch_api_key.get_secret_value()),
+            "sync_enabled": self.settings.Mismatch_sync_enabled,
+            "webhook_enabled": self.settings.Mismatch_webhook_enabled,
         }
 
 
 # Singleton instance
-_lamoda_init_service: Optional[LamodaInitializationService] = None
+_Mismatch_init_service: Optional[MismatchInitializationService] = None
 
 
-def get_lamoda_initialization_service() -> LamodaInitializationService:
-    """Get or create singleton LamodaInitializationService
+def get_Mismatch_initialization_service() -> MismatchInitializationService:
+    """Get or create singleton MismatchInitializationService
     
     Returns:
-        LamodaInitializationService instance
+        MismatchInitializationService instance
     """
-    global _lamoda_init_service
-    if _lamoda_init_service is None:
-        _lamoda_init_service = LamodaInitializationService()
-    return _lamoda_init_service
+    global _Mismatch_init_service
+    if _Mismatch_init_service is None:
+        _Mismatch_init_service = MismatchInitializationService()
+    return _Mismatch_init_service
 
 
-def initialize_lamoda() -> Dict[str, Any]:
-    """Initialize Lamoda integration
+def initialize_Mismatch() -> Dict[str, Any]:
+    """Initialize Mismatch integration
     
     Returns:
         Dict with initialization results
     """
-    service = get_lamoda_initialization_service()
+    service = get_Mismatch_initialization_service()
     return service.run_initialization()

@@ -5,7 +5,7 @@ This guide provides comprehensive testing procedures for the three core features
 
 **Status**: Ready for Testing
 **Last Updated**: December 23, 2025
-**Application URL**: https://lamoda-recruiter-maksmisakov.amvera.io
+**Application URL**: https://Mismatch-recruiter-maksmisakov.amvera.io
 
 ---
 
@@ -28,7 +28,7 @@ This guide provides comprehensive testing procedures for the three core features
 **Expected Response**: `{"status": "ok", "timestamp": "..."}`
 
 ```bash
-curl -X GET https://lamoda-recruiter-maksmisakov.amvera.io/api/status
+curl -X GET https://Mismatch-recruiter-maksmisakov.amvera.io/api/status
 ```
 
 ✅ **Pass Criteria**: HTTP 200 with status="ok"
@@ -96,7 +96,7 @@ curl -X GET https://lamoda-recruiter-maksmisakov.amvera.io/api/status
 ### API Test: Batch Upload Endpoint
 
 ```bash
-curl -X POST https://lamoda-recruiter-maksmisakov.amvera.io/api/batch-upload \
+curl -X POST https://Mismatch-recruiter-maksmisakov.amvera.io/api/batch-upload \
   -F "files[]=@resume1.pdf" \
   -F "files[]=@resume2.pdf"
 ```
@@ -175,7 +175,7 @@ Resume: Web developer, HTML, CSS, JavaScript only
 ### API Test: Job Matcher Endpoint
 
 ```bash
-curl -X POST https://lamoda-recruiter-maksmisakov.amvera.io/api/match-resume-to-job \
+curl -X POST https://Mismatch-recruiter-maksmisakov.amvera.io/api/match-resume-to-job \
   -H "Content-Type: application/json" \
   -d '{
     "job_title": "Senior Python Developer",
@@ -244,7 +244,7 @@ Resume Summary: 15 years experience, CTO background, multiple startups
 ### API Test: Interview Questions Endpoint
 
 ```bash
-curl -X POST https://lamoda-recruiter-maksmisakov.amvera.io/api/generate-interview-questions \
+curl -X POST https://Mismatch-recruiter-maksmisakov.amvera.io/api/generate-interview-questions \
   -H "Content-Type: application/json" \
   -d '{
     "job_title": "Senior Backend Developer",
@@ -283,7 +283,7 @@ curl -X POST https://lamoda-recruiter-maksmisakov.amvera.io/api/generate-intervi
 
 **Request**:
 ```bash
-curl -X POST https://lamoda-recruiter-maksmisakov.amvera.io/api/match-resume-to-job \
+curl -X POST https://Mismatch-recruiter-maksmisakov.amvera.io/api/match-resume-to-job \
   -H "Content-Type: application/json" \
   -d '{"job_title": "Position"}'
 ```

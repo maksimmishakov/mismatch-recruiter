@@ -1,7 +1,7 @@
 {
   "companies": {
-    "lamoda": {
-      "name": "Lamoda",
+    "Mismatch": {
+      "name": "Mismatch",
       "bonus_per_hire": 120000,
       "required_level": ["middle", "senior"],
       "required_skills": ["python", "sql", "docker"],

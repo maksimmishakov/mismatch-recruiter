@@ -12,8 +12,8 @@
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/maksimmishakov/lamoda-ai-recruiter.git
-   cd lamoda-ai-recruiter
+   git clone https://github.com/maksimmishakov/Mismatch-ai-recruiter.git
+   cd Mismatch-ai-recruiter
    ```
 
 2. **Create virtual environment**
@@ -49,7 +49,7 @@
 
 ### Required Variables
 ```
-DATABASE_URL=postgresql://user:password@localhost/lamoda_db
+DATABASE_URL=postgresql://user:password@localhost/Mismatch_db
 REDIS_URL=redis://localhost:6379/0
 SECRET_KEY=your-secret-key
 DEBUG=True
@@ -133,12 +133,12 @@ Key metrics to monitor:
 
 ### Database Backup
 ```bash
-pg_dump lamoda_db > backup.sql
+pg_dump Mismatch_db > backup.sql
 ```
 
 ### Database Restore
 ```bash
-psql lamoda_db < backup.sql
+psql Mismatch_db < backup.sql
 ```
 
 ## Security Considerations

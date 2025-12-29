@@ -1,9 +1,9 @@
 # 🚀 Features Completion Summary
 
-## Project: MisMatch - Lamoda Recruitment Bot
+## Project: MisMatch - Mismatch Recruitment Bot
 **Status**: ✅ All 3 core features implemented and deployed
 **Date**: December 23, 2025
-**Repository**: https://github.com/maksimmishakov/lamoda-ai-recruiter
+**Repository**: https://github.com/maksimmishakov/Mismatch-ai-recruiter
 
 ---
 
@@ -158,7 +158,7 @@
 ## 🚀 Deployment
 
 **Platform**: Amvera Cloud
-**Application URL**: https://lamoda-recruiter-maksmisakov.amvera.io
+**Application URL**: https://Mismatch-recruiter-maksmisakov.amvera.io
 **Status**: Deployed (Building in progress)
 **Auto-Rebuild**: Enabled on Git push to master
 

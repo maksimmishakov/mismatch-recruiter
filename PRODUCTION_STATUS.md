@@ -34,7 +34,7 @@
 
 - [View INVESTOR_DEMO.md](./INVESTOR_DEMO.md)
 - [View API Documentation](./API_DOCUMENTATION.md)
-- [View Source Code](https://github.com/maksimmishakov/lamoda-ai-recruiter)
+- [View Source Code](https://github.com/maksimmishakov/Mismatch-ai-recruiter)
 
 ---
 

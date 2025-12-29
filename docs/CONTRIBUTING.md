@@ -1,6 +1,6 @@
-# Contributing to Lamoda AI Recruiter
+# Contributing to Mismatch AI Recruiter
 
-Thank you for your interest in contributing to the Lamoda AI Recruiter project! This document provides guidelines and instructions for contributing.
+Thank you for your interest in contributing to the Mismatch AI Recruiter project! This document provides guidelines and instructions for contributing.
 
 ## Code of Conduct
 
@@ -18,8 +18,8 @@ Please be respectful and constructive in all interactions. We are committed to p
 
 1. Fork the repository
    ```bash
-   git clone https://github.com/YOUR_USERNAME/lamoda-ai-recruiter.git
-   cd lamoda-ai-recruiter
+   git clone https://github.com/YOUR_USERNAME/Mismatch-ai-recruiter.git
+   cd Mismatch-ai-recruiter
    ```
 
 2. Create a virtual environment
@@ -312,7 +312,7 @@ The maintainers handle releases, but contributors should be aware that:
 
 - **Issues**: Bug reports and feature requests
 - **Discussions**: Questions and ideas
-- **Email**: dev@lamoda-recruiter.com
+- **Email**: dev@Mismatch-recruiter.com
 
 ### Getting Help
 
@@ -336,11 +336,11 @@ By contributing, you agree that your contributions will be licensed under the pr
 
 Don't hesitate to:
 - Create a GitHub Discussion
-- Email: dev@lamoda-recruiter.com
+- Email: dev@Mismatch-recruiter.com
 - Check [FAQ.md](FAQ.md) for common questions
 
 ---
 
-Thank you for contributing to making Lamoda AI Recruiter better!
+Thank you for contributing to making Mismatch AI Recruiter better!
 
 *Last Updated: December 25, 2024*

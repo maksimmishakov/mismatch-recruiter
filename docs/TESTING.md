@@ -352,7 +352,7 @@ jobs:
       
       - name: Run integration tests
         env:
-          DATABASE_URL: postgresql://postgres:password@localhost:5432/lamoda
+          DATABASE_URL: postgresql://postgres:password@localhost:5432/Mismatch
           REDIS_URL: redis://localhost:6379
         run: pytest tests/integration/
       

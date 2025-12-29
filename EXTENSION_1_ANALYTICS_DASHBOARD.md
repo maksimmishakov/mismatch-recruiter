@@ -92,7 +92,7 @@ http://localhost:5000/api/analytics
 
 ### Cloud Deployment (Amvera)
 - **Status:** Building (in progress)
-- **Expected URL:** `https://lamoda-recruiter-maksmisakov.amvera.io/analytics-dashboard`
+- **Expected URL:** `https://Mismatch-recruiter-maksmisakov.amvera.io/analytics-dashboard`
 - **Build Status:** Last checked at 23:49 UTC
 
 ---

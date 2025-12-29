@@ -1,12 +1,12 @@
-# Lamoda AI Recruiter - Comprehensive API Reference
+# Mismatch AI Recruiter - Comprehensive API Reference
 
 ## Overview
-This document provides complete API documentation for the Lamoda AI Recruiter platform, including all endpoints, request/response formats, authentication, and error handling.
+This document provides complete API documentation for the Mismatch AI Recruiter platform, including all endpoints, request/response formats, authentication, and error handling.
 
 ## Base URL
 ```
-Production: https://api.lamoda-recruiter.com/v1
-Staging: https://staging-api.lamoda-recruiter.com/v1
+Production: https://api.Mismatch-recruiter.com/v1
+Staging: https://staging-api.Mismatch-recruiter.com/v1
 Local: http://localhost:5000/api/v1
 ```
 
@@ -391,15 +391,15 @@ All list endpoints support pagination with these parameters:
 
 ## SDKs and Libraries
 
-- **Python:** `pip install lamoda-recruiter`
-- **JavaScript/Node.js:** `npm install @lamoda/recruiter-sdk`
-- **Go:** `go get github.com/lamoda/recruiter-go`
+- **Python:** `pip install Mismatch-recruiter`
+- **JavaScript/Node.js:** `npm install @Mismatch/recruiter-sdk`
+- **Go:** `go get github.com/Mismatch/recruiter-go`
 
 ---
 
 ## Support & Resources
 
-- **Documentation:** https://docs.lamoda-recruiter.com
-- **API Status:** https://status.lamoda-recruiter.com
-- **Support Email:** api-support@lamoda-recruiter.com
-- **GitHub Issues:** https://github.com/lamoda/recruiter-api/issues
+- **Documentation:** https://docs.Mismatch-recruiter.com
+- **API Status:** https://status.Mismatch-recruiter.com
+- **Support Email:** api-support@Mismatch-recruiter.com
+- **GitHub Issues:** https://github.com/Mismatch/recruiter-api/issues

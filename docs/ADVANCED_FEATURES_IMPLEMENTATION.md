@@ -1,7 +1,7 @@
 # Advanced Features Implementation Guide
 
 ## Overview
-This document outlines the implementation of Phase 3, 4, and 5 features for the lamoda-ai-recruiter project, enabling comprehensive monitoring, advanced API capabilities, and database optimization.
+This document outlines the implementation of Phase 3, 4, and 5 features for the Mismatch-ai-recruiter project, enabling comprehensive monitoring, advanced API capabilities, and database optimization.
 
 ## PHASE 3: Real-Time Monitoring & Alerting
 

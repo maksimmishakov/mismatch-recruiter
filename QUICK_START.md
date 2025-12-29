@@ -1,7 +1,7 @@
 # 🚀 Quick Start Guide - MisMatch Features
 
 **Status**: Production Ready  
-**Live URL**: https://lamoda-recruiter-maksmisakov.amvera.io  
+**Live URL**: https://Mismatch-recruiter-maksmisakov.amvera.io  
 **Last Updated**: December 23, 2025
 
 ---
@@ -27,7 +27,7 @@ MisMatch provides three powerful features for recruitment automation:
 | Interview Questions | (see API below) |
 | Health Check | `/api/status` |
 
-**Example**: https://lamoda-recruiter-maksmisakov.amvera.io/batch
+**Example**: https://Mismatch-recruiter-maksmisakov.amvera.io/batch
 
 ---
 
@@ -36,7 +36,7 @@ MisMatch provides three powerful features for recruitment automation:
 ### 1. Batch Upload Files
 
 ```bash
-curl -X POST https://lamoda-recruiter-maksmisakov.amvera.io/api/batch-upload \\
+curl -X POST https://Mismatch-recruiter-maksmisakov.amvera.io/api/batch-upload \\
   -F "files[]=@resume1.pdf" \\
   -F "files[]=@resume2.pdf"
 ```
@@ -58,7 +58,7 @@ curl -X POST https://lamoda-recruiter-maksmisakov.amvera.io/api/batch-upload \\
 ### 2. Match Resume to Job
 
 ```bash
-curl -X POST https://lamoda-recruiter-maksmisakov.amvera.io/api/match-resume-to-job \\
+curl -X POST https://Mismatch-recruiter-maksmisakov.amvera.io/api/match-resume-to-job \\
   -H "Content-Type: application/json" \\
   -d '{
     "job_title": "Senior Python Developer",
@@ -82,7 +82,7 @@ curl -X POST https://lamoda-recruiter-maksmisakov.amvera.io/api/match-resume-to-
 ### 3. Generate Interview Questions
 
 ```bash
-curl -X POST https://lamoda-recruiter-maksmisakov.amvera.io/api/generate-interview-questions \\
+curl -X POST https://Mismatch-recruiter-maksmisakov.amvera.io/api/generate-interview-questions \\
   -H "Content-Type: application/json" \\
   -d '{
     "job_title": "Backend Developer",
@@ -111,14 +111,14 @@ curl -X POST https://lamoda-recruiter-maksmisakov.amvera.io/api/generate-intervi
 
 ### Feature 1: Batch Upload
 
-1. Open https://lamoda-recruiter-maksmisakov.amvera.io/batch
+1. Open https://Mismatch-recruiter-maksmisakov.amvera.io/batch
 2. Drag-drop PDF files or click to upload
 3. Wait for processing
 4. View results with extracted skills and scores
 
 ### Feature 2: Job Matcher
 
-1. Open https://lamoda-recruiter-maksmisakov.amvera.io/job-matcher
+1. Open https://Mismatch-recruiter-maksmisakov.amvera.io/job-matcher
 2. Enter job title (e.g., "Senior Python Developer")
 3. Paste job description
 4. Paste resume text
@@ -228,13 +228,13 @@ curl -X POST https://lamoda-recruiter-maksmisakov.amvera.io/api/generate-intervi
 - **Feature Details**: See `FEATURES_COMPLETION_SUMMARY.md`
 - **Testing Guide**: See `TESTING_GUIDE.md`
 - **Deployment**: See `AMVERA_DEPLOYMENT_GUIDE.md`
-- **GitHub**: https://github.com/maksimmishakov/lamoda-ai-recruiter
+- **GitHub**: https://github.com/maksimmishakov/Mismatch-ai-recruiter
 
 ---
 
 ## What's Next?
 
-1. ✅ Test the application at https://lamoda-recruiter-maksmisakov.amvera.io
+1. ✅ Test the application at https://Mismatch-recruiter-maksmisakov.amvera.io
 2. ✅ Try each of the 3 features
 3. 📖 Read the detailed testing guide for comprehensive testing
 4. 🚀 Deploy to your infrastructure

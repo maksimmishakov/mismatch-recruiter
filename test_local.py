@@ -55,7 +55,7 @@ test_message = """
 
 Видел твой опыт с Go - впечатляет! 🚀
 
-В Lamoda ищем Senior Backend Developer:
+В Mismatch ищем Senior Backend Developer:
 💰 120k рублей
 🛠️ Go, Python, Kubernetes
 📊 Масштабируемые системы

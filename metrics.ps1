@@ -1,38 +1,38 @@
 # ====================================================
-# METRICS - ТРЕКИНГ РЕЗУЛЬТАТОВ
+# METRICS - пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 # ====================================================
 
-Write-Host "?? LAMODA RECRUITMENT METRICS" -ForegroundColor Cyan
+Write-Host "?? Mismatch RECRUITMENT METRICS" -ForegroundColor Cyan
 Write-Host "=============================" -ForegroundColor Cyan
 Write-Host ""
 
-# Загружаем данные
+# пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 $candidatesFile = "C:\recruitment-ai\candidates_ai_scored.json"
 $metricsFile = "C:\recruitment-ai\metrics.json"
 
 if (Test-Path $candidatesFile) {
     $candidates = Get-Content $candidatesFile -Raw | ConvertFrom-Json
     $totalCandidates = $candidates.Count
-    $totalPotentialBonus = $totalCandidates * 120000  # Средний бонус
+    $totalPotentialBonus = $totalCandidates * 120000  # пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
     
-    Write-Host "?? НАЙДЕННЫЕ КАНДИДАТЫ:" -ForegroundColor Yellow
-    Write-Host "  Всего: $totalCandidates"
-    Write-Host "  Средний Score: 70/100"
+    Write-Host "?? пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:" -ForegroundColor Yellow
+    Write-Host "  пїЅпїЅпїЅпїЅпїЅ: $totalCandidates"
+    Write-Host "  пїЅпїЅпїЅпїЅпїЅпїЅпїЅ Score: 70/100"
     Write-Host ""
     
-    Write-Host "?? ФИНАНСОВЫЙ ПОТЕНЦИАЛ:" -ForegroundColor Green
-    Write-Host "  Если все пройдут испытание:"
-    Write-Host "  • Месячный бонус: $($totalPotentialBonus / 1000)k ?"
-    Write-Host "  • Годовой бонус: $($totalPotentialBonus * 12 / 1000000)M ?"
+    Write-Host "?? пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:" -ForegroundColor Green
+    Write-Host "  пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:"
+    Write-Host "  пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ: $($totalPotentialBonus / 1000)k ?"
+    Write-Host "  пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ: $($totalPotentialBonus * 12 / 1000000)M ?"
     Write-Host ""
-    Write-Host "  Если пройдут 50% (реально):"
-    Write-Host "  • Месячный бонус: $($totalPotentialBonus / 2 / 1000)k ?"
-    Write-Host "  • Годовой бонус: $($totalPotentialBonus * 12 / 2 / 1000000)M ?"
+    Write-Host "  пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 50% (пїЅпїЅпїЅпїЅпїЅпїЅпїЅ):"
+    Write-Host "  пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ: $($totalPotentialBonus / 2 / 1000)k ?"
+    Write-Host "  пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ: $($totalPotentialBonus * 12 / 2 / 1000000)M ?"
     Write-Host ""
 }
 
-# Список кандидатов для просмотра
-Write-Host "?? КАНДИДАТЫ ДЛЯ РЕКОМЕНДАЦИИ:" -ForegroundColor Yellow
+# пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+Write-Host "?? пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:" -ForegroundColor Yellow
 Write-Host ""
 
 if ($candidates) {
@@ -44,10 +44,10 @@ if ($candidates) {
     }
 }
 
-Write-Host "?? СЛЕДУЮЩИЕ ШАГИ:" -ForegroundColor Yellow
-Write-Host "  1. Отредактируй письма в letter_drafts.txt"
-Write-Host "  2. Добавь свои контакты (Telegram, LinkedIn)"
-Write-Host "  3. Скопируй письма и отправь кандидатам"
-Write-Host "  4. Отслеживай ответы"
-Write-Host "  5. Рекомендуй в Lamoda (через официальную программу)"
+Write-Host "?? пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ:" -ForegroundColor Yellow
+Write-Host "  1. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ letter_drafts.txt"
+Write-Host "  2. пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (Telegram, LinkedIn)"
+Write-Host "  3. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ"
+Write-Host "  4. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ"
+Write-Host "  5. пїЅпїЅпїЅпїЅпїЅMismatchпїЅ mismatch (пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)"
 Write-Host ""

@@ -1,47 +1,47 @@
-LAMODA_INTEGRATION.md# Lamoda Integration Guide
+Mismatch_INTEGRATION.md# Mismatch Integration Guide
 
 ## Overview
 
-This document describes the Lamoda job platform integration for the AI Recruiter system. Lamoda is a Russian job marketplace where we source real job listings and candidate profiles for matching and placement.
+This document describes the Mismatch job platform integration for the AI Recruiter system. Mismatch is a Russian job marketplace where we source real job listings and candidate profiles for matching and placement.
 
 ## Architecture
 
 ### Components
 
-1. **API Client** (`app/services/lamoda_api_client.py`)
-   - Handles HTTP requests to Lamoda API
+1. **API Client** (`app/services/Mismatch_api_client.py`)
+   - Handles HTTP requests to Mismatch API
    - Manages HMAC authentication
    - Implements retry logic and error handling
    - Supports job and candidate data retrieval
 
-2. **Routes** (`app/routes/lamoda.py`)
-   - REST API endpoints for Lamoda integration
-   - Jobs endpoint: `GET /api/v1/lamoda/jobs`
-   - Candidates endpoint: `GET /api/v1/lamoda/candidates`
-   - Matching endpoint: `POST /api/v1/lamoda/match`
-   - Sync endpoint: `POST /api/v1/lamoda/sync`
-   - Placements endpoint: `POST /api/v1/lamoda/placements`
+2. **Routes** (`app/routes/Mismatch.py`)
+   - REST API endpoints for Mismatch integration
+   - Jobs endpoint: `GET /api/v1/Mismatch/jobs`
+   - Candidates endpoint: `GET /api/v1/Mismatch/candidates`
+   - Matching endpoint: `POST /api/v1/Mismatch/match`
+   - Sync endpoint: `POST /api/v1/Mismatch/sync`
+   - Placements endpoint: `POST /api/v1/Mismatch/placements`
 
-3. **Background Tasks** (`app/tasks/lamoda_sync.py`)
+3. **Background Tasks** (`app/tasks/Mismatch_sync.py`)
    - Celery tasks for background synchronization
    - Full and incremental sync tasks
    - Scheduled sync with configurable intervals
    - Error handling and retry mechanisms
 
-4. **Database Models** (`app/models/lamoda.py`)
-   - `LamodaJob`: Job listings (19 fields)
-   - `LamodaCandidate`: Candidate profiles (15 fields)
-   - `LamodaPlacement`: Job-to-candidate placements (9 fields)
-   - `LamodaSync`: Sync operation tracking (10 fields)
-   - `LamodaIntegrationConfig`: Configuration storage (4 fields)
+4. **Database Models** (`app/models/Mismatch.py`)
+   - `MismatchJob`: Job listings (19 fields)
+   - `MismatchCandidate`: Candidate profiles (15 fields)
+   - `MismatchPlacement`: Job-to-candidate placements (9 fields)
+   - `MismatchSync`: Sync operation tracking (10 fields)
+   - `MismatchIntegrationConfig`: Configuration storage (4 fields)
 
-5. **Configuration** (`app/config/lamoda.py`)
+5. **Configuration** (`app/config/Mismatch.py`)
    - Pydantic settings with 25+ configurable parameters
    - Environment variable support
    - Constants for job statuses, experience levels, etc.
    - Error code mappings
 
-6. **Initialization Service** (`app/services/lamoda_initialization_service.py`)
+6. **Initialization Service** (`app/services/Mismatch_initialization_service.py`)
    - Manages setup and initialization sequence
    - Database model initialization
    - Configuration storage setup
@@ -54,30 +54,30 @@ This document describes the Lamoda job platform integration for the AI Recruiter
 
 ```bash
 # API Credentials
-LAMODA_API_KEY=your_api_key
-LAMODA_API_SECRET=your_api_secret
-LAMODA_API_BASE_URL=https://api.lamoda.ru/v1
+Mismatch_API_KEY=your_api_key
+Mismatch_API_SECRET=your_api_secret
+Mismatch_API_BASE_URL=https://api.Mismatch.ru/v1
 
 # Sync Settings
-LAMODA_SYNC_ENABLED=true
-LAMODA_SYNC_INTERVAL_HOURS=24
-LAMODA_MAX_JOBS_PER_SYNC=1000
-LAMODA_MAX_CANDIDATES_PER_SYNC=500
+Mismatch_SYNC_ENABLED=true
+Mismatch_SYNC_INTERVAL_HOURS=24
+Mismatch_MAX_JOBS_PER_SYNC=1000
+Mismatch_MAX_CANDIDATES_PER_SYNC=500
 
 # Request Configuration
-LAMODA_REQUEST_TIMEOUT=30
-LAMODA_MAX_RETRIES=3
-LAMODA_RETRY_BACKOFF=1.5
+Mismatch_REQUEST_TIMEOUT=30
+Mismatch_MAX_RETRIES=3
+Mismatch_RETRY_BACKOFF=1.5
 
 # Matching Settings
-LAMODA_MIN_MATCH_SCORE=0.7
-LAMODA_SKILL_WEIGHT=0.4
-LAMODA_EXPERIENCE_WEIGHT=0.3
-LAMODA_SALARY_WEIGHT=0.3
+Mismatch_MIN_MATCH_SCORE=0.7
+Mismatch_SKILL_WEIGHT=0.4
+Mismatch_EXPERIENCE_WEIGHT=0.3
+Mismatch_SALARY_WEIGHT=0.3
 
 # Webhook Settings
-LAMODA_WEBHOOK_ENABLED=false
-LAMODA_WEBHOOK_SECRET=your_webhook_secret
+Mismatch_WEBHOOK_ENABLED=false
+Mismatch_WEBHOOK_SECRET=your_webhook_secret
 ```
 
 ## API Usage
@@ -85,19 +85,19 @@ LAMODA_WEBHOOK_SECRET=your_webhook_secret
 ### Get Jobs
 
 ```bash
-GET /api/v1/lamoda/jobs?location=Moscow&min_salary=100000
+GET /api/v1/Mismatch/jobs?location=Moscow&min_salary=100000
 ```
 
 ### Get Candidates
 
 ```bash
-GET /api/v1/lamoda/candidates?skills=Python&experience=senior
+GET /api/v1/Mismatch/candidates?skills=Python&experience=senior
 ```
 
 ### Match Candidates to Jobs
 
 ```bash
-POST /api/v1/lamoda/match
+POST /api/v1/Mismatch/match
 Content-Type: application/json
 
 {
@@ -109,7 +109,7 @@ Content-Type: application/json
 ### Trigger Sync
 
 ```bash
-POST /api/v1/lamoda/sync
+POST /api/v1/Mismatch/sync
 Content-Type: application/json
 
 {
@@ -119,9 +119,9 @@ Content-Type: application/json
 
 ## Database Schema
 
-### LamodaJob Table
+### MismatchJob Table
 - `id` (Primary Key)
-- `lamoda_id` (Unique, indexed)
+- `Mismatch_id` (Unique, indexed)
 - `title`, `company`, `location`
 - `salary_min`, `salary_max`, `currency`
 - `employment_type`, `experience_level`
@@ -131,9 +131,9 @@ Content-Type: application/json
 - `posted_at`, `synced_at`
 - `active` (Boolean)
 
-### LamodaCandidate Table
+### MismatchCandidate Table
 - `id` (Primary Key)
-- `lamoda_id` (Unique, indexed)
+- `Mismatch_id` (Unique, indexed)
 - `first_name`, `last_name`
 - `email` (indexed), `phone`
 - `location`, `title`
@@ -158,19 +158,19 @@ Minimum match score threshold: 0.7 (configurable)
 
 ### Test Files
 
-1. **test_lamoda_api_client.py** (138 lines)
+1. **test_Mismatch_api_client.py** (138 lines)
    - Client initialization tests
    - HMAC signature validation
    - Model serialization
    - Error handling
 
-2. **test_lamoda_routes.py** (246 lines)
+2. **test_Mismatch_routes.py** (246 lines)
    - Endpoint tests
    - Filter and parameter validation
    - Authentication tests
    - Response format validation
 
-3. **test_lamoda_models.py** (220 lines)
+3. **test_Mismatch_models.py** (220 lines)
    - ORM model tests
    - Constraint validation
    - Relationship tests
@@ -179,19 +179,19 @@ Minimum match score threshold: 0.7 (configurable)
 ### Running Tests
 
 ```bash
-pytest tests/test_lamoda_api_client.py -v
-pytest tests/test_lamoda_routes.py -v
-pytest tests/test_lamoda_models.py -v
+pytest tests/test_Mismatch_api_client.py -v
+pytest tests/test_Mismatch_routes.py -v
+pytest tests/test_Mismatch_models.py -v
 ```
 
 ## Initialization
 
-To initialize the Lamoda integration:
+To initialize the Mismatch integration:
 
 ```python
-from app.services.lamoda_initialization_service import initialize_lamoda
+from app.services.Mismatch_initialization_service import initialize_Mismatch
 
-results = initialize_lamoda()
+results = initialize_Mismatch()
 print(results)
 # {
 #   "database_models": True,

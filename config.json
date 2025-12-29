@@ -1,5 +1,5 @@
 {
-  "lamoda_search": {
+  "Mismatch_search": {
     "keywords": ["python", "javascript", "golang", "qa", "data analyst"],
     "locations": ["Moscow", "Russia"],
     "min_stars": 100,
@@ -7,7 +7,7 @@
     "excluded_keywords": ["bot", "spam", "test", "tutorial"],
     "daily_limit": 100
   },
-  "lamoda_positions": {
+  "Mismatch_positions": {
     "python_dev": {
       "salary_bonus": 120000,
       "level": "middle",

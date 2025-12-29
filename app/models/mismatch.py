@@ -1,6 +1,6 @@
-""Lamoda Integration Database Models
+""Mismatch Integration Database Models
 
-Defines SQLAlchemy ORM models for Lamoda API data persistence,
+Defines SQLAlchemy ORM models for Mismatch API data persistence,
 including jobs, candidates, placements, and sync tracking.
 """
 from datetime import datetime
@@ -10,12 +10,12 @@ from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 
 
-class LamodaJob(Base):
-    """Lamoda Job Listing Model"""
-    __tablename__ = "lamoda_jobs"
+class MismatchJob(Base):
+    """Mismatch Job Listing Model"""
+    __tablename__ = "Mismatch_jobs"
     
     id = Column(Integer, primary_key=True)
-    lamoda_id = Column(String(100), unique=True, index=True, nullable=False)
+    Mismatch_id = Column(String(100), unique=True, index=True, nullable=False)
     title = Column(String(255), nullable=False)
     company = Column(String(255), nullable=False)
     description = Column(Text)
@@ -34,15 +34,15 @@ class LamodaJob(Base):
     active = Column(Boolean, default=True)
     
     def __repr__(self):
-        return f"<LamodaJob(lamoda_id={self.lamoda_id}, title={self.title})>"
+        return f"<MismatchJob(Mismatch_id={self.Mismatch_id}, title={self.title})>"
 
 
-class LamodaCandidate(Base):
-    """Lamoda Candidate Profile Model"""
-    __tablename__ = "lamoda_candidates"
+class MismatchCandidate(Base):
+    """Mismatch Candidate Profile Model"""
+    __tablename__ = "Mismatch_candidates"
     
     id = Column(Integer, primary_key=True)
-    lamoda_id = Column(String(100), unique=True, index=True, nullable=False)
+    Mismatch_id = Column(String(100), unique=True, index=True, nullable=False)
     first_name = Column(String(100))
     last_name = Column(String(100))
     email = Column(String(255), index=True)
@@ -60,15 +60,15 @@ class LamodaCandidate(Base):
     active = Column(Boolean, default=True)
     
     def __repr__(self):
-        return f"<LamodaCandidate(lamoda_id={self.lamoda_id}, email={self.email})>"
+        return f"<MismatchCandidate(Mismatch_id={self.Mismatch_id}, email={self.email})>"
 
 
-class LamodaPlacement(Base):
-    """Lamoda Job Placement Model"""
-    __tablename__ = "lamoda_placements"
+class MismatchPlacement(Base):
+    """Mismatch Job Placement Model"""
+    __tablename__ = "Mismatch_placements"
     
     id = Column(Integer, primary_key=True)
-    lamoda_id = Column(String(100), unique=True, index=True)
+    Mismatch_id = Column(String(100), unique=True, index=True)
     job_id = Column(String(100), nullable=False, index=True)
     candidate_id = Column(String(100), nullable=False, index=True)
     status = Column(String(50), default="submitted")  # submitted, viewed, rejected, accepted
@@ -79,12 +79,12 @@ class LamodaPlacement(Base):
     synced_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     def __repr__(self):
-        return f"<LamodaPlacement(job_id={self.job_id}, candidate_id={self.candidate_id}, status={self.status})>"
+        return f"<MismatchPlacement(job_id={self.job_id}, candidate_id={self.candidate_id}, status={self.status})>"
 
 
-class LamodaSync(Base):
-    """Lamoda Sync Operation Tracking Model"""
-    __tablename__ = "lamoda_sync_operations"
+class MismatchSync(Base):
+    """Mismatch Sync Operation Tracking Model"""
+    __tablename__ = "Mismatch_sync_operations"
     
     id = Column(Integer, primary_key=True)
     sync_type = Column(String(50), nullable=False)  # full, incremental
@@ -99,12 +99,12 @@ class LamodaSync(Base):
     duration_seconds = Column(Integer)  # Total duration in seconds
     
     def __repr__(self):
-        return f"<LamodaSync(sync_type={self.sync_type}, status={self.status})>"
+        return f"<MismatchSync(sync_type={self.sync_type}, status={self.status})>"
 
 
 class LamodoIntegrationConfig(Base):
-    """Lamoda Integration Configuration Storage"""
-    __tablename__ = "lamoda_config"
+    """Mismatch Integration Configuration Storage"""
+    __tablename__ = "Mismatch_config"
     
     id = Column(Integer, primary_key=True)
     config_key = Column(String(100), unique=True, nullable=False, index=True)
@@ -113,4 +113,4 @@ class LamodoIntegrationConfig(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     def __repr__(self):
-        return f"<LamodaIntegrationConfig(key={self.config_key})>"
+        return f"<MismatchIntegrationConfig(key={self.config_key})>"

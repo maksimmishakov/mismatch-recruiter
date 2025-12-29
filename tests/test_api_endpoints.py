@@ -1,4 +1,4 @@
-"""Comprehensive API Endpoint Tests for Lamoda AI Recruiter
+"""Comprehensive API Endpoint Tests for Mismatch AI Recruiter
 
 This module contains comprehensive tests for all API endpoints including:
 - Health check endpoint

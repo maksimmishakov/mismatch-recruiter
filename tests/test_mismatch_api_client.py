@@ -1,27 +1,27 @@
-"""Test Lamoda API Client
-Tests for app.services.lamoda_api_client module
+"""Test Mismatch API Client
+Tests for app.services.Mismatch_api_client module
 """
 import pytest
 import asyncio
 from datetime import datetime
 from unittest.mock import Mock, patch, AsyncMock
-from app.services.lamoda_api_client import (
-    LamodaAPIClient,
-    LamodaJob,
+from app.services.Mismatch_api_client import (
+    MismatchAPIClient,
+    MismatchJob,
     CandidateProfile,
     Placement,
-    LamodaAPIError,
+    MismatchAPIError,
     PlacementStatus,
-    LamodaJobStatus
+    MismatchJobStatus
 )
 
 
-class TestLamodaClientInit:
-    """Test LamodaAPIClient initialization"""
+class TestMismatchClientInit:
+    """Test MismatchAPIClient initialization"""
     
     def test_client_initialization(self):
         """Test client can be initialized with credentials"""
-        client = LamodaAPIClient(
+        client = MismatchAPIClient(
             api_key="test-key",
             api_secret="test-secret",
             api_url="https://api.test.com"
@@ -32,7 +32,7 @@ class TestLamodaClientInit:
     
     def test_client_with_environment(self):
         """Test client initialization with environment parameter"""
-        client = LamodaAPIClient(
+        client = MismatchAPIClient(
             api_key="test",
             api_secret="test",
             api_url="https://api.test.com",
@@ -46,19 +46,19 @@ class TestHMACSignature:
     
     def test_signature_generation(self):
         """Test HMAC-SHA256 signature is generated correctly"""
-        client = LamodaAPIClient(
+        client = MismatchAPIClient(
             api_key="test",
             api_secret="secret",
             api_url="https://api.test.com"
         )
         signature = client._generate_signature("GET", "/jobs", "")
         assert signature is not None
-        assert "Lamoda" in signature
+        assert "Mismatch" in signature
         assert ":" in signature
     
     def test_signature_deterministic(self):
         """Test signature is deterministic for same input"""
-        client = LamodaAPIClient(
+        client = MismatchAPIClient(
             api_key="test",
             api_secret="secret",
             api_url="https://api.test.com"
@@ -68,13 +68,13 @@ class TestHMACSignature:
         assert sig1 == sig2
 
 
-class TestLamodaJobModel:
-    """Test LamodaJob data structure"""
+class TestMismatchJobModel:
+    """Test MismatchJob data structure"""
     
     def test_job_to_dict(self):
-        """Test LamodaJob can be converted to dict"""
-        job = LamodaJob(
-            id="lamoda-123",
+        """Test MismatchJob can be converted to dict"""
+        job = MismatchJob(
+            id="Mismatch-123",
             title="Python Developer",
             description="Seeking experienced Python developer",
             company="TechCorp",
@@ -82,7 +82,7 @@ class TestLamodaJobModel:
             salary_to=120000
         )
         job_dict = job.to_dict()
-        assert job_dict["id"] == "lamoda-123"
+        assert job_dict["id"] == "Mismatch-123"
         assert job_dict["title"] == "Python Developer"
         assert job_dict["salary_from"] == 80000
 
@@ -114,7 +114,7 @@ class TestPlacementModel:
         now = datetime.utcnow()
         placement = Placement(
             id="plac-789",
-            job_id="lamoda-123",
+            job_id="Mismatch-123",
             candidate_id="cand-456",
             status="submitted",
             created_at=now,
@@ -124,12 +124,12 @@ class TestPlacementModel:
         assert placement.status == "submitted"
 
 
-class TestLamodaAPIError:
+class TestMismatchAPIError:
     """Test error handling"""
     
     def test_error_with_status_code(self):
-        """Test LamodaAPIError captures status codes"""
-        error = LamodaAPIError("Unauthorized", 401)
+        """Test MismatchAPIError captures status codes"""
+        error = MismatchAPIError("Unauthorized", 401)
         assert error.status_code == 401
         assert "Unauthorized" in str(error)
 

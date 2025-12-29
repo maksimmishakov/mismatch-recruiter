@@ -1,8 +1,8 @@
-# 🚀 MisMatch Deployment Guide - Amvera (Lamoda Cloud)
+# 🚀 MisMatch Deployment Guide - Amvera (Mismatch Cloud)
 
 ## Overview
 
-This guide covers deploying the MisMatch AI Resume Analysis Platform to Amvera (Lamoda's cloud platform). Amvera is the recommended platform for Russian deployment with excellent support for FastAPI applications.
+This guide covers deploying the MisMatch AI Resume Analysis Platform to Amvera (Mismatch's cloud platform). Amvera is the recommended platform for Russian deployment with excellent support for FastAPI applications.
 
 ## Quick Start (5-10 minutes)
 
@@ -61,7 +61,7 @@ This guide covers deploying the MisMatch AI Resume Analysis Platform to Amvera (
    - Click "New Application" or select existing "mismatch" app
    - Choose "Connect Repository"
    - Select GitHub
-   - Choose `maksimmishakov/lamoda-ai-recruiter`
+   - Choose `maksimmishakov/Mismatch-ai-recruiter`
    - Set branch to `master`
 
 3. **Configure Environment Variables**
@@ -221,7 +221,7 @@ To use your own domain (e.g., mismatch.company.com):
 - **Amvera Docs**: https://amvera.ru/docs
 - **FastAPI Docs**: https://fastapi.tiangolo.com/
 - **OpenAI API**: https://platform.openai.com/docs
-- **GitHub Repo**: https://github.com/maksimmishakov/lamoda-ai-recruiter
+- **GitHub Repo**: https://github.com/maksimmishakov/Mismatch-ai-recruiter
 
 ## Checklist Before Going Live
 

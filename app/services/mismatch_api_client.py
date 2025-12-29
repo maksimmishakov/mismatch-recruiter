@@ -1,4 +1,4 @@
-"""Lamoda API Client - Integration with Lamoda job portal
+"""Mismatch API Client - Integration with Mismatch job portal
 Phase 5 Step 4 - Job import, candidate submission, placement tracking
 Supports: Job import, candidate sync, placement results, error handling
 """
@@ -17,8 +17,8 @@ import time
 logger = logging.getLogger(__name__)
 
 
-class LamodaJobStatus(Enum):
-    """Lamoda job statuses"""
+class MismatchJobStatus(Enum):
+    """Mismatch job statuses"""
     OPEN = "open"
     CLOSED = "closed"
     ON_REVIEW = "on_review"
@@ -37,8 +37,8 @@ class PlacementStatus(Enum):
 
 
 @dataclass
-class LamodaJob:
-    """Lamoda job data structure"""
+class MismatchJob:
+    """Mismatch job data structure"""
     id: str
     title: str
     description: str
@@ -48,7 +48,7 @@ class LamodaJob:
     currency: str = "RUB"
     location: str = ""
     job_type: str = "full_time"
-    status: str = LamodaJobStatus.OPEN.value
+    status: str = MismatchJobStatus.OPEN.value
     created_at: datetime = None
     updated_at: datetime = None
     category: str = ""
@@ -105,16 +105,16 @@ class Placement:
     feedback: Optional[str] = None
 
 
-class LamodaAPIError(Exception):
-    """Lamoda API error"""
+class MismatchAPIError(Exception):
+    """Mismatch API error"""
     def __init__(self, message: str, status_code: Optional[int] = None):
         self.message = message
         self.status_code = status_code
         super().__init__(self.message)
 
 
-class LamodaAPIClient:
-    """Client for Lamoda API integration"""
+class MismatchAPIClient:
+    """Client for Mismatch API integration"""
     def __init__(self, api_key: str, api_secret: str, api_url: str, 
                  environment: str = "sandbox", timeout: int = 30):
         self.api_key = api_key
@@ -135,12 +135,12 @@ class LamodaAPIClient:
             signature_string.encode(),
             hashlib.sha256
         ).hexdigest()
-        return f"Lamoda {self.api_key}:{signature}:{timestamp}"
+        return f"Mismatch {self.api_key}:{signature}:{timestamp}"
 
     async def _make_request(self, method: str, endpoint: str, 
                            data: Optional[Dict] = None,
                            params: Optional[Dict] = None) -> Dict[str, Any]:
-        """Make HTTP request to Lamoda API"""
+        """Make HTTP request to Mismatch API"""
         url = f"{self.api_url}{endpoint}"
         body = json.dumps(data) if data else ""
         signature = self._generate_signature(method, endpoint, body)
@@ -148,7 +148,7 @@ class LamodaAPIClient:
         headers = {
             "Authorization": signature,
             "Content-Type": "application/json",
-            "User-Agent": "LamodaAIRecruiter/1.0"
+            "User-Agent": "MismatchAIRecruiter/1.0"
         }
 
         try:
@@ -183,23 +183,23 @@ class LamodaAPIClient:
                     if response.status >= 400:
                         error_text = await response.text()
                         logger.error(f"API Error: {response.status} - {error_text}")
-                        raise LamodaAPIError(error_text, response.status)
+                        raise MismatchAPIError(error_text, response.status)
 
                     return await response.json()
         except asyncio.TimeoutError:
             logger.error("API request timeout")
-            raise LamodaAPIError("API request timeout")
+            raise MismatchAPIError("API request timeout")
         except Exception as e:
             logger.error(f"API request failed: {str(e)}")
             raise
 
     async def get_jobs(self, skip: int = 0, limit: int = 50,
                       status: Optional[str] = None,
-                      created_after: Optional[datetime] = None) -> List[LamodaJob]:
-        """Get jobs from Lamoda"""
+                      created_after: Optional[datetime] = None) -> List[MismatchJob]:
+        """Get jobs from Mismatch"""
         params = {
             "skip": skip,
-            "limit": min(limit, 100)  # Lamoda max limit is 100
+            "limit": min(limit, 100)  # Mismatch max limit is 100
         }
         if status:
             params["status"] = status
@@ -209,7 +209,7 @@ class LamodaAPIClient:
         response = await self._make_request("GET", "/jobs", params=params)
         jobs = []
         for job_data in response.get("jobs", []):
-            job = LamodaJob(
+            job = MismatchJob(
                 id=job_data["id"],
                 title=job_data["title"],
                 description=job_data["description"],
@@ -226,11 +226,11 @@ class LamodaAPIClient:
             jobs.append(job)
         return jobs
 
-    async def get_job(self, job_id: str) -> LamodaJob:
+    async def get_job(self, job_id: str) -> MismatchJob:
         """Get job details"""
         response = await self._make_request("GET", f"/jobs/{job_id}")
         job_data = response["job"]
-        return LamodaJob(
+        return MismatchJob(
             id=job_data["id"],
             title=job_data["title"],
             description=job_data["description"],
@@ -319,7 +319,7 @@ class LamodaAPIClient:
         """Verify API connection with test call"""
         try:
             await self.get_jobs(limit=1)
-            logger.info("✅ Connected to Lamoda API")
+            logger.info("✅ Connected to Mismatch API")
             return True
         except Exception as e:
             logger.error(f"❌ Connection failed: {str(e)}")
@@ -335,4 +335,4 @@ class LamodaAPIClient:
 
 
 if __name__ == "__main__":
-    logger.info("Lamoda API Client initialized")
+    logger.info("Mismatch API Client initialized")

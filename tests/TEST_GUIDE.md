@@ -1,4 +1,4 @@
-# Testing Guide for Lamoda AI Recruiter
+# Testing Guide for Mismatch AI Recruiter
 
 ## Quick Start
 

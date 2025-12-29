@@ -1,5 +1,5 @@
 # ====================================================
-# TELEGRAM NOTIFIER - Отправка результатов в Telegram
+# TELEGRAM NOTIFIER - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ Telegram
 # ====================================================
 
 param(
@@ -10,7 +10,7 @@ param(
 Write-Host "?? TELEGRAM NOTIFIER" -ForegroundColor Cyan
 Write-Host "==================" -ForegroundColor Cyan
 
-# Загружаем результаты
+# пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 $candidatesFile = "C:\recruitment-ai\candidates_ai_scored.json"
 
 if (Test-Path $candidatesFile) {
@@ -18,7 +18,7 @@ if (Test-Path $candidatesFile) {
     $count = $candidates.Count
     $totalBonus = $count * 120000
     
-    # Формируем сообщение
+    # пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     $message = @"
 ?? AI Recruiter Daily Report
 
@@ -29,15 +29,15 @@ if (Test-Path $candidatesFile) {
 Top Candidates:
 $(($candidates | Select-Object -First 3 | ForEach-Object { "? $($_.login) (Score: $($_.AI_Score)/100)" }) -join "`n")
 
-?? View all: https://github.com/maksimmishakov/lamoda-ai-recruiter
+?? View all: https://github.com/maksimmishakov/Mismatch-ai-recruiter
 
-#recruitment #lamoda #ai
+#recruitment #Mismatch #ai
 "@
     
     Write-Host "Message prepared:" -ForegroundColor Green
     Write-Host $message
     
-    # Отправляем в Telegram (если токены заполнены)
+    # пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ Telegram (пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)
     if ($botToken -ne "YOUR_BOT_TOKEN" -and $chatId -ne "YOUR_CHAT_ID") {
         $telegramUrl = "https://api.telegram.org/bot$botToken/sendMessage"
         

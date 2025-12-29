@@ -211,7 +211,7 @@ CREATE TABLE interviews (
 
 ```ini
 # Database
-DATABASE_URL=postgresql://user:password@host:5432/lamoda
+DATABASE_URL=postgresql://user:password@host:5432/Mismatch
 
 # Redis
 REDIS_URL=redis://localhost:6379

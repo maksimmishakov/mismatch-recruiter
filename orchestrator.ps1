@@ -1,91 +1,91 @@
 # ====================================================
-# ORCHESTRATOR - ГЛАВНОЕ УПРАВЛЕНИЕ (для Lamoda)
+# ORCHESTRATOR - пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅMismatchпїЅпїЅпїЅ (пїЅпїЅпїЅ mismatch)
 # ====================================================
 
 param(
     [string]$action = "status"  # status, run, schedule, dashboard
 )
 
-Write-Host "?? LAMODA RECRUITMENT ORCHESTRATOR" -ForegroundColor Cyan
+Write-Host "?? Mismatch RECRUITMENT ORCHESTRATOR" -ForegroundColor Cyan
 Write-Host "================================" -ForegroundColor Cyan
 Write-Host ""
 
-# Загружаем конфиг
+# пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 $config = Get-Content "C:\recruitment-ai\config.json" | ConvertFrom-Json
 
 function Show-Status {
-    Write-Host "?? ТЕКУЩИЙ СТАТУС:" -ForegroundColor Yellow
+    Write-Host "?? пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ:" -ForegroundColor Yellow
     Write-Host ""
     
-    # Проверяем файлы
+    # пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
     $candidatesFile = "C:\recruitment-ai\candidates_ai_scored.json"
     $lettersFile = "C:\recruitment-ai\letter_drafts.txt"
     
     if (Test-Path $candidatesFile) {
         $count = (Get-Content $candidatesFile | ConvertFrom-Json).Count
-        Write-Host "? Кандидатов найдено: $count" -ForegroundColor Green
+        Write-Host "? пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ: $count" -ForegroundColor Green
     } else {
-        Write-Host "? Кандидатов не найдено" -ForegroundColor Red
+        Write-Host "? пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ" -ForegroundColor Red
     }
     
     if (Test-Path $lettersFile) {
         $size = (Get-Item $lettersFile).Length
-        Write-Host "? Писем подготовлено: $([Math]::Round($size/1024))KB" -ForegroundColor Green
+        Write-Host "? пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: $([Math]::Round($size/1024))KB" -ForegroundColor Green
     } else {
-        Write-Host "? Писем не подготовлено" -ForegroundColor Red
+        Write-Host "? пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ" -ForegroundColor Red
     }
     
     Write-Host ""
-    Write-Host "?? КОНФИГ:" -ForegroundColor Yellow
-    Write-Host "  Ключевые слова: $($config.lamoda_search.keywords -join ', ')"
-    Write-Host "  Локация: $($config.lamoda_search.locations -join ', ')"
-    Write-Host "  Лимит в день: $($config.lamoda_search.daily_limit)"
-    Write-Host "  Запуск в: $($config.automation.run_time)"
+    Write-Host "?? пїЅпїЅпїЅпїЅпїЅпїЅ:" -ForegroundColor Yellow
+    Write-Host "  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅMismatch$($config.mismatch_search.keywords -join ', ')"
+    Write-Host "  пїЅпїЅпїЅпїЅпїЅпїЅпїЅMismatchonfig.mismatch_search.locations -join ', ')"
+    Write-Host "  пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅMismatch$config.mismatch_search.daily_limit)"
+    Write-Host "  пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ: $($config.automation.run_time)"
     Write-Host ""
 }
 
 function Run-Full-Cycle {
-    Write-Host "?? ЗАПУСК ПОЛНОГО ЦИКЛА:" -ForegroundColor Green
+    Write-Host "?? пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ:" -ForegroundColor Green
     Write-Host ""
     
-    Write-Host "1?? Поиск на GitHub..." -ForegroundColor Cyan
+    Write-Host "1?? пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ GitHub..." -ForegroundColor Cyan
     & "C:\recruitment-ai\level2_github.ps1"
     
     Write-Host ""
-    Write-Host "2?? Фильтрация через AI..." -ForegroundColor Cyan
+    Write-Host "2?? пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ AI..." -ForegroundColor Cyan
     & "C:\recruitment-ai\level5_simple_filter.ps1"
     
     Write-Host ""
-    Write-Host "3?? Генерация писем..." -ForegroundColor Cyan
+    Write-Host "3?? пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ..." -ForegroundColor Cyan
     & "C:\recruitment-ai\level6_letter_generator.ps1"
     
     Write-Host ""
-    Write-Host "? ЦИКЛ ЗАВЕРШЕН!" -ForegroundColor Green
+    Write-Host "? пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ!" -ForegroundColor Green
     
-    # Отправляем уведомление
+    # пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     $candidates = Get-Content "C:\recruitment-ai\candidates_ai_scored.json" -Raw | ConvertFrom-Json
-    Write-Host "?? Результат: $($candidates.Count) кандидатов готовы к рекомендации" -ForegroundColor Cyan
+    Write-Host "?? пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: $($candidates.Count) пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ" -ForegroundColor Cyan
 }
 
 function Show-Dashboard {
     Clear-Host
-    Write-Host "г========================================¬" -ForegroundColor Cyan
-    Write-Host "¦  LAMODA RECRUITMENT DASHBOARD          ¦" -ForegroundColor Cyan
+    Write-Host "пїЅ========================================пїЅ" -ForegroundColor Cyan
+    Write-Host "пїЅMismatchDA RECRUITMENT DASHBOARD          пїЅ" -ForegroundColor Cyan
     Write-Host "L========================================-" -ForegroundColor Cyan
     Write-Host ""
     
     Show-Status
     
     Write-Host ""
-    Write-Host "?? КОМАНДЫ:" -ForegroundColor Yellow
-    Write-Host "  .\orchestrator.ps1 status     - Показать статус"
-    Write-Host "  .\orchestrator.ps1 run        - Запустить поиск сейчас"
-    Write-Host "  .\orchestrator.ps1 schedule   - Настроить расписание"
-    Write-Host "  .\orchestrator.ps1 dashboard  - Эта панель"
+    Write-Host "?? пїЅпїЅпїЅпїЅпїЅпїЅпїЅ:" -ForegroundColor Yellow
+    Write-Host "  .\orchestrator.ps1 status     - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ"
+    Write-Host "  .\orchestrator.ps1 run        - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ"
+    Write-Host "  .\orchestrator.ps1 schedule   - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ"
+    Write-Host "  .\orchestrator.ps1 dashboard  - пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ"
     Write-Host ""
 }
 
-# Обработка команд
+# пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 switch ($action) {
     "status" {
         Show-Status
@@ -97,12 +97,12 @@ switch ($action) {
         Show-Dashboard
     }
     "schedule" {
-        Write-Host "?? НАСТРОЙКА РАСПИСАНИЯ:" -ForegroundColor Yellow
+        Write-Host "?? пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:" -ForegroundColor Yellow
         Write-Host ""
-        Write-Host "Расписание уже установлено в Task Scheduler"
-        Write-Host "Запуск каждый день в: $($config.automation.run_time)"
+        Write-Host "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ Task Scheduler"
+        Write-Host "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ: $($config.automation.run_time)"
         Write-Host ""
-        Write-Host "Для изменения времени отредактируй config.json"
+        Write-Host "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ config.json"
     }
     default {
         Show-Dashboard

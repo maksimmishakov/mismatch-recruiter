@@ -4,7 +4,7 @@
 
 This document details all API endpoints related to the analytics dashboard for the recruitment bot.
 
-**Base URL:** `https://lamoda-recruiter-maksmisakov.amvera.io` (Cloud) or `http://localhost:5000` (Local)
+**Base URL:** `https://Mismatch-recruiter-maksmisakov.amvera.io` (Cloud) or `http://localhost:5000` (Local)
 
 ---
 
@@ -50,7 +50,7 @@ This document details all API endpoints related to the analytics dashboard for t
 **Example Request:**
 
 ```bash
-curl https://lamoda-recruiter-maksmisakov.amvera.io/api/analytics
+curl https://Mismatch-recruiter-maksmisakov.amvera.io/api/analytics
 ```
 
 **Caching:** Enabled (5-minute TTL)
@@ -72,9 +72,9 @@ curl https://lamoda-recruiter-maksmisakov.amvera.io/api/analytics
 **Example Request:**
 
 ```bash
-# Browser: https://lamoda-recruiter-maksmisakov.amvera.io/analytics-dashboard
+# Browser: https://Mismatch-recruiter-maksmisakov.amvera.io/analytics-dashboard
 # Or via curl:
-curl https://lamoda-recruiter-maksmisakov.amvera.io/analytics-dashboard
+curl https://Mismatch-recruiter-maksmisakov.amvera.io/analytics-dashboard
 ```
 
 **Features:**

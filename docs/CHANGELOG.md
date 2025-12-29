@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to the Lamoda AI Recruiter project will be documented in this file.
+All notable changes to the Mismatch AI Recruiter project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
@@ -141,11 +141,11 @@ We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guid
 ## Support
 
 For issues or questions:
-- Email: support@lamoda-recruiter.com
+- Email: support@Mismatch-recruiter.com
 - GitHub Issues: Bug reports
 - GitHub Discussions: Feature requests
 
 ---
 
 *Last Updated: December 25, 2024*
-*Maintained by: Lamoda AI Recruiter Team*
+*Maintained by: Mismatch AI Recruiter Team*

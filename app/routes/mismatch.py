@@ -1,40 +1,40 @@
-"""Lamoda Integration Routes - Phase 5 Step 4.2
+"""Mismatch Integration Routes - Phase 5 Step 4.2
 API endpoints for job management, candidate submission, and placement tracking
 """
 from fastapi import APIRouter, HTTPException, Query, Depends
 from typing import List, Optional
 from datetime import datetime
 import logging
-from app.services.lamoda_api_client import LamodaAPIClient, LamodaJob, CandidateProfile, PlacementStatus
+from app.services.Mismatch_api_client import MismatchAPIClient, MismatchJob, CandidateProfile, PlacementStatus
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/api/lamoda", tags=["lamoda"])
+router = APIRouter(prefix="/api/Mismatch", tags=["Mismatch"])
 
 # Global client instance (would be dependency-injected in production)
-lamoda_client: Optional[LamodaAPIClient] = None
+Mismatch_client: Optional[MismatchAPIClient] = None
 
 
 @router.post("/configure")
-async def configure_lamoda(
+async def configure_Mismatch(
     api_key: str,
     api_secret: str,
     environment: str = "sandbox"
 ):
     """
-    Configure Lamoda API credentials
+    Configure Mismatch API credentials
     Returns: {"status": "connected", "jobs_available": N}
     """
-    global lamoda_client
+    global Mismatch_client
     
     try:
         api_url = (
-            "https://api.lamoda.ru/v1"
+            "https://api.Mismatch.ru/v1"
             if environment == "production"
-            else "https://sandbox-api.lamoda.ru/v1"
+            else "https://sandbox-api.Mismatch.ru/v1"
         )
         
-        lamoda_client = LamodaAPIClient(
+        Mismatch_client = MismatchAPIClient(
             api_key=api_key,
             api_secret=api_secret,
             api_url=api_url,
@@ -42,18 +42,18 @@ async def configure_lamoda(
         )
         
         # Test connection
-        is_connected = await lamoda_client.verify_connection()
+        is_connected = await Mismatch_client.verify_connection()
         if not is_connected:
             raise HTTPException(
                 status_code=401,
-                detail="Failed to authenticate with Lamoda API"
+                detail="Failed to authenticate with Mismatch API"
             )
         
         # Get jobs count
-        jobs = await lamoda_client.get_jobs(limit=1)
+        jobs = await Mismatch_client.get_jobs(limit=1)
         jobs_count = len(jobs) if jobs else 0
         
-        logger.info(f"✅ Lamoda configured for {environment} environment")
+        logger.info(f"✅ Mismatch configured for {environment} environment")
         return {
             "status": "connected",
             "environment": environment,
@@ -68,23 +68,23 @@ async def configure_lamoda(
 
 
 @router.get("/jobs")
-async def get_lamoda_jobs(
+async def get_Mismatch_jobs(
     status: Optional[str] = "open",
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=100)
 ):
     """
-    Get available jobs from Lamoda
+    Get available jobs from Mismatch
     Returns: List of jobs with details
     """
-    if not lamoda_client:
+    if not Mismatch_client:
         raise HTTPException(
             status_code=400,
-            detail="Lamoda not configured. Call /configure first"
+            detail="Mismatch not configured. Call /configure first"
         )
     
     try:
-        jobs = await lamoda_client.get_jobs(
+        jobs = await Mismatch_client.get_jobs(
             skip=skip,
             limit=limit,
             status=status
@@ -103,19 +103,19 @@ async def get_lamoda_jobs(
 
 
 @router.get("/jobs/{job_id}")
-async def get_lamoda_job(job_id: str):
+async def get_Mismatch_job(job_id: str):
     """
-    Get specific job details from Lamoda
+    Get specific job details from Mismatch
     Returns: Job details
     """
-    if not lamoda_client:
+    if not Mismatch_client:
         raise HTTPException(
             status_code=400,
-            detail="Lamoda not configured"
+            detail="Mismatch not configured"
         )
     
     try:
-        job = await lamoda_client.get_job(job_id)
+        job = await Mismatch_client.get_job(job_id)
         return {
             "job": job.to_dict(),
             "status": "success"
@@ -129,25 +129,25 @@ async def get_lamoda_job(job_id: str):
 
 
 @router.post("/sync/{job_id}")
-async def sync_job_to_lamoda(
+async def sync_job_to_Mismatch(
     job_id: int,
     min_score: float = 0.70
 ):
     """
-    Submit matched candidates for a job to Lamoda
+    Submit matched candidates for a job to Mismatch
     Returns: {"submitted": N, "status": "sent"}
     """
-    if not lamoda_client:
+    if not Mismatch_client:
         raise HTTPException(
             status_code=400,
-            detail="Lamoda not configured"
+            detail="Mismatch not configured"
         )
     
     try:
         # In production, fetch candidates from database
         # For now, return simulated response
         
-        logger.info(f"Syncing job {job_id} to Lamoda")
+        logger.info(f"Syncing job {job_id} to Mismatch")
         return {
             "job_id": job_id,
             "submitted": 5,  # Simulated count
@@ -169,13 +169,13 @@ async def get_placement_results(
     date_to: Optional[str] = None
 ):
     """
-    Get hiring results from Lamoda
+    Get hiring results from Mismatch
     Returns: Placements with status (hired, rejected, etc)
     """
-    if not lamoda_client:
+    if not Mismatch_client:
         raise HTTPException(
             status_code=400,
-            detail="Lamoda not configured"
+            detail="Mismatch not configured"
         )
     
     try:
@@ -188,7 +188,7 @@ async def get_placement_results(
         if date_to:
             date_to_dt = datetime.fromisoformat(date_to)
         
-        placements = await lamoda_client.get_placements(
+        placements = await Mismatch_client.get_placements(
             job_id=str(job_id) if job_id else None,
             date_from=date_from_dt,
             date_to=date_to_dt
@@ -227,10 +227,10 @@ async def update_placement(
     Update placement status
     Status values: hired, rejected, interview_scheduled, etc
     """
-    if not lamoda_client:
+    if not Mismatch_client:
         raise HTTPException(
             status_code=400,
-            detail="Lamoda not configured"
+            detail="Mismatch not configured"
         )
     
     try:
@@ -249,7 +249,7 @@ async def update_placement(
                 detail=f"Invalid status. Must be one of: {', '.join(valid_statuses)}"
             )
         
-        result = await lamoda_client.update_placement(
+        result = await Mismatch_client.update_placement(
             placement_id=placement_id,
             status=status,
             notes=notes
@@ -276,16 +276,16 @@ async def get_sync_status():
     Get last sync status and statistics
     Returns: {"last_sync": datetime, "jobs_synced": N, "candidates_submitted": N}
     """
-    if not lamoda_client:
+    if not Mismatch_client:
         raise HTTPException(
             status_code=400,
-            detail="Lamoda not configured"
+            detail="Mismatch not configured"
         )
     
     try:
-        rate_limit = lamoda_client.get_rate_limit_info()
+        rate_limit = Mismatch_client.get_rate_limit_info()
         return {
-            "environment": lamoda_client.environment,
+            "environment": Mismatch_client.environment,
             "rate_limit": {
                 "remaining": rate_limit["remaining"],
                 "reset_at": rate_limit["reset_at"]
@@ -302,4 +302,4 @@ async def get_sync_status():
 
 
 if __name__ == "__main__":
-    logger.info("Lamoda routes initialized")
+    logger.info("Mismatch routes initialized")

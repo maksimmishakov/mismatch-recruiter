@@ -1,4 +1,4 @@
-"""Test Lamoda Database Models"""
+"""Test Mismatch Database Models"""
 import pytest
 from datetime import datetime
 from sqlalchemy.orm import Session
@@ -23,15 +23,15 @@ def db_session():
     session.close()
 
 
-class TestLamodaJobModel:
-    """Test LamodaJob model"""
+class TestMismatchJobModel:
+    """Test MismatchJob model"""
     
     def test_create_job_model(self, db_session: Session):
-        """Test creating a LamodaJob instance"""
-        from app.models.lamoda import LamodaJob
+        """Test creating a MismatchJob instance"""
+        from app.models.Mismatch import MismatchJob
         
-        job = LamodaJob(
-            lamoda_id="job-123",
+        job = MismatchJob(
+            Mismatch_id="job-123",
             title="Python Developer",
             company="TechCorp",
             description="Build scalable backend systems",
@@ -45,23 +45,23 @@ class TestLamodaJobModel:
             requirements="5+ years of experience",
             benefits="Remote, Health Insurance",
             posted_at=datetime.utcnow(),
-            external_url="https://lamoda.ru/jobs/123"
+            external_url="https://Mismatch.ru/jobs/123"
         )
         
         db_session.add(job)
         db_session.commit()
         
-        retrieved = db_session.query(LamodaJob).filter_by(lamoda_id="job-123").first()
+        retrieved = db_session.query(MismatchJob).filter_by(Mismatch_id="job-123").first()
         assert retrieved is not None
         assert retrieved.title == "Python Developer"
         assert retrieved.company == "TechCorp"
     
     def test_job_salary_range(self, db_session: Session):
         """Test job salary range validation"""
-        from app.models.lamoda import LamodaJob
+        from app.models.Mismatch import MismatchJob
         
-        job = LamodaJob(
-            lamoda_id="job-456",
+        job = MismatchJob(
+            Mismatch_id="job-456",
             title="Senior Developer",
             company="StartUp",
             salary_min=300000,
@@ -71,19 +71,19 @@ class TestLamodaJobModel:
         db_session.add(job)
         db_session.commit()
         
-        retrieved = db_session.query(LamodaJob).filter_by(lamoda_id="job-456").first()
+        retrieved = db_session.query(MismatchJob).filter_by(Mismatch_id="job-456").first()
         assert retrieved.salary_min <= retrieved.salary_max
 
 
-class TestLamodaCandidateModel:
-    """Test LamodaCandidate model"""
+class TestMismatchCandidateModel:
+    """Test MismatchCandidate model"""
     
     def test_create_candidate_model(self, db_session: Session):
-        """Test creating a LamodaCandidate instance"""
-        from app.models.lamoda import LamodaCandidate
+        """Test creating a MismatchCandidate instance"""
+        from app.models.Mismatch import MismatchCandidate
         
-        candidate = LamodaCandidate(
-            lamoda_id="cand-789",
+        candidate = MismatchCandidate(
+            Mismatch_id="cand-789",
             first_name="Ivan",
             last_name="Petrov",
             email="ivan@example.com",
@@ -96,13 +96,13 @@ class TestLamodaCandidateModel:
             education="Computer Science, MSU",
             languages=["Russian", "English"],
             available_from=datetime.utcnow(),
-            external_url="https://lamoda.ru/candidates/789"
+            external_url="https://Mismatch.ru/candidates/789"
         )
         
         db_session.add(candidate)
         db_session.commit()
         
-        retrieved = db_session.query(LamodaCandidate).filter_by(lamoda_id="cand-789").first()
+        retrieved = db_session.query(MismatchCandidate).filter_by(Mismatch_id="cand-789").first()
         assert retrieved is not None
         assert retrieved.first_name == "Ivan"
         assert retrieved.last_name == "Petrov"
@@ -110,10 +110,10 @@ class TestLamodaCandidateModel:
     
     def test_candidate_contact_info(self, db_session: Session):
         """Test candidate contact information validation"""
-        from app.models.lamoda import LamodaCandidate
+        from app.models.Mismatch import MismatchCandidate
         
-        candidate = LamodaCandidate(
-            lamoda_id="cand-new",
+        candidate = MismatchCandidate(
+            Mismatch_id="cand-new",
             email="maria@example.com",
             phone="+7 888 555 12 34"
         )
@@ -121,20 +121,20 @@ class TestLamodaCandidateModel:
         db_session.add(candidate)
         db_session.commit()
         
-        retrieved = db_session.query(LamodaCandidate).filter_by(lamoda_id="cand-new").first()
+        retrieved = db_session.query(MismatchCandidate).filter_by(Mismatch_id="cand-new").first()
         assert "@" in retrieved.email
         assert "+7" in retrieved.phone
 
 
-class TestLamodaPlacementModel:
-    """Test LamodaPlacement model"""
+class TestMismatchPlacementModel:
+    """Test MismatchPlacement model"""
     
     def test_create_placement_model(self, db_session: Session):
-        """Test creating a LamodaPlacement instance"""
-        from app.models.lamoda import LamodaPlacement
+        """Test creating a MismatchPlacement instance"""
+        from app.models.Mismatch import MismatchPlacement
         
-        placement = LamodaPlacement(
-            lamoda_id="plac-123",
+        placement = MismatchPlacement(
+            Mismatch_id="plac-123",
             job_id="job-123",
             candidate_id="cand-789",
             status="submitted",
@@ -146,17 +146,17 @@ class TestLamodaPlacementModel:
         db_session.add(placement)
         db_session.commit()
         
-        retrieved = db_session.query(LamodaPlacement).filter_by(lamoda_id="plac-123").first()
+        retrieved = db_session.query(MismatchPlacement).filter_by(Mismatch_id="plac-123").first()
         assert retrieved is not None
         assert retrieved.status == "submitted"
         assert retrieved.match_score > 0.8
     
     def test_placement_status_tracking(self, db_session: Session):
         """Test placement status transitions"""
-        from app.models.lamoda import LamodaPlacement
+        from app.models.Mismatch import MismatchPlacement
         
-        placement = LamodaPlacement(
-            lamoda_id="plac-456",
+        placement = MismatchPlacement(
+            Mismatch_id="plac-456",
             job_id="job-456",
             candidate_id="cand-456",
             status="submitted"
@@ -169,18 +169,18 @@ class TestLamodaPlacementModel:
         placement.status = "viewed"
         db_session.commit()
         
-        retrieved = db_session.query(LamodaPlacement).filter_by(lamoda_id="plac-456").first()
+        retrieved = db_session.query(MismatchPlacement).filter_by(Mismatch_id="plac-456").first()
         assert retrieved.status == "viewed"
 
 
-class TestLamodaSyncModel:
-    """Test LamodaSync model for tracking sync operations"""
+class TestMismatchSyncModel:
+    """Test MismatchSync model for tracking sync operations"""
     
     def test_create_sync_record(self, db_session: Session):
-        """Test creating a LamodaSync tracking record"""
-        from app.models.lamoda import LamodaSync
+        """Test creating a MismatchSync tracking record"""
+        from app.models.Mismatch import MismatchSync
         
-        sync = LamodaSync(
+        sync = MismatchSync(
             sync_type="full",
             status="completed",
             started_at=datetime.utcnow(),
@@ -194,16 +194,16 @@ class TestLamodaSyncModel:
         db_session.add(sync)
         db_session.commit()
         
-        retrieved = db_session.query(LamodaSync).filter_by(sync_type="full").first()
+        retrieved = db_session.query(MismatchSync).filter_by(sync_type="full").first()
         assert retrieved is not None
         assert retrieved.status == "completed"
         assert retrieved.jobs_synced == 1000
     
     def test_sync_progress_tracking(self, db_session: Session):
         """Test sync progress tracking"""
-        from app.models.lamoda import LamodaSync
+        from app.models.Mismatch import MismatchSync
         
-        sync = LamodaSync(
+        sync = MismatchSync(
             sync_type="incremental",
             status="running",
             started_at=datetime.utcnow()
@@ -212,7 +212,7 @@ class TestLamodaSyncModel:
         db_session.add(sync)
         db_session.commit()
         
-        retrieved = db_session.query(LamodaSync).filter_by(sync_type="incremental").first()
+        retrieved = db_session.query(MismatchSync).filter_by(sync_type="incremental").first()
         assert retrieved.status == "running"
         assert retrieved.started_at is not None
 

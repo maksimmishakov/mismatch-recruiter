@@ -1,4 +1,4 @@
-"""Performance Testing Module for Lamoda AI Recruiter
+"""Performance Testing Module for Mismatch AI Recruiter
 
 Tests for:
 - Response time optimization

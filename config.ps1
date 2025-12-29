@@ -2,13 +2,13 @@
 
 $global:Config = @{
     GoogleCredsPath = "C:\recruitment-ai\google_creds.json"
-    SheetName = "Lamoda_Recruitment_DB"
+    SheetName = "Mismatch_Recruitment_DB"
     
     HHApiUrl = "https://api.hh.ru"
     HHSearchKeywords = @(
         "python developer",
         "frontend react",
-        "старший разработчик"
+        "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ"
     )
     
     GitHubToken = $env:GITHUB_TOKEN

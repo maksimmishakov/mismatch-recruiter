@@ -1,4 +1,4 @@
-name: Replace lamoda with mismatch in all files
+name: Replace Mismatch with mismatch in all files
 
 on:
   workflow_dispatch:
@@ -10,11 +10,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      - name: Replace all lamoda references
+      - name: Replace all Mismatch references
         run: |
-          find . -type f \( -name "*.py" -o -name "*.md" -o -name "*.yml" -o -name "*.yaml" -o -name "*.json" -o -name "*.txt" \) ! -path "./.git/*" ! -path "./.*" -exec sed -i 's/lamoda/mismatch/g' {} \;
-          find . -type f \( -name "*.py" -o -name "*.md" -o -name "*.yml" -o -name "*.yaml" -o -name "*.json" -o -name "*.txt" \) ! -path "./.git/*" ! -path "./.*" -exec sed -i 's/Lamoda/Mismatch/g' {} \;
-          find . -type f \( -name "*.py" -o -name "*.md" -o -name "*.yml" -o -name "*.yaml" -o -name "*.json" -o -name "*.txt" \) ! -path "./.git/*" ! -path "./.*" -exec sed -i 's/LAMODA/MISMATCH/g' {} \;
+          find . -type f \( -name "*.py" -o -name "*.md" -o -name "*.yml" -o -name "*.yaml" -o -name "*.json" -o -name "*.txt" \) ! -path "./.git/*" ! -path "./.*" -exec sed -i 's/Mismatch/mismatch/g' {} \;
+          find . -type f \( -name "*.py" -o -name "*.md" -o -name "*.yml" -o -name "*.yaml" -o -name "*.json" -o -name "*.txt" \) ! -path "./.git/*" ! -path "./.*" -exec sed -i 's/Mismatch/Mismatch/g' {} \;
+          find . -type f \( -name "*.py" -o -name "*.md" -o -name "*.yml" -o -name "*.yaml" -o -name "*.json" -o -name "*.txt" \) ! -path "./.git/*" ! -path "./.*" -exec sed -i 's/Mismatch/MISMATCH/g' {} \;
           echo "✅ All replacements completed!"
       
       - name: Commit changes
@@ -22,5 +22,5 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add -A
-          git commit -m "refactor: Replace all lamoda references with mismatch globally" || echo "No changes to commit"
+          git commit -m "refactor: Replace all Mismatch references with mismatch globally" || echo "No changes to commit"
           git push

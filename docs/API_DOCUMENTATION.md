@@ -5,7 +5,7 @@ Comprehensive API specification for the MisMatch Recruitment Bot system.
 
 ## Base URL
 ```
-https://lamoda-recruiter-maksmisakov.amvera.io/api
+https://Mismatch-recruiter-maksmisakov.amvera.io/api
 ```
 
 ## Authentication
@@ -161,7 +161,7 @@ import httpx
 async def generate_questions():
     async with httpx.AsyncClient() as client:
         response = await client.post(
-            "https://lamoda-recruiter-maksmisakov.amvera.io/api/generate-interview-questions",
+            "https://Mismatch-recruiter-maksmisakov.amvera.io/api/generate-interview-questions",
             headers={"Authorization": f"Bearer {token}"},
             json={"job_description": "...", "candidate_profile": "..."}
         )
@@ -170,7 +170,7 @@ async def generate_questions():
 
 ### JavaScript
 ```javascript
-fetch('https://lamoda-recruiter-maksmisakov.amvera.io/api/generate-interview-questions', {
+fetch('https://Mismatch-recruiter-maksmisakov.amvera.io/api/generate-interview-questions', {
   method: 'POST',
   headers: {
     'Authorization': `Bearer ${token}`,
@@ -189,4 +189,4 @@ fetch('https://lamoda-recruiter-maksmisakov.amvera.io/api/generate-interview-que
 - Redis caching integration
 
 ## Support
-For API support, contact: api-support@lamoda.ru
+For API support, contact: api-support@Mismatch.ru

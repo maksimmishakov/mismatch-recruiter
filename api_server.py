@@ -14,7 +14,7 @@ app = FastAPI(
     version="2.0.0"
 )
 
-GITHUB_HTML_URL = "https://raw.githubusercontent.com/maksimmishakov/lamoda-ai-recruiter/master/templates/index.html"
+GITHUB_HTML_URL = "https://raw.githubusercontent.com/maksimmishakov/Mismatch-ai-recruiter/master/templates/index.html"
 ai_brain = MisMatchAI()
 
 @app.get("/", response_class=HTMLResponse)

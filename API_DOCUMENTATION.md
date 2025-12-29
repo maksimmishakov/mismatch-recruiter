@@ -2,7 +2,7 @@
 
 ## Base URL
 
-`https://lamoda-recruiter-maksmisakov.amvera.io`
+`https://Mismatch-recruiter-maksmisakov.amvera.io`
 
 ## 11 Endpoints
 

@@ -8,9 +8,9 @@
 
 ## 🎯 Live Demo
 
-🌐 **[lamoda-recruiter-maksimisakov.amvera.io](https://lamoda-recruiter-maksimisakov.amvera.io)**
+🌐 **[Mismatch-recruiter-maksimisakov.amvera.io](https://Mismatch-recruiter-maksimisakov.amvera.io)**
 
-**Admin Dashboard:** [https://lamoda-recruiter-maksimisakov.amvera.io/admin-dashboard](https://lamoda-recruiter-maksimisakov.amvera.io/admin-dashboard)
+**Admin Dashboard:** [https://Mismatch-recruiter-maksimisakov.amvera.io/admin-dashboard](https://Mismatch-recruiter-maksimisakov.amvera.io/admin-dashboard)
 
 **Status:** Live on Amvera, 99.9% uptime
 
@@ -70,8 +70,8 @@
 
 ```bash
 # Clone repository
-git clone https://github.com/maksimmishakov/lamoda-ai-recruiter
-cd lamoda-ai-recruiter
+git clone https://github.com/maksimmishakov/Mismatch-ai-recruiter
+cd Mismatch-ai-recruiter
 
 # Create virtual environment
 python -m venv venv
@@ -282,7 +282,7 @@ python -m unittest tests.test_api_endpoints.TestAPIEndpoints.test_health_check
 
 - **Email:** maksim@mismatch.io
 - **GitHub:** [@maksimmishakov](https://github.com/maksimmishakov)
-- **Live Demo:** [lamoda-recruiter-maksimisakov.amvera.io](https://lamoda-recruiter-maksimisakov.amvera.io)
+- **Live Demo:** [Mismatch-recruiter-maksimisakov.amvera.io](https://Mismatch-recruiter-maksimisakov.amvera.io)
 
 ---
 
@@ -302,49 +302,49 @@ MIT License - See LICENSE file for details
 **Status:** 🟢 Ready for production and investor pitches
 
 
-## Phase 5 - Lamoda Integration (COMPLETED)
+## Phase 5 - Mismatch Integration (COMPLETED)
 
 **Status:** Testing & Models Complete
 
 ### Components Created:
 
-1. **API Client** (lamoda_api_client.py)
+1. **API Client** (Mismatch_api_client.py)
    - HMAC authentication
    - Job/Candidate data retrieval
    - Retry logic with backoff
 
-2. **REST API Routes** (lamoda.py) 
+2. **REST API Routes** (Mismatch.py) 
    - 6 endpoints for jobs, candidates, matching, sync, placements
    - 306 lines, fully tested
 
-3. **Background Tasks** (lamoda_sync.py)
+3. **Background Tasks** (Mismatch_sync.py)
    - Celery sync tasks
    - Full and incremental sync
    - 247 lines
 
-4. **Database Models** (app/models/lamoda.py)
+4. **Database Models** (app/models/Mismatch.py)
    - 5 SQLAlchemy ORM models
    - 217 lines
 
-5. **Configuration** (app/config/lamoda.py)
+5. **Configuration** (app/config/Mismatch.py)
    - Pydantic settings
    - 25+ environment variables
    - 189 lines
 
-6. **Initialization Service** (lamoda_initialization_service.py)
+6. **Initialization Service** (Mismatch_initialization_service.py)
    - Setup orchestration
    - 170 lines
 
 ### Testing Coverage:
 
-- test_lamoda_api_client.py: 138 lines
-- test_lamoda_routes.py: 246 lines  
-- test_lamoda_models.py: 220 lines
+- test_Mismatch_api_client.py: 138 lines
+- test_Mismatch_routes.py: 246 lines  
+- test_Mismatch_models.py: 220 lines
 - Total: 604 lines of tests
 
 ### Documentation:
 
-- LAMODA_INTEGRATION.md: 240 lines
+- Mismatch_INTEGRATION.md: 240 lines
   - Full architecture guide
   - API usage examples
   - Database schema
@@ -356,4 +356,4 @@ MIT License - See LICENSE file for details
 - **Test Code**: 604 lines
 - **Documentation**: 240 lines
 - **Total**: 2,241 lines
-- **Test Coverage**: 90%+ for Lamoda integration
+- **Test Coverage**: 90%+ for Mismatch integration

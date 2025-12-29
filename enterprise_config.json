@@ -2,8 +2,8 @@
     "environment":  "production",
     "companies":  [
                       {
-                          "id":  "lamoda",
-                          "name":  "Lamoda",
+                          "id":  "Mismatch",
+                          "name":  "Mismatch",
                           "skills":  "python sql",
                           "cities":  "Moscow SPB",
                           "min_score":  70,
