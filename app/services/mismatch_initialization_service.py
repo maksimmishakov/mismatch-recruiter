@@ -8,7 +8,7 @@ from typing import Dict, Any, Optional
 from datetime import datetime
 
 from app.config.Mismatch import get_settings, MismatchSettings
-from app.models.Mismatch import Base, MismatchSync, LamodoIntegrationConfig
+from app.models.Mismatch import Base, MismatchSync
 
 
 logger = logging.getLogger(__name__)
