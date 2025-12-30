@@ -39,7 +39,7 @@ class ResumeParser:
         )
     
     def _extract_email(self, text: str) -> Optional[str]:
-        pattern = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+        pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
         matches = re.findall(pattern, text)
         return matches[0] if matches else None
     
