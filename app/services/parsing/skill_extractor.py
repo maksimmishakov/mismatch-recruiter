@@ -14,6 +14,8 @@ class SkillExtractor:
     
     def extract_and_categorize(self, text: str) -> List[Dict]:
         found_skills = []
+                if not text or not isinstance(text, str):
+            return []
         text_lower = text.lower()
         
         for skill, metadata in self.skill_taxonomy.items():
