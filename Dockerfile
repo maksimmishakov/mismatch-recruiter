@@ -25,5 +25,10 @@ EXPOSE 5000
 # Создайте папки для логов и uploads
 RUN mkdir -p logs uploads
 
+ENV FLASK_ENV=production
+ENV FLASK_DEBUG=False
+ENV FLASK_HOST=0.0.0.0
+ENV FLASK_PORT=5000
+
 # Команда для запуска
 CMD ["python", "run.py"]
