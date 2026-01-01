@@ -1,61 +1,199 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>RankPO - AI Recruitment Platform</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MisMatch Platform - AI Recruitment Intelligence</title>
     <style>
-        body { font-family: sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 400px; text-align: center; }
-        h1 { color: #333; margin-bottom: 30px; }
-        input { width: 100%; padding: 15px; margin-bottom: 15px; border: 2px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 16px; }
-        button { width: 100%; padding: 15px; background: #007bff; color: white; border: none; border-radius: 10px; font-size: 18px; cursor: pointer; transition: 0.3s; }
-        button:hover { background: #0056b3; }
-        #status { margin-top: 20px; color: #666; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #208091 0%, #1a4856 100%);
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+        
+        .hero {
+            background: linear-gradient(135deg, #208091 0%, #1a4856 100%);
+            color: white;
+            padding: 100px 2rem;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            margin: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: white;
+            color: #208091;
+        }
+        
+        .btn-secondary {
+            background: #5E5240;
+            color: white;
+        }
+        
+        .features {
+            padding: 80px 2rem;
+            background: #f8f9fa;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #208091;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        
+        .pricing {
+            padding: 80px 2rem;
+        }
+        
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .pricing-card {
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .pricing-card.featured {
+            border-color: #208091;
+            background: #f0f7f9;
+        }
+        
+        footer {
+            background: #1a1a1a;
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h1>🚀 AI Recruiter</h1>
-        <input type="text" id="keyword" placeholder="Кого ищем? (например: Python)" value="Python">
-        <input type="text" id="location" placeholder="Где? (например: Moscow)" value="Moscow">
-        <button id="btn" onclick="startSearch()">Найти кандидатов</button>
-        <div id="status">Готов к работе</div>
-    </div>
+    <header>
+        <nav>
+            <div class="logo">🚀 MisMatch</div>
+        </nav>
+    </header>
 
-    <script>
-        async function startSearch() {
-            const btn = document.getElementById('btn');
-            const status = document.getElementById('status');
-            const keyword = document.getElementById('keyword').value;
-            
-            btn.disabled = true;
-            btn.innerText = "⏳ Ищу...";
-            status.innerText = "Запускаю AI агентов...";
-            
-            try {
-                const response = await fetch('http://localhost:5000/run-analysis', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ keyword: keyword, location: 'Moscow' })
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    status.innerHTML = '✅ Найдено: ' + data.count + ' кандидатов!<br><br>' + 
-                        data.candidates.map(c => c.login + ' (' + (c.AI_Score || 0) + ')').join('<br>');
-                    btn.innerText = "Найти еще";
-                } else {
-                    status.innerText = "❌ Ошибка: " + data.message;
-                    btn.innerText = "Попробовать снова";
-                }
-            } catch (e) {
-                status.innerText = "❌ Ошибка соединения с сервером";
-                console.error(e);
-                btn.innerText = "Ошибка";
-            }
-            btn.disabled = false;
-        }
-    </script>
+    <section class="hero">
+        <h1>AI-Powered Recruitment Intelligence</h1>
+        <p>Find the perfect candidate match in seconds, not weeks.</p>
+        <button class="btn btn-primary">Start Free Trial</button>
+        <button class="btn btn-secondary">Schedule Demo</button>
+    </section>
+
+    <section class="features" id="features">
+        <div class="container">
+            <h2 class="section-title">Why Choose MisMatch?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3>🤖 AI Resume Parsing</h3>
+                    <p>Automatically extract skills and experience from resumes.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🎯 Smart Matching</h3>
+                    <p>Match candidates to jobs with 0-100 confidence score.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>📊 Real-time Analytics</h3>
+                    <p>Track hiring metrics and funnel conversion rates.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="pricing" id="pricing">
+        <div class="container">
+            <h2 class="section-title">Simple Pricing</h2>
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <h3>Starter</h3>
+                    <p>€299/month</p>
+                </div>
+                <div class="pricing-card featured">
+                    <h3>Professional</h3>
+                    <p>€999/month</p>
+                </div>
+                <div class="pricing-card">
+                    <h3>Enterprise</h3>
+                    <p>Custom pricing</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 MisMatch Platform. All rights reserved.</p>
+    </footer>
 </body>
 </html>
