@@ -23,3 +23,28 @@ def get_job_profile(job_id):
     if not profile:
         return jsonify({'error': 'Not found'}), 404
     return jsonify(profile.to_dict()), 200
+
+    @job_profiles_bp.route('/', methods=['GET'])
+def list_job_profiles():
+    """Retrieve all job profiles with pagination"""
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 20, type=int)
+    
+    # Query with pagination
+    pagination = JobProfile.query.paginate(
+        page=page,
+        per_page=per_page,
+        error_out=False
+    )
+    
+    profiles = [profile.to_dict() for profile in pagination.items]
+    
+    return jsonify({
+        'data': profiles,
+        'pagination': {
+            'page': page,
+            'per_page': per_page,
+            'total': pagination.total,
+            'pages': pagination.pages
+        }
+    }), 200

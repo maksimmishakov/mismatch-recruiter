@@ -380,6 +380,40 @@ class JobProfile(db.Model):
         }
 
 
+class Candidate(db.Model):
+    __tablename__ = 'candidates'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    email = db.Column(db.String(255), nullable=False, unique=True)
+    phone = db.Column(db.String(20), nullable=True)
+    resume_text = db.Column(db.Text, nullable=True)
+    skills = db.Column(db.JSON, nullable=True)
+    experience_years = db.Column(db.Integer, nullable=True)
+    current_position = db.Column(db.String(255), nullable=True)
+    current_company = db.Column(db.String(255), nullable=True)
+    salary_expectation = db.Column(db.Integer, nullable=True)
+    location = db.Column(db.String(255), nullable=True)
+    availability = db.Column(db.String(50), nullable=True)  # immediately, 2 weeks, 1 month, etc.
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'email': self.email,
+            'phone': self.phone,
+            'skills': self.skills,
+            'experience_years': self.experience_years,
+            'current_position': self.current_position,
+            'current_company': self.current_company,
+            'salary_expectation': self.salary_expectation,
+            'location': self.location,
+            'availability': self.availability,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }
 class SalaryData(db.Model):
     __tablename__ = 'salary_data'
     
@@ -438,4 +472,54 @@ class HiringSignal(db.Model):
             'signal_value': self.signal_value,
             'related_entity': self.related_entity,
             'timestamp': self.timestamp.isoformat()
+        }
+
+
+        class Feedback(db.Model):
+    __tablename__ = 'feedback'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    rating = db.Column(db.Integer, nullable=False)  # 1-5 stars
+    comment = db.Column(db.Text, nullable=True)
+    feedback_type = db.Column(db.String(50), nullable=True)  # bug, feature, general, etc.
+    email = db.Column(db.String(255), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'rating': self.rating,
+            'comment': self.comment,
+            'feedback_type': self.feedback_type,
+            'email': self.email,
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
+
+
+class FeatureRequest(db.Model):
+    __tablename__ = 'feature_requests'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    feature_name = db.Column(db.String(255), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    priority = db.Column(db.Integer, default=3)  # 1-5, higher is more important
+    votes = db.Column(db.Integer, default=1)  # Number of votes for this feature
+    status = db.Column(db.String(50), default='open')  # open, in_progress, done, rejected
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'feature_name': self.feature_name,
+            'description': self.description,
+            'priority': self.priority,
+            'votes': self.votes,
+            'status': self.status,
+            'created_at': self.created_at.isoformat() if self.created_at else None
         }

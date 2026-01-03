@@ -24,6 +24,8 @@ from app.routes.job_profiles import job_profiles_bp
 from app.routes.salary import salary_bp
 from app.routes.hiring_dna import hiring_dna_bp
 from app.routes.signals import signals_bp
+from app.routes.candidates import candidates_bp
+from app.routes.feedback import feedback_bp
 
 # Initialize services
 rate_limiter = RateLimiter(max_requests=100, time_window=3600)
@@ -162,3 +164,6 @@ def register_routes(app):
     app.register_blueprint(salary_bp)
     app.register_blueprint(hiring_dna_bp)
     app.register_blueprint(signals_bp)
+        app.register_blueprint(job_profiles_bp, url_prefix='/api/job-profiles')
+            app.register_blueprint(candidates_bp, url_prefix='/api/candidates')
+                app.register_blueprint(feedback_bp, url_prefix='/api/feedback')

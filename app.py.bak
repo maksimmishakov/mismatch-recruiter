@@ -1,0 +1,32 @@
+from flask import Flask, jsonify, render_template
+from datetime import datetime
+
+app = Flask(__name__)
+
+@app.route("/health", methods=["GET"])
+def health():
+    return jsonify({
+        "status": "ok",
+        "timestamp": datetime.utcnow().isoformat(),
+        "service": "mismatch-recruiter"
+    }), 200
+
+    @app.route('/')
+def index():
+    return render_template('index.html')
+
+
+@app.route("/api/v1/candidates", methods=["GET"])
+def get_candidates():
+    return jsonify({
+        "success": True,
+        "data": [],
+        "message": "No candidates yet"
+    }), 200
+
+@app.route("/metrics", methods=["GET"])
+def metrics():
+    return "mismatch_requests_total 0", 200
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000, debug=True)

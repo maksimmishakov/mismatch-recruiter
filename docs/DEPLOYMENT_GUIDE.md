@@ -1,99 +1,85 @@
-# Deployment & DevOps Guide - MisMatch Recruiter
+# 🚀 MisMatch Recruiter - Production Deployment Guide
 
-## Overview
-Comprehensive guide for deploying MisMatch Recruiter using multiple strategies (Docker, Kubernetes, Amvera).
-
-## Prerequisites
+## System Requirements
 - Docker & Docker Compose
-- Node.js 18+
-- PostgreSQL 15+
-- Git
-- GitHub secrets configured
+- Node.js 18+ (for local development)
+- Python 3.10+ (for local development)
+- 4GB RAM minimum
+- 20GB disk space minimum
 
-## Local Deployment
+## Deployment Architecture
 
-### Using Docker Compose
+### Multi-Stage Docker Build
+```
+Builder Stage: Node.js 18-Alpine → Build frontend
+Runtime Stage: Node.js 18-Alpine → Serve frontend on port 3000
+```
+
+### Services
+- Frontend: React application (Port 3000)
+- Backend: Flask API (Port 5000)
+- Database: PostgreSQL (Port 5432)
+- Cache: Redis (Port 6379)
+
+## Quick Start
+
+### 1. Build Docker Image
+```bash
+docker build -t mismatch-recruiter:v1.0.0 .
+```
+
+### 2. Deploy with Docker Compose
 ```bash
 docker-compose up -d
-# Frontend: http://localhost:3000
-# API: http://localhost:5000
-# PostgreSQL: localhost:5432
-# Redis: localhost:6379
 ```
 
-### Using Docker
+### 3. Run Migrations
 ```bash
-docker build -t mismatch-recruiter:latest .
-docker run -p 3000:3000 mismatch-recruiter:latest
+docker-compose exec web python -m alembic upgrade head
 ```
 
-## Production Deployment
-
-### GitHub Actions CI/CD
-Automatically runs on push to main:
-1. **Test**: Run Vitest suite with coverage
-2. **Lint**: ESLint and code quality checks
-3. **Security**: npm audit for vulnerabilities
-4. **Deploy**: Push to Amvera on success
-
-### Deploy to Amvera
-1. Set `AMVERA_TOKEN` in GitHub Secrets
-2. Push to main branch
-3. GitHub Actions triggers deployment
-4. Access at: https://mismatch-recruiter-maksimisakov.amvera.io
-
-## Environment Variables
-
-### Frontend (.env.production)
-```
-VITE_API_URL=https://api.mismatch.io
-VITE_GOOGLE_ANALYTICS_ID=UA-XXXXXXXXX-1
-VITE_SENTRY_DSN=https://...@sentry.io/...
-```
-
-### Backend
-```
-DATABASE_URL=postgresql://user:password@db:5432/mismatch
-REDIS_URL=redis://localhost:6379
-JWT_SECRET=your-secret-key
-AMVERA_TOKEN=your-amvera-token
-```
-
-## Performance Metrics
-
-### Target Metrics
-- Time to Interactive (TTI): < 2s
-- First Contentful Paint (FCP): < 1s
-- Largest Contentful Paint (LCP): < 2.5s
-- Cumulative Layout Shift (CLS): < 0.1
-- Lighthouse Score: 90+
-
-### Monitoring
-- New Relic / Sentry for error tracking
-- PageSpeed Insights for performance
-- Uptime monitoring via Amvera
-
-## Rollback Procedure
+### 4. Verify Deployment
 ```bash
-# Get previous deployment hash
-git log --oneline
-
-# Rollback to previous version
-git reset --hard <commit-hash>
-git push origin main --force-with-lease
-
-# CI/CD will trigger redeploy
+curl http://localhost:3000
+curl http://localhost:5000/health
 ```
 
-## Security Checklist
-- [ ] HTTPS enabled
-- [ ] Environment variables secured
-- [ ] Dependencies up to date
-- [ ] Security headers configured
-- [ ] CORS properly configured
-- [ ] Rate limiting enabled
-- [ ] Input validation implemented
-- [ ] XSS prevention active
-- [ ] CSRF tokens used
-- [ ] Authentication tokens secured
+## Production Deployment (Amvera)
+
+### 1. Prepare Environment
+```bash
+# Set production environment variables
+export AMVERA_ACCOUNT_ID=your_account_id
+export AMVERA_TOKEN=your_auth_token
+export APP_ENV=production
+export DEBUG=false
+```
+
+### 2. Deploy to Amvera
+```bash
+# Using blue-green deployment for zero downtime
+bash deployment/blue_green_deploy.sh
+```
+
+### 3. Verify Production Health
+```bash
+curl https://mismatch-recruiter.amvera.io/health
+```
+
+## Monitoring
+
+### Application Logs
+```bash
+docker-compose logs -f web
+```
+
+### Performance Metrics
+```bash
+docker stats
+```
+
+### Database Health
+```bash
+docker-compose exec db psql -U postgres -d mismatch_recruiter -c "SELECT * FROM pg_stat_statements LIMIT 10;"
+```
 
