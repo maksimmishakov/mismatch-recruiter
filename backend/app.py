@@ -13,6 +13,13 @@ from datetime import datetime, timedelta
 import os
 import logging
 
+# Import Blueprints
+from app.routes.job_profiles import job_profiles_bp
+from app.routes.candidates import candidates_bp
+from app.routes.matching_v2 import matching_bp
+from app.routes.analytics import analytics_bp
+from app.routes.feedback import feedback_bp
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -35,6 +42,13 @@ def create_app():
         }
     })
     JWTManager(app)
+
+    # Register Blueprints
+    app.register_blueprint(job_profiles_bp)
+    app.register_blueprint(candidates_bp)
+    app.register_blueprint(matching_bp)
+    app.register_blueprint(analytics_bp)
+    app.register_blueprint(feedback_bp)
     
     # Routes
     @app.route('/health', methods=['GET'])
