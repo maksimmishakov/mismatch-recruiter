@@ -1,45 +1,87 @@
-version: '3.9'
+version: '3.8'
 
 services:
-  frontend:
+  app:
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=production
-    depends_on:
-      - api
-
-  api:
-    image: mismatch-api:latest
+    container_name: mismatch-recruiter
     ports:
       - "5000:5000"
+      - "3000:3001"
     environment:
+      - FLASK_APP=backend/app.py
       - FLASK_ENV=production
-      - DATABASE_URL=postgresql://user:password@db:5432/mismatch
+      - DATABASE_URL=${DATABASE_URL:-postgresql://user:password@db:5432/mismatch}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-your-secret-key-change-in-production}
+      - NLP_MODEL_PATH=/app/models
+      - NODE_ENV=production
+    volumes:
+      - ./backend:/app/backend
+      - ./models:/app/models
     depends_on:
       - db
+      - redis
+    restart: unless-stopped
+    networks:
+      - mismatch-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
 
   db:
     image: postgres:15-alpine
-    ports:
-      - "5432:5432"
+    container_name: mismatch-db
     environment:
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=mismatch
+      - POSTGRES_USER=${POSTGRES_USER:-mismatch_user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-mismatch_password}
+      - POSTGRES_DB=${POSTGRES_DB:-mismatch_db}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - mismatch-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mismatch_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:7-alpine
+    container_name: mismatch-redis
+    restart: unless-stopped
+    networks:
+      - mismatch-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  nginx:
+    image: nginx:alpine
+    container_name: mismatch-nginx
     ports:
-      - "6379:6379"
+      - "80:80"
+      - "443:443"
     volumes:
-      - redis_data:/data
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./frontend/dist:/usr/share/nginx/html:ro
+    depends_on:
+      - app
+    restart: unless-stopped
+    networks:
+      - mismatch-network
 
 volumes:
   postgres_data:
-  redis_data:
+    driver: local
+
+networks:
+  mismatch-network:
+    driver: bridge
