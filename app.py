@@ -125,3 +125,34 @@ def audit_hiring_compliance():
         return jsonify(result), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+# Real-time Metrics via WebSocket
+from flask_socketio import SocketIO, emit, disconnect
+from services.realtime_service import RealtimeMetricsService
+
+realtime_service = RealtimeMetricsService()
+socketio = SocketIO(app, cors_allowed_origins="*")
+
+@socketio.on('connect')
+def handle_connect():
+    """Handle WebSocket connection"""
+    try:
+        realtime_service.connect(request.sid, request.sid)
+        emit('connected', {'data': 'Connected to live metrics'})
+    except Exception as e:
+        print(f"Connection error: {e}")
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    """Handle WebSocket disconnection"""
+    realtime_service.disconnect(request.sid)
+    print(f"Client disconnected")
+
+@socketio.on('request_metrics')
+def handle_metrics_request():
+    """Send live metrics to client"""
+    try:
+        metrics = realtime_service.get_current_metrics()
+        emit('metrics_update', metrics, broadcast=True)
+    except Exception as e:
+        emit('error', {'error': str(e)})
