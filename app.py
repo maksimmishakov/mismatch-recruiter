@@ -1,27 +1,110 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template, request
+from flask_cors import CORS
+from db_models import db, Candidates, JobProfiles, MatchRecords, SkillsTaxonomy
+import uuid
 from datetime import datetime
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mismatch.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db.init_app(app)
 
-@app.route("/health", methods=["GET"])
+CORS(app)
+
+with app.app_context():
+    db.create_all()
+
+@app.route('/api/health', methods=['GET'])
 def health():
-    return jsonify({
-        "status": "ok",
-        "timestamp": datetime.utcnow().isoformat(),
-        "service": "mismatch-recruiter"
-    }), 200
+    return jsonify({'status': 'healthy', 'message': '✅ MisMatch API OK', 'database': 'connected'}), 200
 
-@app.route("/api/v1/candidates", methods=["GET"])
+@app.route('/', methods=['GET'])
+def index():
+    return render_template('index.html')
+
+@app.route('/api/candidates', methods=['GET'])
 def get_candidates():
-    return jsonify({
-        "success": True,
-        "data": [],
-        "message": "No candidates yet"
-    }), 200
+    try:
+        candidates = Candidates.query.all()
+        data = [{
+            'id': c.id,
+            'name': f'{c.first_name} {c.last_name}',
+            'email': c.email,
+            'skills': c.skills or [],
+            'experience_years': c.experience_years,
+            'match_score': 85
+        } for c in candidates]
+        return jsonify({'status': 'ok', 'count': len(data), 'data': data}), 200
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
-@app.route("/metrics", methods=["GET"])
-def metrics():
-    return "mismatch_requests_total 0", 200
+@app.route('/api/candidates', methods=['POST'])
+def create_candidate():
+    try:
+        data = request.get_json()
+        candidate = Candidates(
+            id=str(uuid.uuid4()),
+            first_name=data.get('first_name', 'John'),
+            last_name=data.get('last_name', 'Doe'),
+            email=data.get('email', f'user_{uuid.uuid4().hex[:8]}@example.com'),
+            skills=data.get('skills', []),
+            experience_years=data.get('experience_years', 0)
+        )
+        db.session.add(candidate)
+        db.session.commit()
+        return jsonify({'status': 'ok', 'message': 'Candidate created', 'id': candidate.id}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'status': 'error', 'message': str(e)}), 400
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@app.route('/api/database/reset', methods=['POST'])
+def reset_database():
+    try:
+        db.drop_all()
+        db.create_all()
+        return jsonify({'status': 'ok', 'message': 'Database reset successfully'}), 200
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)
+
+# Import NLP service
+from services.transformer_nlp_service import TransformerNLPService
+
+# Initialize NLP service
+nlp_service = TransformerNLPService()
+
+# NLP Endpoints
+@app.route('/api/resume/analyze-advanced', methods=['POST'])
+def analyze_resume_advanced():
+    """Advanced resume analysis with DistilBERT NLP"""
+    try:
+        data = request.json
+        resume_text = data.get('resume_text', '')
+        
+        if not resume_text:
+            return jsonify({'error': 'resume_text is required'}), 400
+        
+        result = nlp_service.extract_skills_advanced(resume_text)
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/matching/semantic', methods=['POST'])
+def semantic_matching():
+    """Semantic matching between resume and job"""
+    try:
+        data = request.json
+        resume_text = data.get('resume_text', '')
+        job_description = data.get('job_description', '')
+        
+        if not resume_text or not job_description:
+            return jsonify({'error': 'Both resume_text and job_description are required'}), 400
+        
+        result = nlp_service.semantic_matching(resume_text, job_description)
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
