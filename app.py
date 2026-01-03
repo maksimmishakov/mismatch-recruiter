@@ -108,3 +108,20 @@ def semantic_matching():
         return jsonify(result), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+# Bias Detection and Compliance
+from services.bias_detection_service import BiasDetectionService
+
+bias_service = BiasDetectionService()
+
+@app.route('/api/compliance/audit-hiring', methods=['POST'])
+def audit_hiring_compliance():
+    """Comprehensive hiring bias audit (EU AI Act compliant)"""
+    try:
+        data = request.json
+        hiring_data = data.get('hiring_data', {})
+        
+        result = bias_service.comprehensive_audit(hiring_data)
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

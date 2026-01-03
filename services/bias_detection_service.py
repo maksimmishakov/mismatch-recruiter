@@ -1,204 +1,194 @@
-"""Bias Detection Service - AI Fairness & Compliance
-Detects and mitigates hiring bias to ensure fair recruitment
-Compliance: EU AI Act, GDPR, Equal Employment Opportunity"""
-import logging
-from typing import List, Dict
-from collections import Counter
-
-logger = logging.getLogger(__name__)
+import pandas as pd
+import numpy as np
+from scipy.stats import chi2_contingency
+from datetime import datetime
+from typing import Dict, List
 
 class BiasDetectionService:
-    """Detect and mitigate bias in hiring process"""
-    
-    def __init__(self):
-        self.logger = logging.getLogger(__name__)
-    
-    def audit_job_hiring(self, job_id: str, applications: List[Dict]) -> Dict:
-        """Audit a specific job's hiring process for bias"""
-        
-        findings = {
-            'job_id': job_id,
-            'total_applications': len(applications),
-            'biases_detected': [],
-            'risk_level': 'low',
-            'recommendations': []
-        }
-        
-        if len(applications) < 10:
-            return findings  # Not enough data
-        
-        # Check various bias dimensions
-        self._check_gender_bias(applications, findings)
-        self._check_age_bias(applications, findings)
-        self._check_location_bias(applications, findings)
-        self._check_education_bias(applications, findings)
-        
-        # Determine risk level
-        findings['risk_level'] = self._calculate_risk_level(findings['biases_detected'])
-        
-        self.logger.info(f"Bias audit complete for job {job_id}: {len(findings['biases_detected'])} issues found")
-        return findings
-    
-    def _check_gender_bias(self, applications: List[Dict], findings: Dict) -> None:
-        """Check if there's gender bias in screening"""
-        genders = []
-        selected = []
-        
-        for app in applications:
-            gender = app.get('inferred_gender', 'unknown')
-            genders.append(gender)
-            if app.get('status') in ['interview_scheduled', 'hired']:
-                selected.append(gender)
-        
-        if len(genders) > 10:
-            gender_ratio = Counter(genders)
-            selected_ratio = Counter(selected) if selected else Counter()
+    """Advanced bias detection for EU AI Act compliance"""
+   
+    BIAS_TYPES = {
+        'gender': {'threshold': 0.15, 'weight': 0.25},
+        'age': {'threshold': 0.20, 'weight': 0.20},
+        'disability': {'threshold': 0.25, 'weight': 0.15},
+        'location': {'threshold': 0.20, 'weight': 0.10}
+    }
+   
+    def comprehensive_audit(self, hiring_data: Dict) -> Dict:
+        """Comprehensive bias audit for compliance"""
+        try:
+            audit_results = {}
             
-            for gender, count in gender_ratio.items():
-                selection_rate = selected_ratio.get(gender, 0) / count if count > 0 else 0
-                
-                if selection_rate < 0.3:  # Less than 30% selected
-                    findings['biases_detected'].append({
-                        'type': 'gender_bias',
-                        'gender': gender,
-                        'selection_rate': round(selection_rate, 2),
-                        'severity': 'high' if selection_rate < 0.1 else 'medium'
-                    })
-    
-    def _check_age_bias(self, applications: List[Dict], findings: Dict) -> None:
-        """Check for age-based discrimination"""
-        age_groups = []
-        selected = []
-        
-        for app in applications:
-            age = app.get('inferred_age', 0)
-            age_group = self._categorize_age(age)
-            age_groups.append(age_group)
-            if app.get('status') in ['interview_scheduled', 'hired']:
-                selected.append(age_group)
-        
-        if len(age_groups) > 10:
-            age_ratio = Counter(age_groups)
-            selected_ratio = Counter(selected) if selected else Counter()
+            for bias_type in self.BIAS_TYPES.keys():
+                audit_results[bias_type] = self._detect_bias(bias_type, hiring_data)
             
-            for age_group, count in age_ratio.items():
-                selection_rate = selected_ratio.get(age_group, 0) / count if count > 0 else 0
-                
-                if selection_rate < 0.2:
-                    findings['biases_detected'].append({
-                        'type': 'age_bias',
-                        'age_group': age_group,
-                        'selection_rate': round(selection_rate, 2),
-                        'severity': 'high'
-                    })
-    
-    def _check_location_bias(self, applications: List[Dict], findings: Dict) -> None:
-        """Check if candidates from certain locations are disadvantaged"""
-        locations = []
-        selected = []
-        
-        for app in applications:
-            location = app.get('location', 'unknown')
-            locations.append(location)
-            if app.get('status') in ['interview_scheduled', 'hired']:
-                selected.append(location)
-        
-        location_ratio = Counter(locations)
-        selected_ratio = Counter(selected) if selected else Counter()
-        
-        for location, count in location_ratio.items():
-            selection_rate = selected_ratio.get(location, 0) / count if count > 0 else 0
+            fairness_scores = [
+                1 - r.get('bias_level', 0) 
+                for r in audit_results.values()
+            ]
+            overall_score = np.mean(fairness_scores) if fairness_scores else 0
             
-            if selection_rate < 0.15:
-                findings['biases_detected'].append({
-                    'type': 'location_bias',
-                    'location': location,
-                    'selection_rate': round(selection_rate, 2),
-                    'severity': 'medium'
-                })
-    
-    def _check_education_bias(self, applications: List[Dict], findings: Dict) -> None:
-        """Check if candidates with certain education are favored/disfavored"""
-        education_levels = []
-        selected = []
-        
-        for app in applications:
-            edu = app.get('education_level', 'unknown')
-            education_levels.append(edu)
-            if app.get('status') in ['interview_scheduled', 'hired']:
-                selected.append(edu)
-        
-        edu_ratio = Counter(education_levels)
-        selected_ratio = Counter(selected) if selected else Counter()
-        
-        for edu, count in edu_ratio.items():
-            selection_rate = selected_ratio.get(edu, 0) / count if count > 0 else 0
+            compliance_status = self._determine_compliance(overall_score, audit_results)
             
-            if selection_rate < 0.15:
-                findings['biases_detected'].append({
-                    'type': 'education_bias',
-                    'education_level': edu,
-                    'selection_rate': round(selection_rate, 2),
-                    'severity': 'low'
-                })
-    
-    def _categorize_age(self, age: int) -> str:
-        """Categorize age into groups"""
-        if age < 25:
-            return 'under_25'
-        elif age < 35:
-            return '25_34'
-        elif age < 45:
-            return '35_44'
-        elif age < 55:
-            return '45_54'
-        else:
-            return 'over_55'
-    
-    def _calculate_risk_level(self, biases: List[Dict]) -> str:
-        """Determine overall risk level"""
-        if not biases:
-            return 'low'
-        
-        high_severity = sum(1 for b in biases if b.get('severity') == 'high')
-        
-        if high_severity >= 2:
-            return 'critical'
-        elif high_severity == 1:
-            return 'high'
-        else:
-            return 'medium'
-    
-    def blind_screen_applications(self, applications: List[Dict]) -> List[Dict]:
-        """Return applications with personal info hidden for bias-free screening"""
-        blind_apps = []
-        
-        for app in applications:
-            blind_app = {
-                'application_id': app.get('id'),
-                'match_score': app.get('match_score'),
-                'experience_years': app.get('experience_years'),
-                'skills': app.get('skills'),
-                'match_reasons': app.get('match_reasons')
-                # Hidden: name, gender, age, location, university, etc.
+            return {
+                'overall_fairness_score': float(overall_score),
+                'compliance_status': compliance_status,
+                'detailed_results': audit_results,
+                'critical_issues': self._find_critical_issues(audit_results),
+                'recommendations': self._generate_recommendations(audit_results),
+                'audit_timestamp': datetime.now().isoformat(),
+                'eu_ai_act_compliant': compliance_status == 'COMPLIANT'
             }
-            blind_apps.append(blind_app)
+        except Exception as e:
+            return {
+                'error': str(e),
+                'compliance_status': 'ERROR',
+                'eu_ai_act_compliant': False
+            }
+   
+    def _detect_bias(self, bias_type: str, hiring_data: Dict) -> Dict:
+        """Detect specific type of bias"""
+        if bias_type == 'gender':
+            return self._detect_gender_bias(hiring_data)
+        elif bias_type == 'age':
+            return self._detect_age_bias(hiring_data)
+        elif bias_type == 'disability':
+            return self._detect_disability_bias(hiring_data)
+        elif bias_type == 'location':
+            return self._detect_location_bias(hiring_data)
+        return {'bias_level': 0, 'is_biased': False}
+   
+    def _detect_gender_bias(self, hiring_data: Dict) -> Dict:
+        """Detect gender discrimination"""
+        candidates = hiring_data.get('candidates', [])
+        if len(candidates) < 2:
+            return {'bias_level': 0, 'is_biased': False}
         
-        return blind_apps
-    
-    def get_recommendations(self, findings: Dict) -> List[str]:
-        """Generate recommendations to mitigate bias"""
-        recs = []
+        male_count = sum(1 for c in candidates if c.get('gender') == 'male' and c.get('hired'))
+        female_count = sum(1 for c in candidates if c.get('gender') == 'female' and c.get('hired'))
+        male_total = sum(1 for c in candidates if c.get('gender') == 'male')
+        female_total = sum(1 for c in candidates if c.get('gender') == 'female')
         
-        if findings['biases_detected']:
-            recs.append('Implement blind screening process (hide names, age, gender)')
-            recs.append('Review job description for biased language')
-            recs.append('Ensure diverse hiring panel')
-            recs.append('Use structured interviews with standardized questions')
-            recs.append('Document hiring decisions with clear justifications')
+        male_rate = male_count / male_total if male_total > 0 else 0
+        female_rate = female_count / female_total if female_total > 0 else 0
+        
+        bias_level = abs(male_rate - female_rate)
+        
+        return {
+            'bias_level': bias_level,
+            'is_biased': bias_level > self.BIAS_TYPES['gender']['threshold'],
+            'male_hire_rate': male_rate,
+            'female_hire_rate': female_rate,
+            'recommendation': 'Review hiring process' if bias_level > 0.1 else 'No significant bias detected'
+        }
+   
+    def _detect_age_bias(self, hiring_data: Dict) -> Dict:
+        """Detect age discrimination"""
+        candidates = hiring_data.get('candidates', [])
+        if len(candidates) < 2:
+            return {'bias_level': 0, 'is_biased': False}
+        
+        ages = [c.get('age', 35) for c in candidates]
+        hired_ages = [c.get('age', 35) for c in candidates if c.get('hired')]
+        
+        if not hired_ages:
+            return {'bias_level': 0, 'is_biased': False}
+        
+        avg_all = np.mean(ages)
+        avg_hired = np.mean(hired_ages)
+        
+        bias_level = abs(avg_all - avg_hired) / avg_all if avg_all > 0 else 0
+        
+        return {
+            'bias_level': min(bias_level, 1.0),
+            'is_biased': bias_level > self.BIAS_TYPES['age']['threshold'],
+            'avg_candidate_age': float(avg_all),
+            'avg_hired_age': float(avg_hired),
+            'recommendation': 'Consider blind resume screening' if bias_level > 0.1 else 'No significant age bias'
+        }
+   
+    def _detect_disability_bias(self, hiring_data: Dict) -> Dict:
+        """Detect disability discrimination"""
+        candidates = hiring_data.get('candidates', [])
+        if len(candidates) < 2:
+            return {'bias_level': 0, 'is_biased': False}
+        
+        with_disability = sum(1 for c in candidates if c.get('disability', False) and c.get('hired'))
+        without_disability = sum(1 for c in candidates if not c.get('disability', False) and c.get('hired'))
+        with_total = sum(1 for c in candidates if c.get('disability', False))
+        without_total = sum(1 for c in candidates if not c.get('disability', False))
+        
+        with_rate = with_disability / with_total if with_total > 0 else 0
+        without_rate = without_disability / without_total if without_total > 0 else 0
+        
+        bias_level = abs(with_rate - without_rate)
+        
+        return {
+            'bias_level': bias_level,
+            'is_biased': bias_level > self.BIAS_TYPES['disability']['threshold'],
+            'with_disability_hire_rate': with_rate,
+            'without_disability_hire_rate': without_rate,
+            'recommendation': 'Review accessibility and accommodation practices' if bias_level > 0.1 else 'No significant disability bias'
+        }
+   
+    def _detect_location_bias(self, hiring_data: Dict) -> Dict:
+        """Detect location-based discrimination"""
+        candidates = hiring_data.get('candidates', [])
+        if len(candidates) < 2:
+            return {'bias_level': 0, 'is_biased': False}
+        
+        locations = {}
+        for candidate in candidates:
+            loc = candidate.get('location', 'unknown')
+            if loc not in locations:
+                locations[loc] = {'total': 0, 'hired': 0}
+            locations[loc]['total'] += 1
+            if candidate.get('hired'):
+                locations[loc]['hired'] += 1
+        
+        rates = [locations[loc]['hired'] / locations[loc]['total'] 
+                for loc in locations if locations[loc]['total'] > 0]
+        
+        if not rates:
+            return {'bias_level': 0, 'is_biased': False}
+        
+        bias_level = max(rates) - min(rates) if len(rates) > 1 else 0
+        
+        return {
+            'bias_level': bias_level,
+            'is_biased': bias_level > self.BIAS_TYPES['location']['threshold'],
+            'location_rates': {loc: locations[loc]['hired']/locations[loc]['total'] for loc in locations if locations[loc]['total'] > 0},
+            'recommendation': 'Evaluate location-based hiring patterns' if bias_level > 0.1 else 'No significant location bias'
+        }
+   
+    def _determine_compliance(self, fairness_score: float, results: Dict) -> str:
+        """Determine EU AI Act compliance status"""
+        biased_count = sum(1 for r in results.values() if r.get('is_biased'))
+        
+        if fairness_score >= 0.85 and biased_count == 0:
+            return 'COMPLIANT'
+        elif fairness_score >= 0.70:
+            return 'AT_RISK'
         else:
-            recs.append('Continue current fair practices')
-        
-        return recs
-
-bias_detector = BiasDetectionService()
+            return 'NON_COMPLIANT'
+   
+    def _find_critical_issues(self, results: Dict) -> List[Dict]:
+        """Find critical compliance issues"""
+        issues = []
+        for bias_type, result in results.items():
+            if result.get('is_biased'):
+                issues.append({
+                    'type': bias_type,
+                    'severity': 'CRITICAL' if result.get('bias_level', 0) > 0.25 else 'HIGH',
+                    'bias_level': result.get('bias_level', 0),
+                    'recommendation': result.get('recommendation', '')
+                })
+        return sorted(issues, key=lambda x: x['bias_level'], reverse=True)
+   
+    def _generate_recommendations(self, results: Dict) -> List[str]:
+        """Generate compliance recommendations"""
+        recommendations = []
+        for bias_type, result in results.items():
+            if result.get('is_biased') and result.get('recommendation'):
+                recommendations.append(result['recommendation'])
+        return recommendations
