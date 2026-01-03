@@ -218,3 +218,5 @@ def run_workflow():
         return jsonify(result), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+# Compression optimization already enabled through Flask-Compress
