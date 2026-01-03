@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang=\"ru\">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset=\"UTF-8\">
+    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
     <title>MisMatch Recruiter - Enterprise Platform v4.2</title>
     <style>
         :root {
@@ -158,34 +158,6 @@
             flex: 1;
             padding: 40px;
             overflow-y: auto;
-        }
-
-        /* TABS */
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 30px;
-            border-bottom: 2px solid var(--border);
-        }
-
-        .tab {
-            padding: 12px 20px;
-            cursor: pointer;
-            border: none;
-            background: none;
-            font-size: 16px;
-            color: var(--text-secondary);
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s;
-        }
-
-        .tab:hover {
-            color: var(--primary);
-        }
-
-        .tab.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
         }
 
         /* CARDS */
@@ -473,20 +445,6 @@
             margin-top: 8px;
         }
 
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid var(--border);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
         /* BUTTONS */
         .btn-group {
             display: flex;
@@ -525,9 +483,9 @@
             background: #e5e5e5;
         }
 
-        .btn-success {
-            background: var(--success);
-            color: white;
+        .btn-sm {
+            padding: 8px 16px;\n            font-size: 12px;
+            width: auto;
         }
 
         /* TABLE */
@@ -571,33 +529,6 @@
             to { opacity: 1; }
         }
 
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: white;
-            padding: 16px 24px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            z-index: 2000;
-            animation: slideInRight 0.3s ease;
-        }
-
-        @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(100px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .notification.success {
-            border-left: 4px solid var(--success);
-        }
-
         @media (max-width: 1200px) {
             .match-container {
                 grid-template-columns: 1fr;
@@ -623,179 +554,179 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="sidebar">
-            <div class="logo">
-                <div class="logo-text">
-                    <div class="logo-icon">🎯</div>
+    <div class=\"container\">
+        <div class=\"sidebar\">
+            <div class=\"logo\">
+                <div class=\"logo-text\">
+                    <div class=\"logo-icon\">🎯</div>
                     <span>MisMatch</span>
                 </div>
             </div>
             <nav>
-                <div class="nav-item active" onclick="switchTab('matching')">
-                    <div class="nav-icon">⚡</div>
+                <div class=\"nav-item active\" onclick=\"switchTab('matching')\">
+                    <div class=\"nav-icon\">⚡</div>
                     <span>Matching</span>
                 </div>
-                <div class="nav-item" onclick="switchTab('jobs')">
-                    <div class="nav-icon">💼</div>
+                <div class=\"nav-item\" onclick=\"switchTab('jobs')\">
+                    <div class=\"nav-icon\">💼</div>
                     <span>Job Profiles</span>
                 </div>
-                <div class="nav-item" onclick="switchTab('candidates')">
-                    <div class="nav-icon">👥</div>
+                <div class=\"nav-item\" onclick=\"switchTab('candidates')\">
+                    <div class=\"nav-icon\">👥</div>
                     <span>Candidates</span>
                 </div>
-                <div class="nav-item" onclick="switchTab('analytics')">
-                    <div class="nav-icon">📊</div>
+                <div class=\"nav-item\" onclick=\"switchTab('analytics')\">
+                    <div class=\"nav-icon\">📊</div>
                     <span>Analytics</span>
                 </div>
             </nav>
         </div>
 
-        <div class="main">
-            <div class="header">
-                <div class="header-title">
-                    <h1 id="page-title">⚡ AI Matching Engine</h1>
-                    <p id="page-subtitle">Real-time candidate-job matching with 89% accuracy</p>
+        <div class=\"main\">
+            <div class=\"header\">
+                <div class=\"header-title\">
+                    <h1 id=\"page-title\">⚡ AI Matching Engine</h1>
+                    <p id=\"page-subtitle\">Real-time candidate-job matching with 89% accuracy</p>
                 </div>
-                <div class="header-user">
-                    <div class="user-avatar">MM</div>
+                <div class=\"header-user\">
+                    <div class=\"user-avatar\">MM</div>
                     <div>
-                        <div style="font-weight: 600;">Max Mishakov</div>
-                        <div style="color: var(--text-secondary); font-size: 12px;">Admin</div>
+                        <div style=\"font-weight: 600;\">Max Mishakov</div>
+                        <div style=\"color: var(--text-secondary); font-size: 12px;\">Admin</div>
                     </div>
                 </div>
             </div>
 
-            <div class="content">
+            <div class=\"content\">
                 <!-- MATCHING TAB -->
-                <div id="matching" class="tab-content active">
-                    <div class="card">
-                        <div class="card-title">⚡ AI Matching Results (87%)</div>
+                <div id=\"matching\" class=\"tab-content active\">
+                    <div class=\"card\">
+                        <div class=\"card-title\">⚡ AI Matching Results (87%)</div>
                         
-                        <div class="match-container">
+                        <div class=\"match-container\">
                             <!-- CANDIDATE CARD -->
-                            <div class="match-card">
-                                <div class="profile-header">
-                                    <div class="profile-avatar">JD</div>
-                                    <div class="profile-info">
+                            <div class=\"match-card\">
+                                <div class=\"profile-header\">
+                                    <div class=\"profile-avatar\">JD</div>
+                                    <div class=\"profile-info\">
                                         <h3>John Doe</h3>
                                         <p>Python Developer</p>
-                                        <span class="badge badge-primary">5 years exp.</span>
+                                        <span class=\"badge badge-primary\">5 years exp.</span>
                                     </div>
                                 </div>
                                 
-                                <div class="job-details">
+                                <div class=\"job-details\">
                                     <h4>Skills</h4>
-                                    <div class="skills-list">
-                                        <span class="skill-tag">Python</span>
-                                        <span class="skill-tag">React</span>
-                                        <span class="skill-tag">PostgreSQL</span>
-                                        <span class="skill-tag">REST API</span>
+                                    <div class=\"skills-list\">
+                                        <span class=\"skill-tag\">Python</span>
+                                        <span class=\"skill-tag\">React</span>
+                                        <span class=\"skill-tag\">PostgreSQL</span>
+                                        <span class=\"skill-tag\">REST API</span>
                                     </div>
                                 </div>
 
-                                <div class="job-details">
+                                <div class=\"job-details\">
                                     <h4>Salary Expectation</h4>
                                     <p>$85,000 - $105,000</p>
                                 </div>
 
-                                <div class="job-details">
+                                <div class=\"job-details\">
                                     <h4>Work Preference</h4>
                                     <p>Remote • Full-time</p>
                                 </div>
                             </div>
 
                             <!-- MATCH SCORE -->
-                            <div class="match-card" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                                <div class="match-score">
-                                    <div class="score-circle">
-                                        <div class="score-text">87%</div>
+                            <div class=\"match-card\" style=\"display: flex; flex-direction: column; align-items: center; justify-content: center;\">
+                                <div class=\"match-score\">
+                                    <div class=\"score-circle\">
+                                        <div class=\"score-text\">87%</div>
                                     </div>
-                                    <div class="score-label">Match Score</div>
-                                    <span class="recommendation">✅ PERFECT MATCH</span>
+                                    <div class=\"score-label\">Match Score</div>
+                                    <span class=\"recommendation\">✅ PERFECT MATCH</span>
                                 </div>
 
-                                <div class="breakdown" style="width: 100%; margin-top: 30px;">
-                                    <div class="breakdown-item">
-                                        <span class="breakdown-label">Skill Match</span>
-                                        <div class="breakdown-value">
-                                            <div class="bar">
-                                                <div class="bar-fill" style="width: 92%"></div>
+                                <div class=\"breakdown\" style=\"width: 100%; margin-top: 30px;\">
+                                    <div class=\"breakdown-item\">
+                                        <span class=\"breakdown-label\">Skill Match</span>
+                                        <div class=\"breakdown-value\">
+                                            <div class=\"bar\">
+                                                <div class=\"bar-fill\" style=\"width: 92%\"></div>
                                             </div>
-                                            <span class="percentage">92%</span>
+                                            <span class=\"percentage\">92%</span>
                                         </div>
                                     </div>
-                                    <div class="breakdown-item">
-                                        <span class="breakdown-label">Seniority</span>
-                                        <div class="breakdown-value">
-                                            <div class="bar">
-                                                <div class="bar-fill" style="width: 100%"></div>
+                                    <div class=\"breakdown-item\">
+                                        <span class=\"breakdown-label\">Seniority</span>
+                                        <div class=\"breakdown-value\">
+                                            <div class=\"bar\">
+                                                <div class=\"bar-fill\" style=\"width: 100%\"></div>
                                             </div>
-                                            <span class="percentage">100%</span>
+                                            <span class=\"percentage\">100%</span>
                                         </div>
                                     </div>
-                                    <div class="breakdown-item">
-                                        <span class="breakdown-label">Experience</span>
-                                        <div class="breakdown-value">
-                                            <div class="bar">
-                                                <div class="bar-fill" style="width: 88%"></div>
+                                    <div class=\"breakdown-item\">
+                                        <span class=\"breakdown-label\">Experience</span>
+                                        <div class=\"breakdown-value\">
+                                            <div class=\"bar\">
+                                                <div class=\"bar-fill\" style=\"width: 88%\"></div>
                                             </div>
-                                            <span class="percentage">88%</span>
+                                            <span class=\"percentage\">88%</span>
                                         </div>
                                     </div>
-                                    <div class="breakdown-item">
-                                        <span class="breakdown-label">Culture Fit</span>
-                                        <div class="breakdown-value">
-                                            <div class="bar">
-                                                <div class="bar-fill" style="width: 75%"></div>
+                                    <div class=\"breakdown-item\">
+                                        <span class=\"breakdown-label\">Culture Fit</span>
+                                        <div class=\"breakdown-value\">
+                                            <div class=\"bar\">
+                                                <div class=\"bar-fill\" style=\"width: 75%\"></div>
                                             </div>
-                                            <span class="percentage">75%</span>
+                                            <span class=\"percentage\">75%</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- JOB CARD -->
-                            <div class="match-card">
-                                <div class="profile-header">
-                                    <div style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #ff6b6b, #ee5a6f); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px;">🏢</div>
-                                    <div class="profile-info">
+                            <div class=\"match-card\">
+                                <div class=\"profile-header\">
+                                    <div style=\"width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #ff6b6b, #ee5a6f); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px;\">🏢</div>
+                                    <div class=\"profile-info\">
                                         <h3>TechCorp Inc.</h3>
                                         <p>Senior Python Developer</p>
-                                        <span class="badge badge-success">Open Now</span>
+                                        <span class=\"badge badge-success\">Open Now</span>
                                     </div>
                                 </div>
 
-                                <div class="job-details">
+                                <div class=\"job-details\">
                                     <h4>Required Skills</h4>
-                                    <div class="skills-list">
-                                        <span class="skill-tag" style="background: var(--success);">Python</span>
-                                        <span class="skill-tag" style="background: var(--success);">React</span>
-                                        <span class="skill-tag" style="background: var(--warning);">GraphQL</span>
-                                        <span class="skill-tag" style="background: var(--success);">PostgreSQL</span>
+                                    <div class=\"skills-list\">
+                                        <span class=\"skill-tag\" style=\"background: var(--success);\">Python</span>
+                                        <span class=\"skill-tag\" style=\"background: var(--success);\">React</span>
+                                        <span class=\"skill-tag\" style=\"background: var(--warning);\">GraphQL</span>
+                                        <span class=\"skill-tag\" style=\"background: var(--success);\">PostgreSQL</span>
                                     </div>
                                 </div>
 
-                                <div class="job-details">
+                                <div class=\"job-details\">
                                     <h4>Salary Range</h4>
                                     <p>$90,000 - $120,000</p>
                                 </div>
 
-                                <div class="job-details">
+                                <div class=\"job-details\">
                                     <h4>Work Mode</h4>
                                     <p>Remote • 50% Travel</p>
                                 </div>
 
-                                <div class="btn-group">
-                                    <button class="btn btn-primary">Send Offer</button>
-                                    <button class="btn btn-secondary">View Details</button>
+                                <div class=\"btn-group\">
+                                    <button class=\"btn btn-primary\">Send Offer</button>
+                                    <button class=\"btn btn-secondary\">View Details</button>
                                 </div>
                             </div>
                         </div>
 
-                        <div style="background: #f9f9f7; padding: 20px; border-radius: 8px; margin-top: 20px;">
-                            <h4 style="margin-bottom: 10px;">📝 AI Interview Questions</h4>
-                            <ol style="color: var(--text-secondary); line-height: 1.8;">
+                        <div style=\"background: #f9f9f7; padding: 20px; border-radius: 8px; margin-top: 20px;\">
+                            <h4 style=\"margin-bottom: 10px;\">📝 AI Interview Questions</h4>
+                            <ol style=\"color: var(--text-secondary); line-height: 1.8;\">
                                 <li>Tell me about your experience with Python. What are your strongest areas?</li>
                                 <li>You don't have GraphQL experience. How would you approach learning this technology?</li>
                                 <li>Why are you interested in this Senior Developer role at TechCorp?</li>
@@ -803,23 +734,23 @@
                             </ol>
                         </div>
 
-                        <div class="btn-group" style="margin-top: 20px;">
-                            <button class="btn btn-primary" onclick="alert('🔄 Generating new match...')">🔄 Generate New Match</button>
-                            <button class="btn btn-secondary" onclick="alert('📥 Exporting PDF...')">📥 Export as PDF</button>
-                            <button class="btn btn-secondary" onclick="alert('💬 Sending to Slack...')">💬 Send to Slack</button>
+                        <div class=\"btn-group\" style=\"margin-top: 20px;\">
+                            <button class=\"btn btn-primary\">🔄 Generate New Match</button>
+                            <button class=\"btn btn-secondary\">📥 Export as PDF</button>
+                            <button class=\"btn btn-secondary\">💬 Send to Slack</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- JOBS TAB -->
-                <div id="jobs" class="tab-content">
-                    <div class="card">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                            <div class="card-title" style="margin: 0;">💼 Job Profiles</div>
-                            <button class="btn btn-primary btn-sm" style="width: auto; padding: 8px 16px; font-size: 12px;">+ Add Job</button>
+                <div id=\"jobs\" class=\"tab-content\">
+                    <div class=\"card\">
+                        <div style=\"display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;\">
+                            <div class=\"card-title\" style=\"margin: 0;\">💼 Job Profiles</div>
+                            <button class=\"btn btn-primary btn-sm\">+ Add Job</button>
                         </div>
 
-                        <table class="table">
+                        <table class=\"table\">
                             <thead>
                                 <tr>
                                     <th>Position</th>
@@ -837,7 +768,7 @@
                                     <td>$90k - $120k</td>
                                     <td>Senior</td>
                                     <td>12 matches</td>
-                                    <td><span class="badge badge-success">Open</span></td>
+                                    <td><span class=\"badge badge-success\">Open</span></td>
                                 </tr>
                                 <tr>
                                     <td><strong>React Frontend Engineer</strong></td>
@@ -845,7 +776,7 @@
                                     <td>$75k - $95k</td>
                                     <td>Mid-level</td>
                                     <td>8 matches</td>
-                                    <td><span class="badge badge-success">Open</span></td>
+                                    <td><span class=\"badge badge-success\">Open</span></td>
                                 </tr>
                                 <tr>
                                     <td><strong>Full-Stack Developer</strong></td>
@@ -853,7 +784,7 @@
                                     <td>$100k - $130k</td>
                                     <td>Senior</td>
                                     <td>15 matches</td>
-                                    <td><span class="badge" style="background: rgba(245, 166, 35, 0.15); color: var(--warning);">Closing Soon</span></td>
+                                    <td><span class=\"badge\" style=\"background: rgba(245, 166, 35, 0.15); color: var(--warning);\">Closing Soon</span></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -861,14 +792,14 @@
                 </div>
 
                 <!-- CANDIDATES TAB -->
-                <div id="candidates" class="tab-content">
-                    <div class="card">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                            <div class="card-title" style="margin: 0;">👥 Candidates</div>
-                            <button class="btn btn-primary btn-sm" style="width: auto; padding: 8px 16px; font-size: 12px;">+ Add Candidate</button>
+                <div id=\"candidates\" class=\"tab-content\">
+                    <div class=\"card\">
+                        <div style=\"display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;\">
+                            <div class=\"card-title\" style=\"margin: 0;\">👥 Candidates</div>
+                            <button class=\"btn btn-primary btn-sm\">+ Add Candidate</button>
                         </div>
 
-                        <table class="table">
+                        <table class=\"table\">
                             <thead>
                                 <tr>
                                     <th>Name</th>
@@ -886,7 +817,7 @@
                                     <td>5 years</td>
                                     <td>$85k - $105k</td>
                                     <td>Python, React, PostgreSQL</td>
-                                    <td>12 <span class="badge badge-primary">Active</span></td>
+                                    <td>12 <span class=\"badge badge-primary\">Active</span></td>
                                 </tr>
                                 <tr>
                                     <td><strong>Sarah Smith</strong></td>
@@ -894,7 +825,7 @@
                                     <td>3 years</td>
                                     <td>$70k - $90k</td>
                                     <td>React, Vue, TypeScript</td>
-                                    <td>8 <span class="badge badge-primary">Active</span></td>
+                                    <td>8 <span class=\"badge badge-primary\">Active</span></td>
                                 </tr>
                                 <tr>
                                     <td><strong>Mike Johnson</strong></td>
@@ -902,7 +833,7 @@
                                     <td>7 years</td>
                                     <td>$95k - $125k</td>
                                     <td>Python, React, Node.js</td>
-                                    <td>15 <span class="badge badge-success">Interviewing</span></td>
+                                    <td>15 <span class=\"badge badge-success\">Interviewing</span></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -910,33 +841,33 @@
                 </div>
 
                 <!-- ANALYTICS TAB -->
-                <div id="analytics" class="tab-content">
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-label">Total Matches</div>
-                            <div class="stat-value">12,450</div>
-                            <div class="stat-change">↑ +15% this month</div>
+                <div id=\"analytics\" class=\"tab-content\">
+                    <div class=\"stats-grid\">
+                        <div class=\"stat-card\">
+                            <div class=\"stat-label\">Total Matches</div>
+                            <div class=\"stat-value\">12,450</div>
+                            <div class=\"stat-change\">↑ +15% this month</div>
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-label">Avg Match Score</div>
-                            <div class="stat-value">72%</div>
-                            <div class="stat-change">↑ +3% vs last month</div>
+                        <div class=\"stat-card\">
+                            <div class=\"stat-label\">Avg Match Score</div>
+                            <div class=\"stat-value\">72%</div>
+                            <div class=\"stat-change\">↑ +3% vs last month</div>
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-label">Successful Placements</div>
-                            <div class="stat-value">34</div>
-                            <div class="stat-change">↑ +8 this month</div>
+                        <div class=\"stat-card\">
+                            <div class=\"stat-label\">Successful Placements</div>
+                            <div class=\"stat-value\">34</div>
+                            <div class=\"stat-change\">↑ +8 this month</div>
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-label">Conversion Rate</div>
-                            <div class="stat-value">28%</div>
-                            <div class="stat-change">↑ +2% vs last month</div>
+                        <div class=\"stat-card\">
+                            <div class=\"stat-label\">Conversion Rate</div>
+                            <div class=\"stat-value\">28%</div>
+                            <div class=\"stat-change\">↑ +2% vs last month</div>
                         </div>
                     </div>
 
-                    <div class="card">
-                        <div class="card-title">📈 Top Skills in Demand</div>
-                        <table class="table">
+                    <div class=\"card\">
+                        <div class=\"card-title\">📈 Top Skills in Demand</div>
+                        <table class=\"table\">
                             <thead>
                                 <tr>
                                     <th>Skill</th>
@@ -1010,4 +941,4 @@
         }
     </script>
 </body>
-</html>
+</html>"
