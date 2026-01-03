@@ -1,0 +1,18 @@
+name: Auto Commit
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  auto-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Auto-commit changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -A
+          git commit -m "[AUTO] Optimization commit" || echo "No changes to commit"
+          git push
