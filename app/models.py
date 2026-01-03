@@ -358,3 +358,84 @@ class ResumeExperience(db.Model):
             'description': self.description,
             'duration_months': self.duration_months
         }
+
+
+class JobProfile(db.Model):
+    __tablename__ = 'job_profiles'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    job_title = db.Column(db.String(255), nullable=False)
+    required_skills = db.Column(db.JSON, nullable=True)
+    salary_range = db.Column(db.String(100), nullable=True)
+    description = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'job_title': self.job_title,
+            'required_skills': self.required_skills,
+            'salary_range': self.salary_range,
+            'description': self.description
+        }
+
+
+class SalaryData(db.Model):
+    __tablename__ = 'salary_data'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    position = db.Column(db.String(255), nullable=False)
+    base_salary = db.Column(db.Float, nullable=True)
+    bonus_percentage = db.Column(db.Float, nullable=True)
+    benefits = db.Column(db.JSON, nullable=True)
+    market_rate = db.Column(db.Float, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'position': self.position,
+            'base_salary': self.base_salary,
+            'bonus_percentage': self.bonus_percentage,
+            'benefits': self.benefits,
+            'market_rate': self.market_rate
+        }
+
+
+class HiringDNA(db.Model):
+    __tablename__ = 'hiring_dna'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    candidate_id = db.Column(db.String(255), nullable=False)
+    dna_profile = db.Column(db.JSON, nullable=True)
+    cultural_fit = db.Column(db.Float, nullable=True)
+    technical_match = db.Column(db.Float, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'candidate_id': self.candidate_id,
+            'dna_profile': self.dna_profile,
+            'cultural_fit': self.cultural_fit,
+            'technical_match': self.technical_match
+        }
+
+
+class HiringSignal(db.Model):
+    __tablename__ = 'hiring_signals'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    signal_type = db.Column(db.String(100), nullable=False)
+    signal_value = db.Column(db.Float, nullable=True)
+    related_entity = db.Column(db.String(255), nullable=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'signal_type': self.signal_type,
+            'signal_value': self.signal_value,
+            'related_entity': self.related_entity,
+            'timestamp': self.timestamp.isoformat()
+        }

@@ -20,6 +20,10 @@ from services.health_check import HealthCheckService
 logger = logging.getLogger(__name__)
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 from app.routes.resume_parsing import resume_parsing_bp
+from app.routes.job_profiles import job_profiles_bp
+from app.routes.salary import salary_bp
+from app.routes.hiring_dna import hiring_dna_bp
+from app.routes.signals import signals_bp
 
 # Initialize services
 rate_limiter = RateLimiter(max_requests=100, time_window=3600)
@@ -155,3 +159,6 @@ def get_dashboard_data():
 def register_routes(app):
     app.register_blueprint(api_bp)
         app.register_blueprint(resume_parsing_bp)
+    app.register_blueprint(salary_bp)
+    app.register_blueprint(hiring_dna_bp)
+    app.register_blueprint(signals_bp)
