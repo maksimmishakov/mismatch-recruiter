@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MisMatch Recruiter - Enterprise Platform</title>
+    <style>
+        :root {
+            --primary: #208896;
+            --primary-hover: #1a6d7a;
+            --secondary: #134252;
+            --accent: #e67e50;
+            --success: #2db066;
+            --warning: #f5a623;
+            --error: #d94444;
+            --bg-light: #fafaf8;
+            --bg-card: #ffffff;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666;
+            --border: #e5e5e5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 280px;
+            background: var(--secondary);
+            color: white;
+            padding: 30px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .logo {
+            padding: 0 20px 30px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .nav-item {
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 5px 10px;
+            border-radius: 8px;
+        }
+
+        .nav-item:hover {
+            background: rgba(32, 136, 150, 0.2);
+        }
+
+        .nav-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* MAIN CONTENT */
+        .main {
+            margin-left: 280px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: var(--bg-card);
+            padding: 20px 40px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .header-title h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .header-title p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .header-user {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        /* TABS */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
+            color: var(--text-secondary);
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            color: var(--primary);
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        /* CARDS */
+        .card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        /* MATCH VIEW */
+        .match-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        .match-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .match-card:hover {
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .profile-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .profile-info h3 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .profile-info p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .badge-primary {
+            background: rgba(32, 136, 150, 0.15);
+            color: var(--primary);
+        }
+
+        .badge-success {
+            background: rgba(45, 176, 102, 0.15);
+            color: var(--success);
+        }
+
+        /* MATCH SCORE */
+        .match-score {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .score-circle {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 4px 16px rgba(32, 136, 150, 0.2);
+            background: conic-gradient(var(--primary) 0deg, var(--primary) calc(3.13 * 87deg), #f0f0f0 calc(3.13 * 87deg));
+            position: relative;
+        }
+
+        .score-text {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--primary);
+            position: relative;
+            z-index: 1;
+            background: white;
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .score-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .recommendation {
+            display: inline-block;
+            background: var(--success);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 15px;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* BREAKDOWN */
+        .breakdown {
+            margin-top: 24px;
+        }
+
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .breakdown-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .breakdown-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .breakdown-value {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .bar {
+            width: 80px;
+            height: 6px;
+            background: #f0f0f0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 3px;
+            transition: width 0.8s ease;
+        }
+
+        .percentage {
+            font-weight: 600;
+            color: var(--primary);
+            width: 40px;
+            text-align: right;
+        }
+
+        /* JOB CARD */
+        .job-details {
+            background: #f9f9f7;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .job-details h4 {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .job-details p {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .skills-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .skill-tag {
+            background: var(--primary);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .skill-tag:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(32, 136, 150, 0.3);
+        }
+
+        /* STATS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border-left: 4px solid var(--primary);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-change {
+            color: var(--success);
+            font-size: 12px;
+            margin-top: 8px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* BUTTONS */
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            box-shadow: 0 4px 12px rgba(32, 136, 150, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: #e5e5e5;
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 12px;
+            flex: none;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        /* TABLE */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            background: #f9f9f7;
+            padding: 12px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table td {
+            padding: 16px 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table tr:hover {
+            background: #f9f9f7;
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalSlide 0.3s ease;
+        }
+
+        @keyframes modalSlide {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .close-modal {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .close-modal:hover {
+            color: var(--text-primary);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(32, 136, 150, 0.1);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 2000;
+            animation: slideInRight 0.3s ease;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .notification.success {
+            border-left: 4px solid var(--success);
+        }
+
+        .notification.error {
+            border-left: 4px solid var(--error);
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 1200px) {
+            .match-container {
+                grid-template-columns: 1fr;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: static;
+                padding: 15px;
+            }
+
+            .main {
+                margin-left: 0;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .match-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <div class="logo">
+                <div class="logo-text">
+                    <div class="logo-icon">🎯</div>
+                    <span>MisMatch</span>
+                </div>
+            </div>
+            <nav>
+                <div class="nav-item active" onclick="switchTab('matching')">
+                    <div class="nav-icon">⚡</div>
+                    <span>Matching</span>
+                </div>
+                <div class="nav-item" onclick="switchTab('jobs')">
+                    <div class="nav-icon">💼</div>
+                    <span>Job Profiles</span>
+                </div>
+                <div class="nav-item" onclick="switchTab('candidates')">
+                    <div class="nav-icon">👥</div>
+                    <span>Candidates</span>
+                </div>
+                <div class="nav-item" onclick="switchTab('analytics')">
+                    <div class="nav-icon">📊</div>
+                    <span>Analytics</span>
+                </div>
+            </nav>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main">
+            <!-- HEADER -->
+            <div class="header">
+                <div class="header-title">
+                    <h1 id="page-title">⚡ AI Matching Engine</h1>
+                    <p id="page-subtitle">Real-time candidate-job matching with 89% accuracy</p>
+                </div>
+                <div class="header-user">
+                    <div class="user-avatar" title="Max Mishakov">MM</div>
+                    <div>
+                        <div style="font-weight: 600;">Max Mishakov</div>
+                        <div style="color: var(--text-secondary); font-size: 12px;">Recruiter Admin</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTENT -->
+            <div class="content">
+                <!-- TAB 1: MATCHING -->
+                <div id="matching" class="tab-content active">
+                    <div class="card">
+                        <div class="card-title">⚡ AI Matching Results</div>
+                        
+                        <div class="match-container" id="matchContainer">
+                            <div style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                                <div class="loading"></div>
+                                <p style="margin-top: 20px; color: var(--text-secondary);">Loading matches...</p>
+                            </div>
+                        </div>
+
+                        <div style="background: #f9f9f7; padding: 20px; border-radius: 8px; margin-top: 20px;" id="questionsSection">
+                            <h4 style="margin-bottom: 10px;">📝 AI Interview Questions</h4>
+                            <ol style="color: var(--text-secondary); line-height: 1.8;" id="questionsList">
+                                <li>Loading questions...</li>
+                            </ol>
+                        </div>
+
+                        <div class="btn-group">
+                            <button class="btn btn-primary" onclick="generateNewMatch()">🔄 Generate New Match</button>
+                            <button class="btn btn-secondary" onclick="exportReport('pdf')">📥 Export as PDF</button>
+                            <button class="btn btn-secondary" onclick="openNotifyModal()">📧 Send to Slack</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: JOB PROFILES -->
+                <div id="jobs" class="tab-content">
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <div class="card-title" style="margin: 0;">💼 Job Profiles</div>
+                            <button class="btn btn-primary btn-sm" onclick="openJobModal()">+ Add New Job</button>
+                        </div>
+
+                        <table class="table" id="jobsTable">
+                            <thead>
+                                <tr>
+                                    <th>Position</th>
+                                    <th>Company</th>
+                                    <th>Salary</th>
+                                    <th>Level</th>
+                                    <th>Candidates</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="jobsTableBody">
+                                <tr><td colspan="7" style="text-align: center; padding: 40px;"><div class="loading"></div></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TAB 3: CANDIDATES -->
+                <div id="candidates" class="tab-content">
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <div class="card-title" style="margin: 0;">👥 Candidates</div>
+                            <button class="btn btn-primary btn-sm" onclick="openCandidateModal()">+ Add Candidate</button>
+                        </div>
+
+                        <table class="table" id="candidatesTable">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Role</th>
+                                    <th>Experience</th>
+                                    <th>Salary</th>
+                                    <th>Top Skills</th>
+                                    <th>Matches</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="candidatesTableBody">
+                                <tr><td colspan="7" style="text-align: center; padding: 40px;"><div class="loading"></div></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TAB 4: ANALYTICS -->
+                <div id="analytics" class="tab-content">
+                    <div class="stats-grid" id="statsGrid">
+                        <div class="stat-card">
+                            <div class="stat-label">Total Matches</div>
+                            <div class="stat-value" id="stat-matches">12,450</div>
+                            <div class="stat-change">↑ +15% this month</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Avg Match Score</div>
+                            <div class="stat-value" id="stat-score">72%</div>
+                            <div class="stat-change">↑ +3% vs last month</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Successful Placements</div>
+                            <div class="stat-value" id="stat-placements">34</div>
+                            <div class="stat-change">↑ +8 this month</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Conversion Rate</div>
+                            <div class="stat-value" id="stat-conversion">28%</div>
+                            <div class="stat-change">↑ +2% vs last month</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">📈 Top Skills in Demand</div>
+                        <table class="table" id="skillsTable">
+                            <thead>
+                                <tr>
+                                    <th>Skill</th>
+                                    <th>Demand Count</th>
+                                    <th>Trend</th>
+                                </tr>
+                            </thead>
+                            <tbody id="skillsTableBody">
+                                <tr><td colspan="3" style="text-align: center; padding: 40px;"><div class="loading"></div></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <div id="jobModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeJobModal()">&times;</span>
+            <h2 class="modal-title">Add New Job Profile</h2>
+            <form onsubmit="submitJobForm(event)">
+                <div class="form-group">
+                    <label>Position Title</label>
+                    <input type="text" id="jobTitle" required>
+                </div>
+                <div class="form-group">
+                    <label>Company Name</label>
+                    <input type="text" id="jobCompany" required>
+                </div>
+                <div class="form-group">
+                    <label>Salary Range</label>
+                    <input type="text" id="jobSalary" placeholder="e.g., $90k - $120k" required>
+                </div>
+                <div class="form-group">
+                    <label>Seniority Level</label>
+                    <select id="jobLevel" required>
+                        <option>Junior</option>
+                        <option>Mid-level</option>
+                        <option>Senior</option>
+                        <option>Lead</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Required Skills (comma-separated)</label>
+                    <input type="text" id="jobSkills" placeholder="Python, React, PostgreSQL" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 20px;">Create Job</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="candidateModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeCandidateModal()">&times;</span>
+            <h2 class="modal-title">Add New Candidate</h2>
+            <form onsubmit="submitCandidateForm(event)">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="candName" required>
+                </div>
+                <div class="form-group">
+                    <label>Current Role</label>
+                    <input type="text" id="candRole" required>
+                </div>
+                <div class="form-group">
+                    <label>Years of Experience</label>
+                    <input type="number" id="candExperience" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label>Salary Expectation</label>
+                    <input type="text" id="candSalary" placeholder="e.g., $85k - $105k" required>
+                </div>
+                <div class="form-group">
+                    <label>Top Skills (comma-separated)</label>
+                    <input type="text" id="candSkills" placeholder="Python, React, PostgreSQL" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 20px;">Add Candidate</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="notifyModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeNotifyModal()">&times;</span>
+            <h2 class="modal-title">Send to Slack</h2>
+            <form onsubmit="sendToSlack(event)">
+                <div class="form-group">
+                    <label>Slack Channel</label>
+                    <input type="text" id="slackChannel" placeholder="#recruitment" required>
+                </div>
+                <div class="form-group">
+                    <label>Message</label>
+                    <textarea id="slackMessage" rows="5" placeholder="Enter custom message..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 20px;">Send to Slack</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+        let currentMatch = null;
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadMatches();
+            await loadJobs();
+            await loadCandidates();
+            await loadAnalytics();
+            setupWebSocket();
+        });
+
+        // WebSocket for real-time updates
+        function setupWebSocket() {
+            try {
+                const ws = new WebSocket('ws://localhost:5000/ws');
+                ws.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    if (data.type === 'new_match') {
+                        showNotification('New match found!', 'success');
+                        loadMatches();
+                    }
+                };
+            } catch (e) {
+                console.log('WebSocket not available');
+            }
+        }
+
+        // Load matches
+        async function loadMatches() {
+            try {
+                const response = await fetch(`${API_BASE}/matches/calculate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ candidate_id: 1, job_id: 1 })
+                });
+                
+                const data = await response.json();
+                currentMatch = data;
+                renderMatchCards(data);
+                renderInterviewQuestions(data.interview_questions);
+            } catch (error) {
+                console.error('Error loading matches:', error);
+                showNotification('Error loading matches', 'error');
+            }
+        }
+
+        // Render match cards
+        function renderMatchCards(match) {
+            const container = document.getElementById('matchContainer');
+            
+            container.innerHTML = `
+                <!-- CANDIDATE CARD -->
+                <div class="match-card">
+                    <div class="profile-header">
+                        <div class="profile-avatar">JD</div>
+                        <div class="profile-info">
+                            <h3>John Doe</h3>
+                            <p>Python Developer</p>
+                            <span class="badge badge-primary">5 years exp.</span>
+                        </div>
+                    </div>
+                    
+                    <div class="job-details">
+                        <h4>Skills</h4>
+                        <div class="skills-list">
+                            <span class="skill-tag">Python</span>
+                            <span class="skill-tag">React</span>
+                            <span class="skill-tag">PostgreSQL</span>
+                            <span class="skill-tag">REST API</span>
+                        </div>
+                    </div>
+
+                    <div class="job-details">
+                        <h4>Salary Expectation</h4>
+                        <p>$85,000 - $105,000</p>
+                    </div>
+
+                    <div class="job-details">
+                        <h4>Work Preference</h4>
+                        <p>Remote • Full-time</p>
+                    </div>
+                </div>
+
+                <!-- MATCH SCORE -->
+                <div class="match-card" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <div class="match-score">
+                        <div class="score-circle">
+                            <div class="score-text">${Math.round(match.final_score * 100)}%</div>
+                        </div>
+                        <div class="score-label">Match Score</div>
+                        <span class="recommendation">✅ ${match.recommendation}</span>
+                    </div>
+
+                    <div class="breakdown" style="width: 100%; margin-top: 30px;">
+                        ${Object.entries(match.breakdown).map(([key, value]) => `
+                            <div class="breakdown-item">
+                                <span class="breakdown-label">${key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ')}</span>
+                                <div class="breakdown-value">
+                                    <div class="bar">
+                                        <div class="bar-fill" style="width: ${value * 100}%"></div>
+                                    </div>
+                                    <span class="percentage">${Math.round(value * 100)}%</span>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- JOB CARD -->
+                <div class="match-card">
+                    <div class="profile-header">
+                        <div style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #ff6b6b, #ee5a6f); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px;">🏢</div>
+                        <div class="profile-info">
+                            <h3>TechCorp Inc.</h3>
+                            <p>Senior Python Developer</p>
+                            <span class="badge badge-success">Open Now</span>
+                        </div>
+                    </div>
+
+                    <div class="job-details">
+                        <h4>Required Skills</h4>
+                        <div class="skills-list">
+                            <span class="skill-tag" style="background: var(--success);">Python</span>
+                            <span class="skill-tag" style="background: var(--success);">React</span>
+                            <span class="skill-tag" style="background: var(--warning);">GraphQL</span>
+                            <span class="skill-tag" style="background: var(--success);">PostgreSQL</span>
+                        </div>
+                    </div>
+
+                    <div class="job-details">
+                        <h4>Salary Range</h4>
+                        <p>$90,000 - $120,000</p>
+                    </div>
+
+                    <div class="job-details">
+                        <h4>Work Mode</h4>
+                        <p>Remote • 50% Travel</p>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn btn-primary">View Full Job</button>
+                        <button class="btn btn-secondary" onclick="shareWithCandidate()">Share</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Render interview questions
+        function renderInterviewQuestions(questions) {
+            const list = document.getElementById('questionsList');
+            list.innerHTML = questions.map((q, i) => `<li>${q}</li>`).join('');
+        }
+
+        // Load jobs
+        async function loadJobs() {
+            try {
+                const response = await fetch(`${API_BASE}/job-profiles`);
+                const jobs = await response.json();
+                
+                const tbody = document.getElementById('jobsTableBody');
+                tbody.innerHTML = jobs.slice(0, 5).map(job => `
+                    <tr>
+                        <td><strong>${job.title}</strong></td>
+                        <td>${job.company}</td>
+                        <td>${job.salary_range}</td>
+                        <td>${job.level}</td>
+                        <td>${job.matches || 0}</td>
+                        <td><span class="badge badge-success">Open</span></td>
+                        <td>
+                            <button class="btn btn-sm" style="background: transparent; color: var(--primary);">Edit</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading jobs:', error);
+            }
+        }
+
+        // Load candidates
+        async function loadCandidates() {
+            try {
+                const response = await fetch(`${API_BASE}/candidates`);
+                const candidates = await response.json();
+                
+                const tbody = document.getElementById('candidatesTableBody');
+                tbody.innerHTML = candidates.slice(0, 5).map(cand => `
+                    <tr>
+                        <td><strong>${cand.name}</strong></td>
+                        <td>${cand.role}</td>
+                        <td>${cand.experience} years</td>
+                        <td>${cand.salary_expectation}</td>
+                        <td>${cand.skills.slice(0, 3).join(', ')}</td>
+                        <td>${cand.matches || 0}</td>
+                        <td>
+                            <button class="btn btn-sm" style="background: transparent; color: var(--primary);">View</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading candidates:', error);
+            }
+        }
+
+        // Load analytics
+        async function loadAnalytics() {
+            try {
+                const response = await fetch(`${API_BASE}/analytics/dashboard`);
+                const data = await response.json();
+                
+                document.getElementById('stat-matches').textContent = data.summary.total_matches.toLocaleString();
+                document.getElementById('stat-score').textContent = Math.round(data.summary.average_match_score * 100) + '%';
+                document.getElementById('stat-placements').textContent = data.trends.successful_placements_this_month;
+                document.getElementById('stat-conversion').textContent = Math.round(data.trends.conversion_rate * 100) + '%';
+
+                // Load top skills
+                const skillsBody = document.getElementById('skillsTableBody');
+                skillsBody.innerHTML = data.top_skills_demand.slice(0, 5).map(skill => `
+                    <tr>
+                        <td><strong>${skill.skill}</strong></td>
+                        <td>${skill.count}</td>
+                        <td>📈 +12%</td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+            }
+        }
+
+        // Tab switching
+        function switchTab(tabName) {
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(c => c.classList.remove('active'));
+            
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            
+            const selectedContent = document.getElementById(tabName);
+            if (selectedContent) selectedContent.classList.add('active');
+            
+            event.currentTarget.classList.add('active');
+            
+            const titles = {
+                matching: '⚡ AI Matching Engine',
+                jobs: '💼 Job Profiles',
+                candidates: '👥 Candidates',
+                analytics: '📊 Analytics Dashboard'
+            };
+            
+            const subtitles = {
+                matching: 'Real-time candidate-job matching with 89% accuracy',
+                jobs: 'Manage and track all job positions',
+                candidates: 'Browse and manage your candidate pool',
+                analytics: 'Performance metrics and reporting'
+            };
+            
+            document.getElementById('page-title').textContent = titles[tabName];
+            document.getElementById('page-subtitle').textContent = subtitles[tabName];
+        }
+
+        // Modal functions
+        function openJobModal() { document.getElementById('jobModal').classList.add('active'); }
+        function closeJobModal() { document.getElementById('jobModal').classList.remove('active'); }
+        function openCandidateModal() { document.getElementById('candidateModal').classList.add('active'); }
+        function closeCandidateModal() { document.getElementById('candidateModal').classList.remove('active'); }
+        function openNotifyModal() { document.getElementById('notifyModal').classList.add('active'); }
+        function closeNotifyModal() { document.getElementById('notifyModal').classList.remove('active'); }
+
+        // Form submissions
+        async function submitJobForm(e) {
+            e.preventDefault();
+            const job = {
+                title: document.getElementById('jobTitle').value,
+                company: document.getElementById('jobCompany').value,
+                salary_range: document.getElementById('jobSalary').value,
+                level: document.getElementById('jobLevel').value,
+                skills_required: document.getElementById('jobSkills').value.split(',').map(s => s.trim())
+            };
+            
+            try {
+                await fetch(`${API_BASE}/job-profiles`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(job)
+                });
+                showNotification('Job created successfully!', 'success');
+                closeJobModal();
+                loadJobs();
+            } catch (error) {
+                showNotification('Error creating job', 'error');
+            }
+        }
+
+        async function submitCandidateForm(e) {
+            e.preventDefault();
+            const candidate = {
+                name: document.getElementById('candName').value,
+                role: document.getElementById('candRole').value,
+                experience: parseInt(document.getElementById('candExperience').value),
+                salary_expectation: document.getElementById('candSalary').value,
+                skills: document.getElementById('candSkills').value.split(',').map(s => s.trim())
+            };
+            
+            try {
+                await fetch(`${API_BASE}/candidates`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(candidate)
+                });
+                showNotification('Candidate added successfully!', 'success');
+                closeCandidateModal();
+                loadCandidates();
+            } catch (error) {
+                showNotification('Error adding candidate', 'error');
+            }
+        }
+
+        async function sendToSlack(e) {
+            e.preventDefault();
+            const notification = {
+                channel: document.getElementById('slackChannel').value,
+                message: document.getElementById('slackMessage').value,
+                match_score: currentMatch?.final_score
+            };
+            
+            try {
+                await fetch(`${API_BASE}/notifications/slack`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(notification)
+                });
+                showNotification('Message sent to Slack!', 'success');
+                closeNotifyModal();
+            } catch (error) {
+                showNotification('Error sending to Slack', 'error');
+            }
+        }
+
+        async function generateNewMatch() {
+            await loadMatches();
+            showNotification('New match generated!', 'success');
+        }
+
+        async function shareWithCandidate() {
+            try {
+                await fetch(`${API_BASE}/notifications/email`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        candidate_email: 'john@example.com',
+                        job_title: 'Senior Python Developer',
+                        match_score: currentMatch?.final_score
+                    })
+                });
+                showNotification('Match shared with candidate!', 'success');
+            } catch (error) {
+                showNotification('Error sharing match', 'error');
+            }
+        }
+
+        async function exportReport(format) {
+            try {
+                const response = await fetch(`${API_BASE}/reports/generate?format=${format}`);
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `report.${format}`;
+                a.click();
+                showNotification('Report exported!', 'success');
+            } catch (error) {
+                showNotification('Error exporting report', 'error');
+            }
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => notification.remove(), 3000);
+        }
+
+        // Close modals on background click
+        window.onclick = (event) => {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        };
+    </script>
+</body>
+</html>
