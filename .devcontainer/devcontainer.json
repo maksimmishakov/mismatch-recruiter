@@ -1,0 +1,37 @@
+{
+  "name": "MisMatch Recruiter Dev Environment",
+  "image": "mcr.microsoft.com/devcontainers/python:3.12",
+  "features": {
+    "ghcr.io/devcontainers/features/node:18": {},
+    "ghcr.io/devcontainers/features/postgres:15": {
+      "version": "15"
+    },
+    "ghcr.io/devcontainers/features/redis:7": {}
+  },
+  "postCreateCommand": "bash .devcontainer/setup-dev.sh",
+  "forwardPorts": [5000, 3000, 5432, 6379, 8080, 9090, 3001],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ES7-React@4.4.2",
+        "eamodio.gitlens",
+        "GitHub.copilot",
+        "ms-docker.docker",
+        "redhat.vscode-yaml"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.linting.enabled": true,
+        "python.linting.pylintEnabled": true,
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "ms-python.python",
+        "[python]": {
+          "editor.defaultFormatter": "ms-python.python",
+          "editor.formatOnSave": true
+        }
+      }
+    }
+  }
+}
