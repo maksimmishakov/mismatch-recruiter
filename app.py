@@ -156,3 +156,20 @@ def handle_metrics_request():
         emit('metrics_update', metrics, broadcast=True)
     except Exception as e:
         emit('error', {'error': str(e)})
+
+# Autonomous AI Agents
+from services.autonomous_agent_service import AutonomousRecruitmentAgent
+
+agent = AutonomousRecruitmentAgent()
+
+@app.route('/api/agent/run-workflow', methods=['POST'])
+def run_workflow():
+    """Run autonomous hiring workflow"""
+    try:
+        data = request.json
+        job_data = data.get('job_data', {})
+        
+        result = agent.run_hiring_workflow(job_data)
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
