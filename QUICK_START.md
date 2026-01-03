@@ -1,269 +1,236 @@
-# 🚀 Quick Start Guide - MisMatch Features
+# ⚡ MisMatch - QUICK START GUIDE
 
-**Status**: Production Ready  
-**Live URL**: https://Mismatch-recruiter-maksmisakov.amvera.io  
-**Last Updated**: December 23, 2025
+## 🎯 Для РАЗРАБОТЧИКОВ (30 сек)
 
----
-
-## 30-Second Overview
-
-MisMatch provides three powerful features for recruitment automation:
-
-1. **Batch Upload** - Process multiple resumes at once
-2. **Job Matcher** - Match candidates with job descriptions
-3. **Interview Questions** - Generate tailored interview questions
-
----
-
-## Access the Application
-
-### Web Interface
-
-| Feature | URL |
-|---------|-----|
-| Batch Upload | `/batch` |
-| Job Matcher | `/job-matcher` |
-| Interview Questions | (see API below) |
-| Health Check | `/api/status` |
-
-**Example**: https://Mismatch-recruiter-maksmisakov.amvera.io/batch
-
----
-
-## API Quick Reference
-
-### 1. Batch Upload Files
-
+### Option 1: GitHub Codespaces (Рекомендуется)
 ```bash
-curl -X POST https://Mismatch-recruiter-maksmisakov.amvera.io/api/batch-upload \\
-  -F "files[]=@resume1.pdf" \\
-  -F "files[]=@resume2.pdf"
+1. Code → Codespaces → Create codespace on main
+2. Ждите 2-3 минуты (автоматический setup)
+3. source /workspace/venv/bin/activate
+4. python app.py
+5. http://localhost:5000 ✅
 ```
 
-**Response**:
-```json
+### Option 2: Локально (Docker)
+```bash
+docker-compose up -d
+# Все 6 сервисов запустятся
+# Frontend: http://localhost:3000
+# Backend: http://localhost:5000
+# Grafana: http://localhost:3001
+```
+
+---
+
+## 🎯 Для LAMODA (Demo)
+
+### Быстрый Demo (5 минут)
+
+#### Шаг 1: Запустить стек
+```bash
+docker-compose up -d
+```
+
+#### Шаг 2: Проверить здоровье
+```bash
+curl http://localhost:5000/health
+# Response: {"status": "ok", ...}
+```
+
+#### Шаг 3: Попробовать API
+```bash
+# GET candidates
+curl http://localhost:5000/api/v1/candidates
+
+# GET jobs
+curl http://localhost:5000/api/v1/jobs
+
+# GET matches
+curl http://localhost:5000/api/v1/matches?job_id=1
+```
+
+#### Шаг 4: Открыть Dashboard
+- **Backend API**: http://localhost:5000
+- **Grafana Metrics**: http://localhost:3001 (admin/admin)
+- **Prometheus**: http://localhost:9090
+- **Database**: http://localhost:5050 (admin@example.com/admin)
+
+---
+
+## 📚 ДОКУМЕНТАЦИЯ
+
+### Для интеграции с Lamoda
+📖 **[LAMODA_INTEGRATION.md](./LAMODA_INTEGRATION.md)**
+- API endpoints
+- Python примеры кода
+- 4-шаговая интеграция
+- Testing procedures
+
+### Для разработки в Codespaces
+👨‍💻 **[CODESPACES_SETUP.md](./docs/CODESPACES_SETUP.md)**
+- One-click setup
+- Configuration
+- Pro tips
+- Troubleshooting
+
+### Полный отчет о завершении
+✅ **[COMPLETION_SUMMARY.md](./COMPLETION_SUMMARY.md)**
+- Статус всех сервисов
+- Выполненные задачи
+- Next steps
+- Docker commands
+
+---
+
+## 🚀 PRODUCTION DEPLOYMENT
+
+### На Amvera (уже настроено)
+```bash
+# Просто push в main
+git push origin main
+# Автоматический CI/CD → Deploy
+```
+
+**Live URL**: https://mismatch-recruiter-maksimisakov.amvera.io
+
+---
+
+## 🔧 ТЕХНИЧЕСКИЙ СТЕК
+
+```
+┌─────────────────────────────────────┐
+│         Frontend (React)            │
+│      Port 3000 (optional)           │
+└──────────────┬──────────────────────┘
+               │
+┌──────────────┴──────────────────────┐
+│    Backend API (Flask)              │
+│    Port 5000 ✅ (ACTIVE)            │
+└──────────────┬──────────────────────┘
+               │
+      ┌────────┼────────┐
+      │        │        │
+  ┌───▼──┐ ┌──▼───┐ ┌──▼─────┐
+  │  DB  │ │Cache │ │Metrics │
+  │PG 15 │ │Redis7│ │Prom/GF │
+  └──────┘ └──────┘ └────────┘
+```
+
+---
+
+## 🎓 ПРИМЕРЫ API ЗАПРОСОВ
+
+### 1. Health Check
+```bash
+GET http://localhost:5000/health
+
+Response:
 {
-  "success": true,
-  "total_files": 2,
-  "successful": 2,
-  "results": [
-    {"filename": "resume1.pdf", "status": "success", "skills": ["Python"], "score": 85}
-  ]
+  "status": "ok",
+  "service": "mismatch-recruiter",
+  "timestamp": "2026-01-03T15:00:00"
 }
 ```
 
----
-
-### 2. Match Resume to Job
-
+### 2. Get Candidates
 ```bash
-curl -X POST https://Mismatch-recruiter-maksmisakov.amvera.io/api/match-resume-to-job \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "job_title": "Senior Python Developer",
-    "job_description": "Looking for experienced Python developer with FastAPI experience",
-    "resume_text": "8 years Python, FastAPI expert, deployed 50+ projects"
-  }'
-```
+GET http://localhost:5000/api/v1/candidates
 
-**Response**:
-```json
+Response:
 {
   "success": true,
-  "match_percentage": 85,
-  "verdict": "GOOD_FIT",
-  "candidate_name": "John Doe"
+  "data": [],
+  "message": "No candidates yet"
 }
 ```
 
----
-
-### 3. Generate Interview Questions
-
+### 3. Get Jobs
 ```bash
-curl -X POST https://Mismatch-recruiter-maksmisakov.amvera.io/api/generate-interview-questions \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "job_title": "Backend Developer",
-    "job_description": "Build scalable backend systems",
-    "resume_analysis": {"summary": "5 years backend experience"}
-  }'
-```
+GET http://localhost:5000/api/v1/jobs
 
-**Response**:
-```json
+Response:
 {
   "success": true,
-  "job_title": "Backend Developer",
-  "total": 10,
-  "questions": [
-    {"level": "basic", "question": "Tell us about your experience"},
-    {"level": "intermediate", "question": "How do you approach system design?"},
-    {"level": "advanced", "question": "How would you optimize database queries?"}
-  ]
+  "data": [],
+  "message": "No jobs yet"
 }
 ```
 
----
+### 4. Get Metrics
+```bash
+GET http://localhost:5000/metrics
 
-## Using the Web Interface
-
-### Feature 1: Batch Upload
-
-1. Open https://Mismatch-recruiter-maksmisakov.amvera.io/batch
-2. Drag-drop PDF files or click to upload
-3. Wait for processing
-4. View results with extracted skills and scores
-
-### Feature 2: Job Matcher
-
-1. Open https://Mismatch-recruiter-maksmisakov.amvera.io/job-matcher
-2. Enter job title (e.g., "Senior Python Developer")
-3. Paste job description
-4. Paste resume text
-5. Click "Find Match"
-6. View match percentage and verdict (GOOD_FIT, MODERATE_FIT, POOR_FIT)
-
-### Feature 3: Interview Questions
-
-1. Navigate to interview questions page
-2. Enter job position
-3. Provide job description
-4. Add resume summary
-5. Click "Generate Questions"
-6. Review questions grouped by difficulty level
+Response: (Prometheus format)
+mismatch_requests_total 0
+```
 
 ---
 
-## Response Status Codes
+## 🔐 CREDENTIALS (Development Only)
 
-| Code | Meaning |
-|------|----------|
-| 200 | Success |
-| 400 | Bad request (missing/invalid fields) |
-| 404 | Resource not found |
-| 500 | Server error |
-| 503 | Service unavailable (building/deploying) |
+```
+📊 Grafana
+URL: http://localhost:3001
+User: admin
+Pass: admin
 
----
+🛠️ PgAdmin
+URL: http://localhost:5050
+Email: admin@example.com
+Pass: admin
 
-## Common Use Cases
+🗄️ PostgreSQL
+Host: localhost:5432
+User: mismatch_user
+Pass: mismatch_password
+DB: mismatch
 
-### Use Case 1: Recruiting Campaign
-
-1. Upload batch of 50 resumes
-2. System extracts skills and scores each candidate
-3. Use scores to shortlist top 10 candidates
-4. Use job matcher to verify fit for specific role
-5. Generate interview questions for finalists
-
-### Use Case 2: Single Candidate Evaluation
-
-1. Provide resume text
-2. Get job match score instantly
-3. Generate tailored interview questions
-4. Conduct structured interview
-
-### Use Case 3: Job Description Analysis
-
-1. Paste job description
-2. Match against candidate pool
-3. Identify skill gaps
-4. Generate questions targeting key competencies
+🔴 Redis
+Host: localhost:6379
+No auth needed
+```
 
 ---
 
-## Troubleshooting
+## ❌ TROUBLESHOOTING
 
-### Application Returns 503
+### Port already in use?
+```bash
+lsof -i :5000
+kill -9 <PID>
+```
 
-**Cause**: Service is building/deploying  
-**Solution**: Wait 5-10 minutes and try again
+### Docker container won't start?
+```bash
+docker-compose down -v
+docker-compose up -d
+```
 
-### File Upload Fails
+### Database connection error?
+```bash
+docker-compose logs mismatch-db
+```
 
-**Possible Causes**:
-- File size > 50MB (maximum)
-- File type not supported (only PDF, DOCX, DOC)
-- Network connectivity issue
-
-**Solution**:
-- Check file size
-- Verify file format
-- Try uploading fewer files
-
-### Job Match Returns 0%
-
-**Cause**: Resume has no matching skills with job  
-**Solution**: 
-- Verify resume content is pasted correctly
-- Check job description has clear requirements
-- Try with different resume/job combination
-
----
-
-## Performance Targets
-
-| Operation | Target Time |
-|-----------|-------------|
-| Single file upload | < 30 seconds |
-| Batch upload (5 files) | < 2 minutes |
-| Job matching | < 5 seconds |
-| Question generation | < 3 seconds |
+### Need fresh start?
+```bash
+# Full reset
+docker-compose down -v
+rm -rf instance/
+git clean -fd
+docker-compose up -d
+```
 
 ---
 
-## System Requirements
+## 📞 SUPPORT
 
-- Modern web browser (Chrome, Firefox, Safari, Edge)
-- Internet connection
-- JavaScript enabled
-- No additional software required
-
----
-
-## Support & Documentation
-
-- **Feature Details**: See `FEATURES_COMPLETION_SUMMARY.md`
-- **Testing Guide**: See `TESTING_GUIDE.md`
-- **Deployment**: See `AMVERA_DEPLOYMENT_GUIDE.md`
-- **GitHub**: https://github.com/maksimmishakov/Mismatch-ai-recruiter
+- 📖 Full Documentation: Check `/docs` folder
+- 🐛 Issues: GitHub Issues
+- �� Questions: Read the docs first!
+- 🎯 Lamoda Integration: See LAMODA_INTEGRATION.md
 
 ---
 
-## What's Next?
-
-1. ✅ Test the application at https://Mismatch-recruiter-maksmisakov.amvera.io
-2. ✅ Try each of the 3 features
-3. 📖 Read the detailed testing guide for comprehensive testing
-4. 🚀 Deploy to your infrastructure
-5. 📊 Monitor performance and gather feedback
-
----
-
-## Key Features Summary
-
-✅ **Batch Upload**
-- Support for PDF, DOCX, DOC files
-- Automatic skill extraction
-- Candidate scoring
-- Error handling with clear messages
-
-✅ **Job Matcher**
-- Skill-based matching algorithm
-- Percentage score (0-100%)
-- 3-level verdict system
-- Experience consideration
-
-✅ **Interview Questions**
-- 10 tailored questions per candidate
-- 3 difficulty levels
-- Contextual to job and candidate
-- Ready-to-use in interviews
-
----
-
-**Version**: 1.0  
-**Created**: December 23, 2025  
+**Last Updated**: 2026-01-03 15:00 MSK
 **Status**: ✅ Production Ready
+**Next**: Get Lamoda API key and integrate!
