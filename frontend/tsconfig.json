@@ -16,7 +16,6 @@
     "noImplicitReturns": true,
     "resolveJsonModule": true,
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "paths": {

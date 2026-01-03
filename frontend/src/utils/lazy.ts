@@ -1,38 +1,85 @@
-import { lazy, Suspense, ReactNode } from 'react'
-import LoadingSpinner from '@components/common/LoadingSpinner'
+import React, { Suspense, lazy, ComponentType, ReactElement, ReactNode } from 'react';
 
-// Lazy load component with fallback
-export const createLazyComponent = <P extends object>(
-  importFunc: () => Promise<{ default: React.ComponentType<P> }>,
-  fallback: ReactNode = <LoadingSpinner />
-) => {
-  const Component = lazy(importFunc)
-  
-  return (props: P) => (
-    <Suspense fallback={fallback}>
-      <Component {...props} />
-    </Suspense>
-  )
-}
+// Default loading spinner component
+const DefaultLoadingSpinner = (): ReactElement => {
+  return React.createElement(
+    'div',
+    {
+      style: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        fontSize: '18px',
+        color: '#666'
+      }
+    },
+    React.createElement('div', null, 'Loading...')
+  );
+};
 
-// Image lazy loading helper
+// Type definition for lazy component factory function
+type LazyComponentFactory<P extends object = {}> = () => Promise<{ default: ComponentType<P> }>;
+
+// Create a lazy loaded component with fallback UI
+export const createLazyComponent = <P extends object = {}>(
+  importFunc: LazyComponentFactory<P>,
+  fallback?: ReactNode
+): ((props: P) => ReactElement) => {
+  const LazyComponent = lazy(() => importFunc() as Promise<{ default: ComponentType<any> }>);
+
+  const Component = (props: P): ReactElement => {
+    const fallbackElement = fallback || React.createElement(DefaultLoadingSpinner);
+    return React.createElement(
+      Suspense,
+      { fallback: fallbackElement },
+      React.createElement(LazyComponent, props as any)
+    );
+  };
+
+  return Component;
+};
+
+// Image lazy loading utility
 export const lazyLoadImage = (src: string, alt: string = ''): string => {
-  return src
-}
+  if (typeof document !== 'undefined') {
+    const selector = `[data-src="${src}"]`;
+    const element = document.querySelector(selector);
+    if (element && element instanceof HTMLImageElement) {
+      element.src = src;
+      if (alt) {
+        element.alt = alt;
+      }
+    }
+  }
+  return src;
+};
 
-// Script lazy loading
+// Script lazy loading utility
 export const lazyLoadScript = (src: string): Promise<void> => {
   return new Promise((resolve, reject) => {
-    if (document.querySelector(`script[src="${src}"]`)) {
-      resolve()
-      return
+    // Check if script already loaded
+    const selector = `script[src="${src}"]`;
+    if (document.querySelector(selector)) {
+      resolve();
+      return;
     }
-    
-    const script = document.createElement('script')
-    script.src = src
-    script.async = true
-    script.onload = () => resolve()
-    script.onerror = () => reject(new Error(`Failed to load script: ${src}`))
-    document.body.appendChild(script)
-  })
-}
+
+    // Create and append script tag
+    const script = document.createElement('script');
+    script.src = src;
+    script.async = true;
+
+    script.onload = () => {
+      resolve();
+    };
+
+    script.onerror = () => {
+      reject(new Error(`Failed to load script: ${src}`));
+    };
+
+    document.body.appendChild(script);
+  });
+};
+
+export default createLazyComponent;

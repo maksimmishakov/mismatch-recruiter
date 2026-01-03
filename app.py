@@ -68,6 +68,51 @@ def reset_database():
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
+        # Job Profiles Endpoints
+@app.route('/api/job-profiles', methods=['GET'])
+def get_job_profiles():
+    try:
+        jobs = JobProfiles.query.all()
+        data = [
+            {
+                'id': j.id,
+                'title': j.title,
+                'description': j.description,
+                'required_skills': j.required_skills or [],
+                'experience_level': j.experience_level,
+                'salary_range': j.salary_range,
+                'created_at': j.created_at.isoformat() if j.created_at else None,
+            }
+            for j in jobs
+        ]
+        return jsonify({'status': 'ok', 'count': len(data), 'data': data}), 200
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@app.route('/api/job-profiles', methods=['POST'])
+def create_job_profile():
+    try:
+        data = request.get_json()
+        job = JobProfiles(
+            id=str(uuid.uuid4()),
+            title=data.get('title', 'Untitled'),
+            description=data.get('description', ''),
+            required_skills=data.get('required_skills', []),
+            experience_level=data.get('experience_level', 0),
+            salary_range=data.get('salary_range', ''),
+        )
+        db.session.add(job)
+        db.session.commit()
+        return jsonify({
+            'status': 'ok',
+            'message': 'Job profile created',
+            'id': job.id,
+            'title': job.title,
+        }), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'status': 'error', 'message': str(e)}), 400
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
 
