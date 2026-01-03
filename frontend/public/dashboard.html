@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MisMatch Recruiter - Enterprise Platform v4.2</title>
+    <style>
+        :root {
+            --primary: #208896;
+            --primary-hover: #1a6d7a;
+            --secondary: #134252;
+            --accent: #e67e50;
+            --success: #2db066;
+            --warning: #f5a623;
+            --error: #d94444;
+            --bg-light: #fafaf8;
+            --bg-card: #ffffff;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666;
+            --border: #e5e5e5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 280px;
+            background: var(--secondary);
+            color: white;
+            padding: 30px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .logo {
+            padding: 0 20px 30px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .nav-item {
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 5px 10px;
+            border-radius: 8px;
+        }
+
+        .nav-item:hover {
+            background: rgba(32, 136, 150, 0.2);
+        }
+
+        .nav-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* MAIN CONTENT */
+        .main {
+            margin-left: 280px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: var(--bg-card);
+            padding: 20px 40px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .header-title h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .header-title p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .header-user {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        /* TABS */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
+            color: var(--text-secondary);
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            color: var(--primary);
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        /* CARDS */
+        .card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        /* MATCH VIEW */
+        .match-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        .match-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .match-card:hover {
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .profile-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .profile-info h3 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .profile-info p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .badge-primary {
+            background: rgba(32, 136, 150, 0.15);
+            color: var(--primary);
+        }
+
+        .badge-success {
+            background: rgba(45, 176, 102, 0.15);
+            color: var(--success);
+        }
+
+        /* MATCH SCORE */
+        .match-score {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .score-circle {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 4px 16px rgba(32, 136, 150, 0.2);
+            background: conic-gradient(var(--primary) 0deg, var(--primary) calc(3.13 * 87deg), #f0f0f0 calc(3.13 * 87deg));
+            position: relative;
+        }
+
+        .score-text {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--primary);
+            position: relative;
+            z-index: 1;
+            background: white;
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .score-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .recommendation {
+            display: inline-block;
+            background: var(--success);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 15px;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* BREAKDOWN */
+        .breakdown {
+            margin-top: 24px;
+        }
+
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .breakdown-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .breakdown-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .breakdown-value {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .bar {
+            width: 80px;
+            height: 6px;
+            background: #f0f0f0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 3px;
+            transition: width 0.8s ease;
+        }
+
+        .percentage {
+            font-weight: 600;
+            color: var(--primary);
+            width: 40px;
+            text-align: right;
+        }
+
+        /* JOB CARD */
+        .job-details {
+            background: #f9f9f7;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .job-details h4 {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .job-details p {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .skills-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .skill-tag {
+            background: var(--primary);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .skill-tag:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(32, 136, 150, 0.3);
+        }
+
+        /* STATS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border-left: 4px solid var(--primary);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-change {
+            color: var(--success);
+            font-size: 12px;
+            margin-top: 8px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* BUTTONS */
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            box-shadow: 0 4px 12px rgba(32, 136, 150, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: #e5e5e5;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        /* TABLE */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            background: #f9f9f7;
+            padding: 12px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table td {
+            padding: 16px 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table tr:hover {
+            background: #f9f9f7;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 2000;
+            animation: slideInRight 0.3s ease;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .notification.success {
+            border-left: 4px solid var(--success);
+        }
+
+        @media (max-width: 1200px) {
+            .match-container {
+                grid-template-columns: 1fr;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: static;
+            }
+            .main {
+                margin-left: 0;
+            }
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="logo">
+                <div class="logo-text">
+                    <div class="logo-icon">🎯</div>
+                    <span>MisMatch</span>
+                </div>
+            </div>
+            <nav>
+                <div class="nav-item active" onclick="switchTab('matching')">
+                    <div class="nav-icon">⚡</div>
+                    <span>Matching</span>
+                </div>
+                <div class="nav-item" onclick="switchTab('jobs')">
+                    <div class="nav-icon">💼</div>
+                    <span>Job Profiles</span>
+                </div>
+                <div class="nav-item" onclick="switchTab('candidates')">
+                    <div class="nav-icon">👥</div>
+                    <span>Candidates</span>
+                </div>
+                <div class="nav-item" onclick="switchTab('analytics')">
+                    <div class="nav-icon">📊</div>
+                    <span>Analytics</span>
+                </div>
+            </nav>
+        </div>
+
+        <div class="main">
+            <div class="header">
+                <div class="header-title">
+                    <h1 id="page-title">⚡ AI Matching Engine</h1>
+                    <p id="page-subtitle">Real-time candidate-job matching with 89% accuracy</p>
+                </div>
+                <div class="header-user">
+                    <div class="user-avatar">MM</div>
+                    <div>
+                        <div style="font-weight: 600;">Max Mishakov</div>
+                        <div style="color: var(--text-secondary); font-size: 12px;">Admin</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content">
+                <!-- MATCHING TAB -->
+                <div id="matching" class="tab-content active">
+                    <div class="card">
+                        <div class="card-title">⚡ AI Matching Results (87%)</div>
+                        
+                        <div class="match-container">
+                            <!-- CANDIDATE CARD -->
+                            <div class="match-card">
+                                <div class="profile-header">
+                                    <div class="profile-avatar">JD</div>
+                                    <div class="profile-info">
+                                        <h3>John Doe</h3>
+                                        <p>Python Developer</p>
+                                        <span class="badge badge-primary">5 years exp.</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="job-details">
+                                    <h4>Skills</h4>
+                                    <div class="skills-list">
+                                        <span class="skill-tag">Python</span>
+                                        <span class="skill-tag">React</span>
+                                        <span class="skill-tag">PostgreSQL</span>
+                                        <span class="skill-tag">REST API</span>
+                                    </div>
+                                </div>
+
+                                <div class="job-details">
+                                    <h4>Salary Expectation</h4>
+                                    <p>$85,000 - $105,000</p>
+                                </div>
+
+                                <div class="job-details">
+                                    <h4>Work Preference</h4>
+                                    <p>Remote • Full-time</p>
+                                </div>
+                            </div>
+
+                            <!-- MATCH SCORE -->
+                            <div class="match-card" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                                <div class="match-score">
+                                    <div class="score-circle">
+                                        <div class="score-text">87%</div>
+                                    </div>
+                                    <div class="score-label">Match Score</div>
+                                    <span class="recommendation">✅ PERFECT MATCH</span>
+                                </div>
+
+                                <div class="breakdown" style="width: 100%; margin-top: 30px;">
+                                    <div class="breakdown-item">
+                                        <span class="breakdown-label">Skill Match</span>
+                                        <div class="breakdown-value">
+                                            <div class="bar">
+                                                <div class="bar-fill" style="width: 92%"></div>
+                                            </div>
+                                            <span class="percentage">92%</span>
+                                        </div>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <span class="breakdown-label">Seniority</span>
+                                        <div class="breakdown-value">
+                                            <div class="bar">
+                                                <div class="bar-fill" style="width: 100%"></div>
+                                            </div>
+                                            <span class="percentage">100%</span>
+                                        </div>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <span class="breakdown-label">Experience</span>
+                                        <div class="breakdown-value">
+                                            <div class="bar">
+                                                <div class="bar-fill" style="width: 88%"></div>
+                                            </div>
+                                            <span class="percentage">88%</span>
+                                        </div>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <span class="breakdown-label">Culture Fit</span>
+                                        <div class="breakdown-value">
+                                            <div class="bar">
+                                                <div class="bar-fill" style="width: 75%"></div>
+                                            </div>
+                                            <span class="percentage">75%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- JOB CARD -->
+                            <div class="match-card">
+                                <div class="profile-header">
+                                    <div style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #ff6b6b, #ee5a6f); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px;">🏢</div>
+                                    <div class="profile-info">
+                                        <h3>TechCorp Inc.</h3>
+                                        <p>Senior Python Developer</p>
+                                        <span class="badge badge-success">Open Now</span>
+                                    </div>
+                                </div>
+
+                                <div class="job-details">
+                                    <h4>Required Skills</h4>
+                                    <div class="skills-list">
+                                        <span class="skill-tag" style="background: var(--success);">Python</span>
+                                        <span class="skill-tag" style="background: var(--success);">React</span>
+                                        <span class="skill-tag" style="background: var(--warning);">GraphQL</span>
+                                        <span class="skill-tag" style="background: var(--success);">PostgreSQL</span>
+                                    </div>
+                                </div>
+
+                                <div class="job-details">
+                                    <h4>Salary Range</h4>
+                                    <p>$90,000 - $120,000</p>
+                                </div>
+
+                                <div class="job-details">
+                                    <h4>Work Mode</h4>
+                                    <p>Remote • 50% Travel</p>
+                                </div>
+
+                                <div class="btn-group">
+                                    <button class="btn btn-primary">Send Offer</button>
+                                    <button class="btn btn-secondary">View Details</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="background: #f9f9f7; padding: 20px; border-radius: 8px; margin-top: 20px;">
+                            <h4 style="margin-bottom: 10px;">📝 AI Interview Questions</h4>
+                            <ol style="color: var(--text-secondary); line-height: 1.8;">
+                                <li>Tell me about your experience with Python. What are your strongest areas?</li>
+                                <li>You don't have GraphQL experience. How would you approach learning this technology?</li>
+                                <li>Why are you interested in this Senior Developer role at TechCorp?</li>
+                                <li>Describe your experience with React. Have you built any complex applications?</li>
+                            </ol>
+                        </div>
+
+                        <div class="btn-group" style="margin-top: 20px;">
+                            <button class="btn btn-primary" onclick="alert('🔄 Generating new match...')">🔄 Generate New Match</button>
+                            <button class="btn btn-secondary" onclick="alert('📥 Exporting PDF...')">📥 Export as PDF</button>
+                            <button class="btn btn-secondary" onclick="alert('💬 Sending to Slack...')">💬 Send to Slack</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- JOBS TAB -->
+                <div id="jobs" class="tab-content">
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <div class="card-title" style="margin: 0;">💼 Job Profiles</div>
+                            <button class="btn btn-primary btn-sm" style="width: auto; padding: 8px 16px; font-size: 12px;">+ Add Job</button>
+                        </div>
+
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Position</th>
+                                    <th>Company</th>
+                                    <th>Salary</th>
+                                    <th>Level</th>
+                                    <th>Candidates</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Senior Python Developer</strong></td>
+                                    <td>TechCorp Inc.</td>
+                                    <td>$90k - $120k</td>
+                                    <td>Senior</td>
+                                    <td>12 matches</td>
+                                    <td><span class="badge badge-success">Open</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>React Frontend Engineer</strong></td>
+                                    <td>StartupXYZ</td>
+                                    <td>$75k - $95k</td>
+                                    <td>Mid-level</td>
+                                    <td>8 matches</td>
+                                    <td><span class="badge badge-success">Open</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Full-Stack Developer</strong></td>
+                                    <td>BigCorp</td>
+                                    <td>$100k - $130k</td>
+                                    <td>Senior</td>
+                                    <td>15 matches</td>
+                                    <td><span class="badge" style="background: rgba(245, 166, 35, 0.15); color: var(--warning);">Closing Soon</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- CANDIDATES TAB -->
+                <div id="candidates" class="tab-content">
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <div class="card-title" style="margin: 0;">👥 Candidates</div>
+                            <button class="btn btn-primary btn-sm" style="width: auto; padding: 8px 16px; font-size: 12px;">+ Add Candidate</button>
+                        </div>
+
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Role</th>
+                                    <th>Experience</th>
+                                    <th>Salary</th>
+                                    <th>Top Skills</th>
+                                    <th>Matches</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>John Doe</strong></td>
+                                    <td>Python Developer</td>
+                                    <td>5 years</td>
+                                    <td>$85k - $105k</td>
+                                    <td>Python, React, PostgreSQL</td>
+                                    <td>12 <span class="badge badge-primary">Active</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Sarah Smith</strong></td>
+                                    <td>Frontend Engineer</td>
+                                    <td>3 years</td>
+                                    <td>$70k - $90k</td>
+                                    <td>React, Vue, TypeScript</td>
+                                    <td>8 <span class="badge badge-primary">Active</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Mike Johnson</strong></td>
+                                    <td>Full-Stack Developer</td>
+                                    <td>7 years</td>
+                                    <td>$95k - $125k</td>
+                                    <td>Python, React, Node.js</td>
+                                    <td>15 <span class="badge badge-success">Interviewing</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ANALYTICS TAB -->
+                <div id="analytics" class="tab-content">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">Total Matches</div>
+                            <div class="stat-value">12,450</div>
+                            <div class="stat-change">↑ +15% this month</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Avg Match Score</div>
+                            <div class="stat-value">72%</div>
+                            <div class="stat-change">↑ +3% vs last month</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Successful Placements</div>
+                            <div class="stat-value">34</div>
+                            <div class="stat-change">↑ +8 this month</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Conversion Rate</div>
+                            <div class="stat-value">28%</div>
+                            <div class="stat-change">↑ +2% vs last month</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">📈 Top Skills in Demand</div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Skill</th>
+                                    <th>Demand Count</th>
+                                    <th>Trend</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Python</strong></td>
+                                    <td>234</td>
+                                    <td>📈 +12%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>React</strong></td>
+                                    <td>189</td>
+                                    <td>📈 +8%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>PostgreSQL</strong></td>
+                                    <td>156</td>
+                                    <td>📈 +5%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>GraphQL</strong></td>
+                                    <td>98</td>
+                                    <td>📈 +15%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>TypeScript</strong></td>
+                                    <td>145</td>
+                                    <td>📈 +10%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabName) {
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(c => c.classList.remove('active'));
+            
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            
+            const selectedContent = document.getElementById(tabName);
+            if (selectedContent) selectedContent.classList.add('active');
+            
+            event.currentTarget.classList.add('active');
+            
+            const titles = {
+                matching: '⚡ AI Matching Engine',
+                jobs: '💼 Job Profiles',
+                candidates: '👥 Candidates',
+                analytics: '📊 Analytics Dashboard'
+            };
+            
+            const subtitles = {
+                matching: 'Real-time candidate-job matching with 89% accuracy',
+                jobs: 'Manage and track all job positions',
+                candidates: 'Browse and manage your candidate pool',
+                analytics: 'Performance metrics and reporting'
+            };
+            
+            document.getElementById('page-title').textContent = titles[tabName];
+            document.getElementById('page-subtitle').textContent = subtitles[tabName];
+        }
+    </script>
+</body>
+</html>
