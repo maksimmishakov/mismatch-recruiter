@@ -1,34 +1,13 @@
-FROM python:3.12-slim
-
-# Установите зависимости ОС
-RUN apt-get update && apt-get install -y \
-    gcc \
-    postgresql-client \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
-
-# Установите рабочую директорию
+FROM node:18-alpine AS builder
 WORKDIR /app
+COPY frontend/package*.json ./
+RUN npm ci
+COPY frontend/ .
+RUN npm run build
 
-# Скопируйте requirements
-COPY requirements.txt .
-
-# Установите Python зависимости
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Скопируйте весь код
-COPY . .
-
-# Экспортируйте порт
-EXPOSE 5000
-
-# Создайте папки для логов и uploads
-RUN mkdir -p logs uploads
-
-ENV FLASK_ENV=production
-ENV FLASK_DEBUG=False
-ENV FLASK_HOST=0.0.0.0
-ENV FLASK_PORT=5000
-
-# Команда для запуска
-CMD ["python", "run.py"]
+FROM node:18-alpine
+WORKDIR /app
+RUN npm install -g serve
+COPY --from=builder /app/dist ./dist
+EXPOSE 3000
+CMD ["serve", "-s", "dist", "-l", "3000"]

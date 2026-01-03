@@ -1,104 +1,45 @@
-version: '3.8'
+version: '3.9'
 
 services:
-  # PostgreSQL Database
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - api
+
+  api:
+    image: mismatch-api:latest
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - DATABASE_URL=postgresql://user:password@db:5432/mismatch
+    depends_on:
+      - db
+
   db:
     image: postgres:15-alpine
-    container_name: mismatch-db
-    environment:
-      POSTGRES_DB: mismatch
-      POSTGRES_USER: mismatch_user
-      POSTGRES_PASSWORD: mismatch_password
     ports:
       - "5432:5432"
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=mismatch
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U mismatch_user"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
-  # Redis Cache
   redis:
     image: redis:7-alpine
-    container_name: mismatch-redis
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # Flask Backend
-  backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: mismatch-backend
-    ports:
-      - "5000:5000"
-    environment:
-      FLASK_ENV: development
-      FLASK_APP: app.py
-      DATABASE_URL: postgresql://mismatch_user:mismatch_password@db:5432/mismatch
-      REDIS_URL: redis://redis:6379/0
-      JWT_SECRET_KEY: dev-secret-key-change-in-production
-      PYTHONUNBUFFERED: 1
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    volumes:
-      - .:/app
-    working_dir: /app
-    command: python app.py
-
-  # Prometheus for metrics
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: mismatch-prometheus
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./deployment/prometheus.yml:/etc/prometheus/prometheus.yml
-      - prometheus_data:/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-
-  # Grafana for dashboards
-  grafana:
-    image: grafana/grafana:latest
-    container_name: mismatch-grafana
-    ports:
-      - "3001:3000"
-    environment:
-      GF_SECURITY_ADMIN_PASSWORD: admin
-      GF_SECURITY_ADMIN_USER: admin
-    volumes:
-      - grafana_data:/var/lib/grafana
-    depends_on:
-      - prometheus
-
-  # PgAdmin for database management
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: mismatch-pgadmin
-    ports:
-      - "5050:80"
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@example.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-    depends_on:
-      - db
 
 volumes:
   postgres_data:
   redis_data:
-  prometheus_data:
-  grafana_data:
