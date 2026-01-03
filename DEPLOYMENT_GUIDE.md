@@ -1,281 +1,145 @@
-# MisMatch Recruiter - Deployment Guide
+# MisMatch Recruiter - Production Deployment Guide
 
-## Stage 1: Pre-Deployment Validation
+## System Requirements
 
-### 1.1 Code Quality Checks
+- **OS:** Linux (Ubuntu 20.04+ recommended)
+- **Python:** 3.10+
+- **Node.js:** 18.x LTS
+- **PostgreSQL:** 13+
+- **Redis:** 6+
+- **Memory:** 4GB minimum (8GB recommended)
+- **Storage:** 20GB minimum
+- **Network:** Stable internet connection
+
+## Pre-Deployment Checklist
+
+- [ ] All 4 scientific innovations tested locally
+- [ ] API endpoints verified working
+- [ ] Database optimized and backed up
+- [ ] Environment variables configured
+- [ ] SSL/TLS certificates ready
+- [ ] CDN configured (optional)
+- [ ] Monitoring and alerting setup
+- [ ] Backup strategy verified
+
+## Deployment Steps
+
+### 1. Infrastructure Setup (Amvera)
+
 ```bash
-# Run all tests
-python -m pytest tests/ -v --cov=app --cov-report=html
+# Create new deployment on Amvera
+git push origin main
 
-# Run linting
-flake8 app/ services/ middleware/ --max-line-length=100
-
-# Run type checking
-mypy app/ services/ middleware/ --ignore-missing-imports
+# Amvera automatically detects and builds
+# - Builds Docker image
+# - Runs database migrations
+# - Installs dependencies
+# - Starts services
 ```
 
-### 1.2 Performance Validation
-```bash
-# Run performance benchmarks
-python tests/test_performance.py
+### 2. Environment Configuration
 
-# Check build size
-cd frontend && npm run build
-ls -lh build/
+Create `.env.production`:
+```
+FLASK_ENV=production
+DEBUG=false
+DATABASE_URL=postgresql://user:password@host:5432/mismatch
+REDIS_URL=redis://localhost:6379/0
+OPENAI_API_KEY=sk-...
+JWT_SECRET=your-secret-key
+LOG_LEVEL=INFO
 ```
 
-### 1.3 Security Scan
+### 3. Database Setup
+
 ```bash
-# Check for vulnerabilities
-pip-audit
-safety check
-```
-
----
-
-## Stage 2: Staging Deployment
-
-### 2.1 Environment Setup
-```bash
-# Clone to staging
-git clone -b feature/job-enrichment-ml-matching .
-
-# Create virtual environment
-python -m venv venv_staging
-source venv_staging/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
-pip install pytest pytest-cov flake8 mypy
-```
-
-### 2.2 Database Migration
-```bash
-# Backup current database
-sqlite3 mismatch.db ".backup mismatch_backup_$(date +%Y%m%d_%H%M%S).db"
-
 # Run migrations
-alembic upgrade head
+flask db upgrade
+
+# Create indices
+python scripts/create_indices.py
+
+# Initialize cache
+python scripts/warmup_cache.py
 ```
 
-### 2.3 Service Deployment
+### 4. Performance Tuning
+
 ```bash
-# Start backend
-gunicorn --workers=4 --threads=2 --bind 0.0.0.0:5000 app:app
+# PostgreSQL optimization
+# Edit postgresql.conf:
+shared_buffers = 2GB
+effective_cache_size = 6GB
+work_mem = 50MB
 
-# Start frontend (in separate terminal)
-cd frontend
-npm install
-npm run build
-npm run serve
+# Redis configuration
+maxmemory = 2gb
+maxmemory-policy = allkeys-lru
 ```
 
-### 2.4 Health Checks
+### 5. Service Startup
+
 ```bash
-# Check API health
-curl http://localhost:5000/health
+# Start Flask backend
+gunicorn app:app --workers 4 --worker-class gevent
 
-# Check frontend
-curl http://localhost:3000
+# Start frontend
+npm run build && npm run start
 
-# Monitor logs
-tail -f logs/mismatch.log
+# Start monitoring
+python monitoring/metrics_collector.py
 ```
 
----
+### 6. Health Check
 
-## Stage 3: Load Testing
-
-### 3.1 Setup Load Test Environment
 ```bash
-# Install locust
-pip install locust
+# Verify all services
+curl http://localhost:3000/api/health
 
-# Create load test file
-cat > locustfile.py << 'LOAD'
-from locust import HttpUser, task, between
-
-class MismatchUser(HttpUser):
-    wait_time = between(1, 5)
-    
-    @task(3)
-    def match_resume(self):
-        self.client.post("/api/match-resume-to-job",
-            json={"resume_id": "123", "job_id": "456"})
-    
-    @task(1)
-    def get_candidates(self):
-        self.client.get("/api/candidates")
-LOAD
+# Expected response:
+# {"status": "OK", "uptime": 99.9, ...}
 ```
 
-### 3.2 Run Load Test
-```bash
-# Start load testing (10,000 users over 5 minutes)
-locust -f locustfile.py -u 10000 -r 200 --run-time 5m --headless
+## Post-Deployment
 
-# Monitor metrics
-# - Response Time
-# - Throughput
-# - Error Rate
-# - Resource Usage
-```
+### Monitoring
+- Monitor real-time metrics via WebSocket
+- Set up alerting for downtime
+- Check system health regularly
 
-### 3.3 Performance Metrics Analysis
-- Response time: Should stay < 100ms (99th percentile)
-- Error rate: Should be < 0.1%
-- Throughput: Should maintain > 1000 req/sec
-- Cache hit rate: Should be > 80%
+### Backup
+- Daily database backups
+- Weekly full system snapshots
+- Offsite backup storage
 
----
+### Updates
+- Schedule maintenance windows
+- Test updates in staging first
+- Keep dependencies current
 
-## Stage 4: User Acceptance Testing (UAT)
+## Performance Targets
 
-### 4.1 Test Scenarios
-1. **Resume Upload & Parsing**
-   - Upload PDF resume
-   - Verify data extraction
-   - Check processing speed
+- **Uptime:** 99.9%
+- **Response Time:** <50ms average
+- **Throughput:** 1000+ req/sec
+- **Latency:** <100ms p95
+- **CPU Usage:** <80%
+- **Memory Usage:** <80%
 
-2. **Job Matching**
-   - Create test job
-   - Run matching algorithm
-   - Verify accuracy (95%+ target)
+## Troubleshooting
 
-3. **Dashboard Analytics**
-   - View metrics
-   - Check real-time updates
-   - Verify performance data
+### High Response Times
+- Check database query performance
+- Verify cache is working
+- Monitor CPU and memory usage
 
-4. **User Management**
-   - Create HR account
-   - Configure permissions
-   - Test role-based access
+### Database Connection Issues
+- Verify connection string
+- Check network connectivity
+- Review PostgreSQL logs
 
-### 4.2 UAT Approval
-- [ ] HR Director approval
-- [ ] Performance metrics verified
-- [ ] All test scenarios passed
-- [ ] Security scan passed
-
----
-
-## Stage 5: Production Deployment
-
-### 5.1 Pre-Production Checklist
-- [ ] All commits reviewed and approved
-- [ ] Staging tests passed
-- [ ] Load testing successful
-- [ ] UAT approved
-- [ ] Database backups created
-- [ ] Rollback plan prepared
-- [ ] Monitoring configured
-- [ ] Alerts set up
-
-### 5.2 Blue-Green Deployment Strategy
-```bash
-# 1. Prepare green environment
-git pull origin feature/job-enrichment-ml-matching
-./deploy.sh --environment production-green
-
-# 2. Run smoke tests
-./smoke_tests.sh
-
-# 3. Route 10% traffic to green
-kubectl patch service mismatch-recruiter \
-  -p '{"spec":{"selector":{"version":"green"}}}' \
-  -n production --type merge
-
-# 4. Monitor for 30 minutes
-# Metrics should remain stable
-
-# 5. Route 50% traffic
-kubectl patch service mismatch-recruiter \
-  -p '{"spec":{"selector":{"weight":"50"}}}
-
-# 6. Monitor for 1 hour
-# All metrics should be within targets
-
-# 7. Route 100% traffic
-kubectl patch service mismatch-recruiter \
-  -p '{"spec":{"selector":{"version":"green"}}}'
-
-# 8. Decommission blue environment
-kubectl delete deployment mismatch-blue -n production
-```
-
-### 5.3 Post-Deployment Verification
-```bash
-# Check services
-kubectl get pods -n production
-kubectl get svc -n production
-
-# Verify metrics
-curl https://api.mismatch-recruiter.com/health
-
-# Check logs
-kubectl logs -n production --all-containers=true -l app=mismatch-recruiter --tail=100
-
-# Run regression tests
-python tests/test_regression.py
-```
-
----
-
-## Stage 6: Post-Deployment Monitoring
-
-### 6.1 Key Metrics to Monitor
-- API Response Time (Target: < 100ms)
-- Error Rate (Target: < 0.1%)
-- CPU Usage (Target: < 70%)
-- Memory Usage (Target: < 80%)
-- Database Query Time (Target: < 50ms)
-- Cache Hit Rate (Target: > 85%)
-
-### 6.2 Alert Thresholds
-- Response Time > 500ms → Alert
-- Error Rate > 1% → Critical Alert
-- CPU > 85% → Alert
-- Memory > 90% → Alert
-- Database Down → Critical Alert
-
-### 6.3 Daily Monitoring Tasks
-- [ ] Review error logs
-- [ ] Check performance metrics
-- [ ] Verify cache effectiveness
-- [ ] Monitor resource usage
-- [ ] Review user feedback
-
----
-
-## Rollback Procedure
-
-### Emergency Rollback
-```bash
-# If production has critical issues
-kubectl set image deployment/mismatch-recruiter \
-  mismatch=mismatch:previous \
-  -n production
-
-# Restore database from backup
-sqlite3 mismatch.db ".restore mismatch_backup_<timestamp>.db"
-
-# Verify rollback
-curl https://api.mismatch-recruiter.com/health
-
-# Investigate issue
-# Create incident report
-```
-
----
-
-## Timeline
-
-- **Day 1:** Staging deployment & validation
-- **Day 2-3:** Load testing & optimization
-- **Day 4:** UAT & approval
-- **Day 5:** Production deployment (Blue-Green)
-- **Days 6-7:** Monitoring & optimization
-
----
+### API Errors
+- Check error logs
+- Verify all services are running
+- Test individual endpoints
 
