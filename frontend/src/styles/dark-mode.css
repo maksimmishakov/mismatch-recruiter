@@ -1,0 +1,99 @@
+/* Dark Mode Styles */
+
+html.dark {
+  color-scheme: dark;
+  --bg-primary: #1f2937;
+  --bg-secondary: #111827;
+  --text-primary: #f9fafb;
+  --text-secondary: #d1d5db;
+  --border-color: #374151;
+}
+
+/* Body and backgrounds */
+html.dark body {
+  background-color: #1f2937;
+  color: #f9fafb;
+}
+
+/* Cards */
+html.dark .card {
+  background-color: #1f2937;
+  border-color: #374151;
+  color: #f9fafb;
+}
+
+/* Forms and inputs */
+html.dark input,
+html.dark select,
+html.dark textarea {
+  background-color: #111827;
+  border-color: #374151;
+  color: #f9fafb;
+}
+
+html.dark input:focus,
+html.dark select:focus,
+html.dark textarea:focus {
+  border-color: #0ea5e9;
+}
+
+/* Buttons */
+html.dark .btn-secondary {
+  background-color: #374151;
+  color: #f9fafb;
+}
+
+html.dark .btn-secondary:hover {
+  background-color: #4b5563;
+}
+
+/* Sidebar and navigation */
+html.dark .sidebar {
+  background-color: #111827;
+  border-right: 1px solid #374151;
+}
+
+/* Header */
+html.dark .header {
+  background-color: #1f2937;
+  border-bottom: 1px solid #374151;
+}
+
+/* Tables */
+html.dark table {
+  border-color: #374151;
+}
+
+html.dark th {
+  background-color: #111827;
+  color: #f9fafb;
+}
+
+html.dark td {
+  border-color: #374151;
+}
+
+html.dark tr:hover {
+  background-color: #374151;
+}
+
+/* Links */
+html.dark a {
+  color: #0ea5e9;
+}
+
+html.dark a:hover {
+  color: #06b6d4;
+}
+
+/* Error messages */
+html.dark .error,
+html.dark .text-red-600 {
+  color: #fca5a5;
+}
+
+/* Success messages */
+html.dark .success,
+html.dark .text-green-600 {
+  color: #6ee7b7;
+}
