@@ -1,13 +1,14 @@
-# MisMatch Recruiter - Deployment Guide
+# Deployment Guide
 
 ## Prerequisites
-- Docker & Docker Compose installed
-- PostgreSQL 15+ (if not using Docker)
-- Python 3.11+
-- Node.js 18+
+
+- Python 3.12+
+- PostgreSQL 15+
+- Node.js 24+
+- Docker & Docker Compose (optional)
 - Git
 
-## Local Development Setup
+## Environment Setup
 
 ### 1. Clone Repository
 ```bash
@@ -15,172 +16,167 @@ git clone https://github.com/maksimmishakov/mismatch-recruiter.git
 cd mismatch-recruiter
 ```
 
-### 2. Using Docker Compose (Recommended)
-```bash
-# Start all services (backend, frontend, database)
-docker-compose up -d
-
-# Check status
-docker-compose ps
-
-# View logs
-docker-compose logs -f backend
-```
-
-Services will be available at:
-- Backend API: http://localhost:5000
-- Frontend: http://localhost:3000
-- PostgreSQL: localhost:5432
-
-### 3. Manual Setup
-
-#### Backend
+### 2. Backend Setup
 ```bash
 cd backend
 
 # Create virtual environment
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\\Scripts\\activate
+source venv/bin/activate  # Linux/Mac
+# venv\\Scripts\\activate  # Windows
 
 # Install dependencies
 pip install -r requirements.txt
 
-# Set environment variables
+# Setup environment variables
 cp .env.example .env
 # Edit .env with your values
+nano .env
+
+# Initialize database
+python init_db.py
 
 # Run migrations (if applicable)
 flask db upgrade
 
 # Start server
 python app.py
+# Runs on http://localhost:5000
 ```
 
-#### Frontend
+### 3. Frontend Setup
 ```bash
 cd frontend
+
+# Install dependencies
 npm install
-npm start
+
+# Setup environment variables
+echo "VITE_APP_API_URL=http://localhost:5000/api" > .env.local
+
+# Start development server
+npm run dev
+# Runs on http://localhost:5173
 ```
 
 ## Production Deployment
 
-### Environment Variables
-Create `.env` file with production values:
+### 1. Database Setup
 ```bash
+# Create PostgreSQL database
+psql postgres
+
+CREATE USER mismatch WITH PASSWORD 'your-secure-password';
+CREATE DATABASE mismatch OWNER mismatch;
+ALTER USER mismatch CREATEDB;
+```
+
+### 2. Environment Variables
+```bash
+# Create .env.production
+cat > backend/.env.production << 'ENV_EOF'
 FLASK_ENV=production
 FLASK_DEBUG=False
-DATABASE_URL=postgresql://user:password@db-host:5432/dbname
-JWT_SECRET_KEY=<generate-secure-256-bit-key>
+DATABASE_URL=postgresql://mismatch:password@localhost:5432/mismatch
+JWT_SECRET_KEY=your-256-bit-secret-key
 CORS_ORIGINS=https://yourdomain.com
 LOG_LEVEL=INFO
-SENTRY_DSN=<your-sentry-dsn>
+SENTRY_DSN=your-sentry-dsn
+ENV_EOF
 ```
 
-### Heroku/Amvera Deployment
+### 3. Docker Deployment
 ```bash
-# Login to deployment platform
-heroku login  # or amvera login
+# Build and run with Docker Compose
+docker-compose -f docker-compose.yml up -d
+
+# Check status
+docker-compose logs -f
+
+# Stop services
+docker-compose down
+```
+
+### 4. Amvera Cloud Deployment
+```bash
+# Login to Amvera
+amvera login
 
 # Create app
-heroku create mismatch-recruiter
-
-# Set environment variables
-heroku config:set FLASK_ENV=production
-heroku config:set JWT_SECRET_KEY=<secure-key>
-heroku config:set DATABASE_URL=<your-db-url>
+amvera app:create mismatch-recruiter
 
 # Deploy
-git push heroku main
+git push amvera main
 ```
 
-### Docker Deployment
+### 5. SSL/TLS Setup
 ```bash
-# Build images
-docker build -t mismatch-backend:latest ./backend
-docker build -t mismatch-frontend:latest ./frontend
+# Using Let's Encrypt with Nginx
+sudo certbot certonly --webroot -w /var/www/html -d yourdomain.com
 
-# Push to registry
-docker tag mismatch-backend:latest registry.example.com/mismatch-backend:latest
-docker push registry.example.com/mismatch-backend:latest
-
-# Deploy with docker-compose
-docker-compose -f docker-compose.prod.yml up -d
+# Configure nginx with SSL
+# See nginx.conf example
 ```
 
-## Testing
+## Post-Deployment
 
-### Run Tests
+### Health Checks
 ```bash
-cd backend
-pytest tests/ -v --cov=app --cov-report=html
+# Check API
+curl https://api.yourdomain.com/health
+
+# Check database
+curl https://api.yourdomain.com/api/candidates
 ```
 
-### Load Testing
+### Monitoring
+- Sentry: https://sentry.io/projects/
+- Logs: /var/log/mismatch/
+- Metrics: /metrics endpoint (if Prometheus enabled)
+
+### Backup & Recovery
 ```bash
-cd backend
-pip install locust
-locust -f tests/load_test.py --host=http://localhost:5000
-```
+# Backup database
+pg_dump mismatch > backup-$(date +%Y%m%d).sql
 
-## Monitoring
-
-### Health Check
-```bash
-curl http://localhost:5000/health
-```
-
-### Metrics (Prometheus)
-```bash
-# Start Prometheus
-docker run -p 9090:9090 -v $(pwd)/prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus
-
-# Access Prometheus
-# http://localhost:9090
-```
-
-### Logs
-```bash
-# View backend logs
-docker-compose logs backend
-
-# View file logs
-tail -f logs/mismatch_*.log
+# Restore from backup
+psql mismatch < backup-20260104.sql
 ```
 
 ## Troubleshooting
 
 ### Database Connection Error
 ```bash
-# Check PostgreSQL is running
-docker-compose logs db
+# Check PostgreSQL status
+sudo systemctl status postgresql
 
-# Reset database
-docker-compose down -v
-docker-compose up db
+# Check connection string in .env
+# Format: postgresql://user:password@host:port/database
 ```
 
-### Port Already in Use
+### API Not Responding
 ```bash
-# Change port in docker-compose.yml or:
-lsof -i :5000  # Find process
-kill -9 <PID>  # Kill process
+# Check logs
+docker-compose logs backend
+
+# Restart service
+docker-compose restart backend
 ```
 
-### Environment Variables Not Working
+### High Memory Usage
 ```bash
-# Verify .env file is in correct location
-ls -la backend/.env
+# Check running processes
+docker stats
 
-# Check values are being read
-python -c "import os; print(os.environ.get('DATABASE_URL'))"
+# Scale backend instances
+docker-compose up -d --scale backend=3
 ```
 
-## Next Steps
+## Security
 
-1. Review `PRODUCTION_CHECKLIST.md` before going live
-2. Set up monitoring with Prometheus + Grafana
-3. Configure alerts with Sentry
-4. Set up CI/CD pipeline (GitHub Actions already configured)
-5. Configure SSL/TLS certificates
-6. Set up database backups
+- Always use HTTPS in production
+- Rotate JWT_SECRET_KEY regularly
+- Keep dependencies updated
+- Monitor Sentry for errors
+- Review logs regularly
+- Use strong PostgreSQL passwords
