@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: mismatch
+      POSTGRES_PASSWORD: mismatch_dev
+      POSTGRES_DB: mismatchdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mismatch"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    environment:
+      FLASK_ENV: development
+      DATABASE_URL: postgresql://mismatch:mismatch_dev@db:5432/mismatchdb
+      JWT_SECRET_KEY: dev-secret-key-change-in-production
+      CORS_ORIGINS: http://localhost:3000,http://localhost:5173
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      REACT_APP_API_URL: http://localhost:5000
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+volumes:
+  postgres_data:
