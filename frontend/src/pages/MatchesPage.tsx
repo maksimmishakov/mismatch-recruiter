@@ -1,8 +1,6 @@
-import Card from '@components/common/Card'
-
+import Card from '@components/common/Card';
 export default function MatchesPage() {
-  return (
-    <div className="p-8">
+    return (<div className="p-8">
       <h1 className="text-3xl font-bold text-gray-900 mb-8">Matches</h1>
       
       <Card title="Candidate-Job Matches" subtitle="AI-powered matching results">
@@ -13,6 +11,5 @@ export default function MatchesPage() {
           </div>
         </div>
       </Card>
-    </div>
-  )
+    </div>);
 }

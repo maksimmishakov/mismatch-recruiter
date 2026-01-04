@@ -1,9 +1,7 @@
-import Card from '@components/common/Card'
-import Button from '@components/common/Button'
-
+import Card from '@components/common/Card';
+import Button from '@components/common/Button';
 export default function CandidatesPage() {
-  return (
-    <div className="p-8">
+    return (<div className="p-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Candidates</h1>
         <Button variant="primary">+ Add Candidate</Button>
@@ -17,6 +15,5 @@ export default function CandidatesPage() {
           </div>
         </div>
       </Card>
-    </div>
-  )
+    </div>);
 }
