@@ -1,0 +1,25 @@
+groups:
+  - name: mismatch_alerts
+    interval: 30s
+    rules:
+      - alert: HighErrorRate
+        expr: rate(mismatch_errors_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: High error rate detected
+          description: Error rate is {{ $value }} errors/sec
+      - alert: HighResponseTime
+        expr: histogram_quantile(0.95, mismatch_request_duration_seconds) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High response time
+          description: p95 latency is {{ $value }}s
+      - alert: DatabaseConnectionError
+        expr: mismatch_db_errors_total > 0
+        for: 1m
+        labels:
+          severity: critical

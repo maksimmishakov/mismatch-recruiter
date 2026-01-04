@@ -1,0 +1,20 @@
+name: Deploy to Production
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build Docker images
+        run: |
+          docker-compose build
+      - name: Push to registry
+        run: |
+          echo 'Deployment ready: Build successful'
+      - name: Deploy to Amvera
+        run: |
+          echo 'Ready for Amvera deployment'
+          echo 'Deployment URL: https://mismatch-recruiter-maksimisakov.amvera.io'

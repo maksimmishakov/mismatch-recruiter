@@ -1,18 +1,38 @@
----
-version: '1.0'
 meta:
-  environment: python
-  toolchain:
-    name: pip
-    version: 3.11
+  name: mismatch-recruiter
+  description: AI-powered recruitment platform
+  version: 1.0.0
+resources:
+  instances: 2
+  cpu: 2000m
+  memory: 2Gi
+  storage: 10Gi
 build:
-  requirementsPath: requirements.txt
-  useCache: false
-run:
-  scriptName: app.py
-  persistenceMount: /data
-  containerPort: 80
-serviceType: compute
----
-command: gunicorn app:app -bind 0.0.0.0:80
-containerPort: 80
+  type: docker-compose
+  files:
+    - docker-compose.yml
+environment:
+  FLASK_ENV: production
+  LOG_LEVEL: INFO
+deployment:
+  strategy: rolling
+  maxSurge: 1
+  maxUnavailable: 0
+health:
+  http:
+    path: /api/health
+    port: 5000
+  initialDelay: 10
+  periodSeconds: 30
+  timeoutSeconds: 10
+  failureThreshold: 3
+monitoring:
+  sentry:
+    enabled: true
+  metrics:
+    enabled: true
+backup:
+  database:
+    enabled: true
+    schedule: '0 2 * * *'
+    retention: 30
