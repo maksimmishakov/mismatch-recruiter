@@ -102,3 +102,6 @@ def log_request(response):
         pass
     
     return response
+
+# Alias for backward compatibility
+setup_logging = init_logging

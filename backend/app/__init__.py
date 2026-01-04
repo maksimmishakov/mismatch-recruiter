@@ -14,6 +14,7 @@ jwt = JWTManager()
 def create_app(config_name='development'):
     """Application factory pattern"""
     app = Flask(__name__)
+    app.config['ENV'] = config_name
     
     # Configuration
     if config_name == 'development':
