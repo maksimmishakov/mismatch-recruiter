@@ -26,10 +26,17 @@ def create_app(config_name='development'):
         app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
         app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'dev-secret')
     
+        # Validate JWT_SECRET_KEY in production
+    if app.config['ENV'] == 'production':
+        jwt_secret = app.config.get('JWT_SECRET_KEY')
+        if not jwt_secret or jwt_secret.startswith('dev-'):
+            raise ValueError('JWT_SECRET_KEY must be set via environment variable in production')
     # Initialize extensions
     db.init_app(app)
     jwt.init_app(app)
-    CORS(app, resources={r"/api/*": {"origins": "*"}})
+    # CORS Configuration
+    cors_origins = os.environ.get('CORS_ORIGINS', 'http://localhost:3000,http://localhost:5173').split(',')
+    CORS(app, resources={"/api/*": {"origins": cors_origins}})
     
     with app.app_context():
         # Register blueprints
