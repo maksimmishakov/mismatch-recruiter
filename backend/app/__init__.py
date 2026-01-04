@@ -6,6 +6,7 @@ import os
 from flask_talisman import Talisman
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from .logger import setup_logging
 
 db = SQLAlchemy()
 jwt = JWTManager()
@@ -67,4 +68,6 @@ def create_app(config_name='development'):
         # Create tables
         db.create_all()
     
+        # Setup logging
+    setup_logging(app)
     return app
