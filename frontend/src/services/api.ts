@@ -1,84 +1,184 @@
-const API_BASE = process.env.VITE_API_URL || 'http://localhost:8000/api';
+/**
+ * API Service - Frontend to Backend Communication
+ * Backend running on: http://localhost:5000
+ */
 
-interface JobData {
-  title: string;
-  company_name: string;
-  description: string;
-  salary_min: number;
-  salary_max: number;
-  seniority_level: string;
-  location: string;
-  work_mode: string;
-  required_skills: string[];
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+interface ApiResponse<T = any> {
+  success: boolean;
+  data?: T;
+  error?: string;
+  message?: string;
 }
 
-export const jobsApi = {
-  async createJob(data: JobData) {
-    const res = await fetch(`${API_BASE}/jobs`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-    return res.json();
-  },
+class ApiService {
+  private baseURL: string;
 
-  async getJob(jobId: number) {
-    const res = await fetch(`${API_BASE}/jobs/${jobId}`);
-    return res.json();
-  },
-
-  async listJobs() {
-    const res = await fetch(`${API_BASE}/jobs`);
-    return res.json();
-  },
-
-  async updateJob(jobId: number, data: Partial<JobData>) {
-    const res = await fetch(`${API_BASE}/jobs/${jobId}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-    return res.json();
-  },
-
-  async closeJob(jobId: number) {
-    const res = await fetch(`${API_BASE}/jobs/${jobId}/close`, {
-      method: 'POST'
-    });
-    return res.json();
+  constructor(baseURL: string = API_BASE_URL) {
+    this.baseURL = baseURL;
   }
-};
 
-export const salaryApi = {
-  async getSalaryRange(title: string, seniority: string, location = 'USA') {
-    const params = new URLSearchParams({ title, seniority, location });
-    const res = await fetch(`${API_BASE}/salary/range?${params}`);
-    return res.json();
-  },
+  private getHeaders(): HeadersInit {
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
 
-  async calculateSalaryMatch(jobMin: number, jobMax: number, candMin: number, candMax: number) {
-    const res = await fetch(`${API_BASE}/salary/match`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ job_min: jobMin, job_max: jobMax, candidate_min: candMin, candidate_max: candMax })
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    return headers;
+  }
+
+  private async request<T>(
+    method: string,
+    endpoint: string,
+    data?: any
+  ): Promise<ApiResponse<T>> {
+    const url = `${this.baseURL}${endpoint}`;
+
+    try {
+      const options: RequestInit = {
+        method,
+        headers: this.getHeaders(),
+      };
+
+      if (data) {
+        options.body = JSON.stringify(data);
+      }
+
+      const response = await fetch(url, options);
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const responseData = await response.json();
+      return {
+        success: true,
+        data: responseData,
+      };
+    } catch (error: any) {
+      console.error('API Error:', error);
+      return {
+        success: false,
+        error: error.message || 'Unknown error occurred',
+      };
+    }
+  }
+
+  // Candidates Endpoints
+  async getCandidates(page = 1, pageSize = 20) {
+    return this.request('/api/candidates', 'GET');
+  }
+
+  async getCandidate(id: number) {
+    return this.request(`/api/candidates/${id}`, 'GET');
+  }
+
+  async createCandidate(data: any) {
+    return this.request('/api/candidates', 'POST', data);
+  }
+
+  async updateCandidate(id: number, data: any) {
+    return this.request(`/api/candidates/${id}`, 'PUT', data);
+  }
+
+  async deleteCandidate(id: number) {
+    return this.request(`/api/candidates/${id}`, 'DELETE');
+  }
+
+  // Jobs Endpoints
+  async getJobs(page = 1, pageSize = 20) {
+    return this.request('/api/jobs', 'GET');
+  }
+
+  async getJob(id: number) {
+    return this.request(`/api/jobs/${id}`, 'GET');
+  }
+
+  async createJob(data: any) {
+    return this.request('/api/jobs', 'POST', data);
+  }
+
+  async updateJob(id: number, data: any) {
+    return this.request(`/api/jobs/${id}`, 'PUT', data);
+  }
+
+  async deleteJob(id: number) {
+    return this.request(`/api/jobs/${id}`, 'DELETE');
+  }
+
+  // Matches Endpoints
+  async getMatches(jobId: number) {
+    return this.request(`/api/matches?job_id=${jobId}`, 'GET');
+  }
+
+  async getCandidateMatches(candidateId: number) {
+    return this.request(`/api/matches?candidate_id=${candidateId}`, 'GET');
+  }
+
+  async getMatch(id: number) {
+    return this.request(`/api/matches/${id}`, 'GET');
+  }
+
+  async createMatch(data: any) {
+    return this.request('/api/matches', 'POST', data);
+  }
+
+  // Auth Endpoints
+  async login(email: string, password: string) {
+    const response = await this.request('/api/auth/login', 'POST', {
+      email,
+      password,
     });
-    return res.json();
+
+    if (response.success && response.data?.token) {
+      localStorage.setItem('auth_token', response.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+    }
+
+    return response;
   }
-};
 
-export const analyticsApi = {
-  async getDashboardStats() {
-    const res = await fetch(`${API_BASE}/analytics/dashboard`);
-    return res.json();
-  },
-
-  async getJobPerformance(jobId: number) {
-    const res = await fetch(`${API_BASE}/analytics/job/${jobId}`);
-    return res.json();
-  },
-
-  async getMarketTrends(location = 'USA') {
-    const res = await fetch(`${API_BASE}/analytics/trends?location=${location}`);
-    return res.json();
+  async logout() {
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('user');
+    return {
+      success: true,
+    };
   }
-};
+
+  async register(userData: any) {
+    return this.request('/api/auth/register', 'POST', userData);
+  }
+
+  // Analytics Endpoints
+  async getAnalytics(startDate?: string, endDate?: string) {
+    let endpoint = '/api/analytics';
+    if (startDate && endDate) {
+      endpoint += `?start_date=${startDate}&end_date=${endDate}`;
+    }
+    return this.request(endpoint, 'GET');
+  }
+
+  // Utility Methods
+  getToken(): string | null {
+    return localStorage.getItem('auth_token');
+  }
+
+  isAuthenticated(): boolean {
+    return !!this.getToken();
+  }
+
+  getUser(): any {
+    const user = localStorage.getItem('user');
+    return user ? JSON.parse(user) : null;
+  }
+}
+
+// Export singleton instance
+export const api = new ApiService();
+export default api;

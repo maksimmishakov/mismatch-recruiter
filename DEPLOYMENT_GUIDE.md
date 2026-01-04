@@ -1,297 +1,249 @@
-# MisMatch Recruiter Platform - Deployment Guide
+# Mismatch Recruiter - Deployment Guide (Phase 5)
 
-## Overview
-This guide provides comprehensive instructions for deploying the MisMatch Recruiter Platform, a full-stack AI-powered recruiting application built with React/TypeScript (Frontend) and Python Flask (Backend).
+## 🚀 Deployment to Yandex Cloud
 
-## Architecture
-- **Frontend**: React 18 with TypeScript, Vite bundler, Redux state management, Tailwind CSS
-- **Backend**: Python 3.x with Flask/FastAPI, RESTful API
-- **Database**: PostgreSQL (configured for production)
-- **Deployment**: Docker containers with orchestration support
+### Prerequisites
+- Yandex Cloud account with active billing
+- YC CLI installed (`yc` command available)
+- Docker installed locally
+- GitHub repository configured
 
-## System Requirements
+### Step 1: Prepare Yandex Cloud Environment
 
-### Development
-- Node.js 16+ (18+ recommended)
-- Python 3.8+
-- npm or yarn
-- Git
-
-### Production
-- Docker & Docker Compose
-- Linux server or cloud container platform
-- Minimum 2GB RAM, 2 CPU cores
-- 5GB storage
-
-## Installation & Setup
-
-### 1. Clone Repository
 ```bash
-git clone <repository-url>
-cd mismatch-recruiter
+# Login to Yandex Cloud
+yc auth login
+
+# Set default folder
+export YC_FOLDER_ID="your-folder-id"
+yc config set folder-id $YC_FOLDER_ID
+
+# Create service account for deployment
+yc iam service-account create --name mismatch-recruiter-sa
+
+# Get service account ID
+SERVICE_ACCOUNT_ID=$(yc iam service-account get --name mismatch-recruiter-sa --format=json | jq -r .id)
+
+# Grant roles
+yc resource-manager folder add-access-binding $YC_FOLDER_ID \\
+  --role=container-registry.images.pusher \\
+  --subject=serviceAccount:$SERVICE_ACCOUNT_ID
 ```
 
-### 2. Frontend Setup
+### Step 2: Create Docker Image
+
 ```bash
-cd frontend
-npm install
-npm run dev          # Development
-npm run build        # Production build
-npm run preview      # Preview build
-```
+# Create Dockerfile
+cat > Dockerfile << 'EOF'
+FROM python:3.9-slim
 
-Frontend runs on: http://localhost:3001
+WORKDIR /app
 
-### 3. Backend Setup
-```bash
-# Install Python dependencies
-pip3 install -r requirements.txt
+# Install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Run development server
-python3 api_server.py
-```
+# Copy application
+COPY . .
 
-Backend API runs on: http://localhost:8000
+# Expose port
+EXPOSE 5000
 
-## Docker Deployment
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \\
+  CMD curl -f http://localhost:5000/health || exit 1
 
-### Build Images
-```bash
-docker-compose build
-```
+# Run application
+CMD ["python", "-m", "app.main"]
+EOF
 
-### Start Services
-```bash
-docker-compose up -d
-```
-
-### Access Services
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:8000
-- API Docs: http://localhost:8000/docs
-
-## Environment Configuration
-
-Create `.env` file in root directory:
-```env
-# Backend
-DATABASE_URL=postgresql://user:password@localhost/mismatch_db
-SECRET_KEY=your-secret-key-here
-DEBUG=False
-ALLOWED_HOSTS=localhost,127.0.0.1
-
-# Frontend
-VITE_API_URL=http://localhost:8000
-VITE_APP_NAME=MisMatch
-```
-
-## Project Structure
-```
-mismatch-recruiter/
-├── frontend/           # React/TypeScript frontend
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── store/     # Redux state
-│   │   └── services/  # API calls
-│   └── package.json
-├── backend/            # Python backend (root level)
-│   ├── api_server.py
-│   ├── app.py
-│   └── requirements.txt
-├── docker-compose.yml
-├── Dockerfile
-└── README.md
-```
-
-## Key Features Implemented
-
-### Frontend
-✅ Responsive UI with Tailwind CSS
-✅ Authentication/Login system
-✅ Dashboard for recruiters
-✅ Candidates management
-✅ Jobs listing and management
-✅ Match analytics
-✅ Redux state management
-✅ React Router for navigation
-✅ Protected routes
-✅ TypeScript support
-
-### Backend
-✅ RESTful API endpoints
-✅ Authentication middleware
-✅ Candidate database models
-✅ Jobs API endpoints
-✅ Matching algorithm
-✅ OpenAPI/Swagger documentation
-✅ Error handling
-✅ CORS support
-
-## Testing
-
-### Frontend Tests
-```bash
-cd frontend
-npm run test
-npm run test:ui      # UI test runner
-```
-
-### Backend Tests
-```bash
-python3 -m pytest
-```
-
-## Production Deployment
-
-### Using Docker
-```bash
-# Build production image
+# Build image
 docker build -t mismatch-recruiter:latest .
-
-# Run container
-docker run -p 8000:8000 -p 3000:3000 mismatch-recruiter:latest
 ```
 
-### Using Cloud Platforms
+### Step 3: Push to Container Registry
 
-#### Heroku
 ```bash
-heroku create mismatch-recruiter
-git push heroku main
+# Configure Docker for Yandex Container Registry
+echo $YC_OAUTH_TOKEN | docker login --username oauth --password-stdin cr.yandex
+
+# Tag image
+docker tag mismatch-recruiter:latest \\
+  cr.yandex/$YC_FOLDER_ID/mismatch-recruiter:latest
+
+# Push to registry
+docker push cr.yandex/$YC_FOLDER_ID/mismatch-recruiter:latest
 ```
 
-#### AWS/GCP/Azure
-- Use container registry (ECR/GCR/ACR)
-- Deploy via Kubernetes or App Engine
-- Configure environment variables in cloud console
+### Step 4: Deploy to Cloud Run
 
-### Nginx Reverse Proxy Configuration
-```nginx
-upstream frontend {
-    server localhost:3000;
-}
-
-upstream backend {
-    server localhost:8000;
-}
-
-server {
-    listen 80;
-    server_name yourdomain.com;
-
-    location / {
-        proxy_pass http://frontend;
-    }
-
-    location /api {
-        proxy_pass http://backend;
-    }
-}
-```
-
-## Monitoring & Logging
-
-- Frontend: Browser DevTools, error boundaries
-- Backend: Python logging module
-- Containers: Docker logs `docker logs <container-id>`
-- Metrics: Prometheus/Grafana integration (optional)
-
-## Troubleshooting
-
-### Port Already in Use
 ```bash
-# Find process using port
-lsof -i :8000
-# Kill process
-kill -9 <PID>
+# Create Cloud Function or deploy to Cloud Run
+yc serverless containers deploy mismatch-recruiter \\
+  --image cr.yandex/$YC_FOLDER_ID/mismatch-recruiter:latest \\
+  --memory 256mb \\
+  --core-fraction 50 \\
+  --execution-timeout 600s \\
+  --environment DB_URL=sqlite:///app.db \\
+  --environment FLASK_ENV=production
 ```
 
-### Database Connection Error
-- Verify PostgreSQL is running
-- Check DATABASE_URL in environment
-- Ensure database exists: `createdb mismatch_db`
+### Step 5: Set Up Database (PostgreSQL in Yandex Managed Service)
 
-### CORS Issues
-- Update ALLOWED_ORIGINS in backend config
-- Verify VITE_API_URL in frontend .env
-
-### Build Failures
-- Clear npm cache: `npm cache clean --force`
-- Reinstall dependencies: `rm -rf node_modules && npm install`
-- Check Node version: `node --version`
-
-## API Documentation
-
-Once backend is running, view API docs at:
-- Swagger UI: http://localhost:8000/docs
-- ReDoc: http://localhost:8000/redoc
-
-## Performance Optimization
-
-### Frontend
-- Code splitting with React.lazy()
-- Image optimization
-- CSS minification (Vite handles automatically)
-- Lazy loading components
-
-### Backend
-- Database indexing
-- Query optimization
-- Caching strategy
-- Load balancing with Nginx
-
-## Security Checklist
-
-- [ ] Update all dependencies regularly
-- [ ] Set secure SECRET_KEY in production
-- [ ] Enable HTTPS/SSL
-- [ ] Configure CORS properly
-- [ ] Use environment variables for secrets
-- [ ] Implement rate limiting
-- [ ] Enable CSRF protection
-- [ ] Regular security audits
-- [ ] Database backups configured
-- [ ] API authentication tokens configured
-
-## Maintenance
-
-### Regular Updates
 ```bash
-# Frontend
-cd frontend
-npm update
-npm audit fix
+# Create PostgreSQL cluster
+yc managed-postgresql cluster create mismatch-db \\
+  --environment=PRESTABLE \\
+  --network-name=default \\
+  --host-class=b1.c1 \\
+  --disk-size=10gb
 
-# Backend
-pip install --upgrade pip
-pip install -r requirements.txt --upgrade
+# Create database
+yc managed-postgresql database create mismatch_recruiter \\
+  --cluster-name=mismatch-db
+
+# Create user
+yc managed-postgresql user create recruiter \\
+  --cluster-name=mismatch-db \\
+  --password=secure_password_here
+
+# Get connection string
+yc managed-postgresql cluster get mismatch-db --format=json | jq '.network_interfaces[0].primary_v4_address.address'
 ```
 
-### Backup Strategy
-- Daily database backups
-- Code repository backups (Git)
-- Configuration backups
-- Document retention policy
+### Step 6: Configure Environment Variables
 
-## Support & Troubleshooting
+```bash
+# In Yandex Cloud console or via CLI:
+# Set these variables in your Cloud Function/Container environment:
 
-For issues or questions:
-1. Check error logs
-2. Review API documentation
-3. Check GitHub issues
-4. Contact development team
+FLASK_ENV=production
+DATABASE_URL=postgresql://recruiter:password@host:5432/mismatch_recruiter
+SECRET_KEY=your-secret-key-here
+JWT_SECRET=your-jwt-secret-here
+CORS_ORIGINS=https://your-frontend-domain.com
+```
 
-## Version History
+### Step 7: Set Up API Gateway
 
-- v1.0.0 (2024-01): Initial release
-  - Frontend React setup
-  - Backend API foundation  
-  - Docker support
-  - Authentication system
-  - Core recruiting features
+```bash
+# Create API Gateway for Cloud Functions
+yc serverless api-gateway create mismatch-api \\
+  --spec=<(cat <<'SPEC'
+apiVersion: serverless.yandex.cloud/v1
+kind: ApiGateway
+metadata:
+  name: mismatch-api
+spec:
+  routes:
+    - path: /api/{proxy+}
+      x-yc-function:
+        functionRef:
+          name: mismatch-recruiter
+SPEC
+  )
+```
 
-## License
+### Step 8: Configure Custom Domain
 
-This project is licensed under MIT License.
+```bash
+# Create certificate in Certificate Manager
+yc certificate-manager certificate request \\
+  --name=mismatch-domain \\
+  --domains=api.mismatch.recruiter
+
+# Link certificate to API Gateway
+yc serverless api-gateway update mismatch-api \\
+  --certificate-id=your-cert-id
+```
+
+### Step 9: Health Check & Monitoring
+
+```bash
+# Test deployment
+curl -X GET https://api.mismatch.recruiter/health
+
+# Check logs
+yc serverless container logs --name=mismatch-recruiter --limit=100
+
+# Monitor performance
+yc monitoring read --query='count()' \\
+  --resource-type=container \\
+  --labels service=mismatch-recruiter
+```
+
+### Step 10: Set Up CI/CD Pipeline
+
+```yaml
+# .github/workflows/deploy.yml
+name: Deploy to Yandex Cloud
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Build Docker image
+        run: docker build -t mismatch-recruiter:${{ github.sha }} .
+      
+      - name: Push to registry
+        env:
+          YC_REGISTRY_ID: ${{ secrets.YC_REGISTRY_ID }}
+          YC_SA_KEY: ${{ secrets.YC_SA_KEY }}
+        run: |
+          echo $YC_SA_KEY | docker login --username json_key --password-stdin cr.yandex
+          docker tag mismatch-recruiter:${{ github.sha }} cr.yandex/$YC_REGISTRY_ID/mismatch-recruiter:latest
+          docker push cr.yandex/$YC_REGISTRY_ID/mismatch-recruiter:latest
+      
+      - name: Deploy to Cloud Run
+        env:
+          YC_FOLDER_ID: ${{ secrets.YC_FOLDER_ID }}
+        run: |
+          yc serverless containers deploy mismatch-recruiter \\
+            --image cr.yandex/$YC_FOLDER_ID/mismatch-recruiter:latest
+```
+
+## 🔐 Security Checklist
+
+- [☐] All secrets stored in Yandex Lockbox or GitHub Secrets
+- [☐] Database has strong password
+- [☐] CORS properly configured
+- [☐] SSL/TLS certificates valid
+- [☐] IAM roles follow least privilege principle
+- [☐] API rate limiting configured
+- [☐] Authentication enabled on all endpoints
+
+## 📊 Monitoring & Alerts
+
+```bash
+# Create alert for high error rate
+yc monitoring alert create mismatch-errors \\
+  --notification-channel=your-channel-id \\
+  --metric-name=errors_total \\
+  --severity=critical \\
+  --threshold=100
+```
+
+## 🔄 Rollback Procedure
+
+```bash
+# List previous versions
+yc serverless container list
+
+# Rollback to previous version
+yc serverless container deploy mismatch-recruiter \\
+  --image=cr.yandex/$YC_FOLDER_ID/mismatch-recruiter:previous-tag
+```
+
+## 🔗 Useful Links
+
+- [Yandex Cloud Documentation](https://cloud.yandex.com/docs)
+- [Cloud Functions Guide](https://cloud.yandex.com/docs/functions/)
+- [Container Registry](https://cloud.yandex.com/docs/container-registry/)
+- [PostgreSQL Managed Service](https://cloud.yandex.com/docs/managed-postgresql/)
 

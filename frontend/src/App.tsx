@@ -1,25 +1,24 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import MainLayout from '@components/layout/MainLayout'
-import DashboardPage from '@pages/DashboardPage'
-import CandidatesPage from '@pages/CandidatesPage'
-import JobsPage from '@pages/JobsPage'
-import MatchesPage from '@pages/MatchesPage'
-import NotFoundPage from '@pages/NotFoundPage'
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import path from 'path'
+import { fileURLToPath } from 'url'
 
-function App() {
-  return (
-    <Router>
-      <Routes>
-        <Route element={<MainLayout />}>
-          <Route path="/" element={<DashboardPage />} />
-          <Route path="/candidates" element={<CandidatesPage />} />
-          <Route path="/jobs" element={<JobsPage />} />
-          <Route path="/matches" element={<MatchesPage />} />
-          <Route path="*" element={<NotFoundPage />} />
-        </Route>
-      </Routes>
-    </Router>
-  )
-}
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-export default App
+export default defineConfig({
+  plugins: [react()],
+  server: { port: 3001, host: true },
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, 'src'),
+      '@components': path.resolve(__dirname, 'src/components'),
+      '@pages': path.resolve(__dirname, 'src/pages'),
+      '@store': path.resolve(__dirname, 'src/store'),
+      '@services': path.resolve(__dirname, 'src/services'),
+      '@hooks': path.resolve(__dirname, 'src/hooks'),
+      '@types': path.resolve(__dirname, 'src/types'),
+      '@utils': path.resolve(__dirname, 'src/utils')
+    }
+  },
+  build: { outDir: 'dist', minify: 'terser' }
+})
