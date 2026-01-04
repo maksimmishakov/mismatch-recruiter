@@ -3,6 +3,9 @@ from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 import os
+from flask_talisman import Talisman
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 db = SQLAlchemy()
 jwt = JWTManager()
@@ -38,6 +41,19 @@ def create_app(config_name='development'):
     cors_origins = os.environ.get('CORS_ORIGINS', 'http://localhost:3000,http://localhost:5173').split(',')
     CORS(app, resources={"/api/*": {"origins": cors_origins}})
     
+
+        # Security Headers (Talisman)
+    if app.config['ENV'] == 'production':
+        Talisman(app, force_https=True, strict_transport_security=True, strict_transport_security_max_age=31536000)
+    else:
+        Talisman(app, force_https=False)
+    
+    # Rate Limiting
+    limiter = Limiter(
+        app=app,
+        key_func=get_remote_address,
+        default_limits=["200 per day", "50 per hour"]
+    )
     with app.app_context():
         # Register blueprints
         from backend.app.routes import health, auth, candidates, jobs, matches
