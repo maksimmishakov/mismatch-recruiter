@@ -69,7 +69,6 @@ def create_app(config_name='development'):
         db.create_all()
     
         # Setup logging
-    setup_logging(app)git add -A && git commit -m "database(day2): add postgresql models, database config, and marshmallow schemas"
-    git push origin HEAD
+    setup_logging(app)
     
     return app
