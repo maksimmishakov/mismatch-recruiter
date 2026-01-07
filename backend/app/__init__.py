@@ -27,11 +27,14 @@ def create_app(config_name='development'):
     jwt.init_app(app)
     CORS(app)
     
+    # Import models to register them with SQLAlchemy
+    from app.models import User, Candidate, Job, Match
+    
     # Create tables
     with app.app_context():
         db.create_all()
     
-    # Register blueprints
+    # Register route blueprints
     from app.routes import auth_bp, candidates_bp, jobs_bp, matches_bp
     app.register_blueprint(auth_bp)
     app.register_blueprint(candidates_bp)
