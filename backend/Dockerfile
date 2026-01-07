@@ -9,4 +9,5 @@ COPY . .
 
 EXPOSE 5000
 
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "main:app"]
+# For development: use Flask dev server
+CMD ["python", "-m", "flask", "run", "--host=0.0.0.0"]
