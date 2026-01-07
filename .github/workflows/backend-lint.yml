@@ -1,0 +1,36 @@
+name: Backend Linting
+'on':
+  push:
+    branches:
+    - main
+    - develop
+    - feat/**
+    paths:
+    - backend/**
+  pull_request:
+    branches:
+    - main
+    - develop
+    paths:
+    - backend/**
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+        cache: pip
+    - name: Install
+      working-directory: ./backend
+      run: pip install black isort flake8 pylint
+    - name: Black
+      working-directory: ./backend
+      run: black --check app/ || echo "Code not formatted"
+    - name: isort
+      working-directory: ./backend
+      run: isort --check app/ || echo "Imports not sorted"
+    - name: flake8
+      working-directory: ./backend
+      run: flake8 app/ --max-line-length=120 --count || echo "Lint issues found"

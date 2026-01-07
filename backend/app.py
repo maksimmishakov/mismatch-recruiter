@@ -1,10 +1,13 @@
+"""Application entry point"""
 import os
-import sys
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from app import create_app, db
 
-from backend.app import create_app
-
-app = create_app(os.getenv('FLASK_ENV', 'development'))
+config_name = os.environ.get('FLASK_ENV', 'development')
+app = create_app(config_name)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    with app.app_context():
+        db.create_all()
+    
+    debug = config_name == 'development'
+    app.run(host='0.0.0.0', port=5000, debug=debug)

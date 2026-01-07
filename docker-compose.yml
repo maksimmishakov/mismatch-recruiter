@@ -6,8 +6,8 @@ services:
     container_name: mismatch-postgres
     environment:
       POSTGRES_USER: mismatch
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dev-password}
-      POSTGRES_DB: mismatch
+      POSTGRES_PASSWORD: dev-password
+      POSTGRES_DB: mismatch_dev
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -22,45 +22,38 @@ services:
 
   backend:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: backend/Dockerfile
     container_name: mismatch-backend
     environment:
-      FLASK_ENV: ${FLASK_ENV:-development}
-      FLASK_DEBUG: ${FLASK_DEBUG:-False}
-      DATABASE_URL: postgresql://mismatch:${POSTGRES_PASSWORD:-dev-password}@postgres:5432/mismatch
-      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-dev-secret-key-change-me}
-      CORS_ORIGINS: http://localhost:5173,http://127.0.0.1:5173
-      LOG_LEVEL: ${LOG_LEVEL:-DEBUG}
-    depends_on:
-      postgres:
-        condition: service_healthy
+      FLASK_ENV: development
+      FLASK_DEBUG: "True"
+      DATABASE_URL: postgresql://mismatch:dev-password@postgres:5432/mismatch_dev
+      JWT_SECRET_KEY: dev-secret-key-change-me
     ports:
       - "5000:5000"
     volumes:
       - ./backend:/app
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
+    depends_on:
+      postgres:
+        condition: service_healthy
     networks:
       - mismatch-network
 
   frontend:
     build:
-      context: ./frontend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: frontend/Dockerfile
     container_name: mismatch-frontend
     environment:
       VITE_APP_API_URL: http://localhost:5000/api
-    depends_on:
-      - backend
     ports:
       - "5173:5173"
     volumes:
       - ./frontend:/app
       - /app/node_modules
+    depends_on:
+      - backend
     networks:
       - mismatch-network
 

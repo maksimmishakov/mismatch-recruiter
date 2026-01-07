@@ -1,0 +1,47 @@
+name: Backend Tests
+'on':
+  push:
+    branches:
+    - main
+    - develop
+    - feat/**
+    paths:
+    - backend/**
+    - .github/workflows/backend-test.yml
+  pull_request:
+    branches:
+    - main
+    - develop
+    paths:
+    - backend/**
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test_db
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s
+          --health-retries 5
+        ports:
+        - 5432:5432
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+        cache: pip
+    - name: Install dependencies
+      working-directory: ./backend
+      run: pip install -r requirements.txt pytest pytest-cov
+    - name: Run tests
+      working-directory: ./backend
+      run: pytest tests/ -v --cov=app --cov-report=xml
+      env:
+        DATABASE_URL: postgresql://test:test@localhost/test_db
+    - uses: codecov/codecov-action@v3
+      with:
+        files: ./backend/coverage.xml
