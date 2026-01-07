@@ -1,107 +1,58 @@
 import logging
-import json
-from logging.handlers import RotatingFileHandler
-from pythonjsonlogger import jsonlogger
-from flask import request, g
-from datetime import datetime
+import logging.handlers
 import os
+import json
+from datetime import datetime
 
-class CustomJsonFormatter(jsonlogger.JsonFormatter):
-    def add_fields(self, log_record, record, message_dict):
-        super(CustomJsonFormatter, self).add_fields(log_record, record, message_dict)
-        log_record['timestamp'] = datetime.utcnow().isoformat()
-        log_record['level'] = record.levelname
-        log_record['logger'] = record.name
-        
-        # Add request context if available
-        if has_request_context():
-            log_record['request_id'] = g.get('request_id', 'N/A')
-            log_record['path'] = request.path
-            log_record['method'] = request.method
-            log_record['remote_addr'] = request.remote_addr
-
-def has_request_context():
-    try:
-        from flask import has_request_context
-        return has_request_context()
-    except:
-        return False
-
-def init_logging(app):
-    """
-    Initialize structured logging for the application.
-    Supports both console (development) and file (production) logging.
-    """
-    # Remove default handlers
-    app.logger.handlers.clear()
+def setup_logging(app):
+    """Setup logging with ELK stack support""    
+    log_level = getattr(logging, app.config.get('LOG_LEVEL', 'INFO'))
     
-    # Set log level
-    log_level = os.getenv('LOG_LEVEL', 'INFO')
-    app.logger.setLevel(getattr(logging, log_level))
+    # JSON formatter for ELK
+    class JSONFormatter(logging.Formatter):
+        def format(self, record):
+            log_obj = {
+                'timestamp': datetime.utcnow().isoformat(),
+                'level': record.levelname,
+                'logger': record.name,
+                'message': record.getMessage(),
+                'module': record.module,
+                'function': record.funcName,
+                'line': record.lineno,
+            }
+            if record.exc_info:
+                log_obj['exception'] = self.formatException(record.exc_info)
+            return json.dumps(log_obj)
     
-    # Create console handler with JSON formatter
-    console_handler = logging.StreamHandler()
-    console_handler.setLevel(getattr(logging, log_level))
+    # File handler
+    if not os.path.exists('logs'):
+        os.makedirs('logs')
     
-    json_formatter = CustomJsonFormatter(
-        '%(timestamp)s %(level)s %(name)s %(message)s'
+    file_handler = logging.handlers.RotatingFileHandler(
+        f"logs/mismatch_{datetime.now().strftime('%Y%m%d')}.log",
+        maxBytes=10485760,
+        backupCount=10
     )
-    console_handler.setFormatter(json_formatter)
-    app.logger.addHandler(console_handler)
+    file_handler.setLevel(log_level)
+    file_handler.setFormatter(JSONFormatter())
     
-    # Create file handler if LOG_DIR is set
-    log_dir = os.getenv('LOG_DIR', None)
-    if log_dir:
-        os.makedirs(log_dir, exist_ok=True)
-        
-        # Application logs
-        file_handler = RotatingFileHandler(
-            f'{log_dir}/app.log',
-            maxBytes=10485760,  # 10MB
-            backupCount=10
+    # Console handler
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(log_level)
+    console_handler.setFormatter(JSONFormatter())
+    
+    # UDP handler for ELK (if enabled)
+    if app.config.get('ENABLE_ELK_LOGGING', False):
+        elk_handler = logging.handlers.SysLogHandler(
+            address=('localhost', 5000),
+            facility=logging.handlers.SysLogHandler.LOG_LOCAL0
         )
-        file_handler.setFormatter(json_formatter)
-        app.logger.addHandler(file_handler)
-        
-        # Error logs
-        error_handler = RotatingFileHandler(
-            f'{log_dir}/error.log',
-            maxBytes=10485760,
-            backupCount=10
-        )
-        error_handler.setLevel(logging.ERROR)
-        error_handler.setFormatter(json_formatter)
-        app.logger.addHandler(error_handler)
+        elk_handler.setLevel(log_level)
+        elk_handler.setFormatter(JSONFormatter())
+        app.logger.addHandler(elk_handler)
+    
+    app.logger.addHandler(file_handler)
+    app.logger.addHandler(console_handler)
+    app.logger.setLevel(log_level)
     
     return app.logger
-
-def log_request(response):
-    """
-    Log incoming request with response status.
-    """
-    try:
-        from flask import g, request
-        duration = (datetime.utcnow() - g.start_time).total_seconds() if hasattr(g, 'start_time') else 0
-        
-        log_data = {
-            'event': 'http_request',
-            'method': request.method,
-            'path': request.path,
-            'status_code': response.status_code,
-            'duration_ms': round(duration * 1000, 2),
-            'remote_addr': request.remote_addr
-        }
-        
-        if response.status_code >= 400:
-            from flask import current_app
-            current_app.logger.warning(json.dumps(log_data))
-        else:
-            from flask import current_app
-            current_app.logger.info(json.dumps(log_data))
-    except Exception as e:
-        pass
-    
-    return response
-
-# Alias for backward compatibility
-setup_logging = init_logging
