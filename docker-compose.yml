@@ -1,52 +1,50 @@
-version: '3.8'
+version: '3.9'
 
 services:
-  postgres:
+  db:
     image: postgres:15-alpine
+    container_name: mismatch_db
     environment:
-      POSTGRES_USER: mismatch
-      POSTGRES_PASSWORD: mismatch-dev-password
-      POSTGRES_DB: mismatch_dev
+      POSTGRES_USER: recruiter_user
+      POSTGRES_PASSWORD: secure_password
+      POSTGRES_DB: mismatch_recruiter
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U mismatch"]
+      test: ["CMD-SHELL", "pg_isready -U recruiter_user"]
       interval: 10s
       timeout: 5s
       retries: 5
 
   backend:
     build:
-      context: .
-      dockerfile: backend/Dockerfile
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: mismatch_backend
     environment:
-      DATABASE_URL: postgresql://mismatch:mismatch-dev-password@postgres:5432/mismatch_dev
+      DATABASE_URL: postgresql://recruiter_user:secure_password@db:5432/mismatch_recruiter
       FLASK_ENV: development
-      FLASK_DEBUG: "True"
-      JWT_SECRET_KEY: dev-secret-key-change-in-production-12345
-      CORS_ORIGINS: http://localhost:3000,http://localhost:5173,http://127.0.0.1:3000,http://127.0.0.1:5173
-      LOG_LEVEL: DEBUG
-      SENTRY_DSN: ""
+      JWT_SECRET_KEY: dev-secret-key-change-in-production
     ports:
       - "5000:5000"
     depends_on:
-      postgres:
+      db:
         condition: service_healthy
     volumes:
       - ./backend:/app
-      - /app/__pycache__
-    command: gunicorn --bind 0.0.0.0:5000 --workers 4 --timeout 30 wsgi:app
+    command: python main.py
 
   frontend:
     build:
-      context: .
-      dockerfile: frontend/Dockerfile
-    environment:
-      VITE_API_URL: http://localhost:5000
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: mismatch_frontend
     ports:
       - "3000:3000"
+    environment:
+      REACT_APP_API_URL: http://localhost:5000/api
     depends_on:
       - backend
     volumes:

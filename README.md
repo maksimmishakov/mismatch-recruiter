@@ -1,307 +1,249 @@
-# MisMatch Recruiter - Production-Ready Talent Matching Platform
-
-[![GitHub Actions](https://github.com/maksimmishakov/mismatch-recruiter/workflows/CI/CD/badge.svg)](https://github.com/maksimmishakov/mismatch-recruiter/actions)
-[![Code Quality](https://img.shields.io/badge/code_quality-A-brightgreen)](https://github.com/maksimmishakov/mismatch-recruiter)
-[![Test Coverage](https://img.shields.io/badge/coverage-85%25-brightgreen)](https://github.com/maksimmishakov/mismatch-recruiter)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+# MisMatch Recruiter - Modern Job Matching Platform
 
 ## Overview
 
-MisMatch Recruiter is a sophisticated, production-ready talent matching platform that uses advanced algorithms to match job candidates with job opportunities. Built with Flask, PostgreSQL, and modern DevOps practices, the platform demonstrates enterprise-grade software engineering practices.
-
-## Key Features
-
-- **Intelligent Matching Algorithm**: Advanced candidate-to-job matching with skill analysis
-- **RESTful API**: Comprehensive API endpoints for all operations
-- **Real-time Notifications**: WebSocket support for instant updates
-- **PostgreSQL Database**: Robust relational database with migrations
-- **Redis Caching**: Fast data retrieval and session management
-- **Docker Deployment**: Container-based deployment for consistency
-- **Comprehensive Testing**: Unit and integration tests with >85% coverage
-- **CI/CD Pipeline**: GitHub Actions automated testing and deployment
-- **Security**: CSRF protection, secure password handling, rate limiting
-
-## Architecture
-
-### Tech Stack
-
-**Backend:**
-- Flask 2.x - Web framework
-- SQLAlchemy - ORM
-- PostgreSQL - Relational database
-- Redis - Caching and session store
-- Gunicorn - Production WSGI server
-
-**Frontend:**
-- React - UI framework
-- Webpack - Module bundler
-- Babel - JavaScript transpiler
-
-**DevOps:**
-- Docker & Docker Compose
-- GitHub Actions
-- Nginx - Reverse proxy
-- Systemd - Process management
+MisMatch Recruiter is a sophisticated job matching platform built with modern technologies:
+- **Backend**: Flask with SQLAlchemy ORM
+- **Frontend**: React 18 with Axios
+- **Database**: PostgreSQL
+- **Infrastructure**: Docker & Docker Compose
+- **CI/CD**: GitHub Actions
 
 ## Project Structure
 
 ```
 mismatch-recruiter/
-├── backend/                    # Flask application
-│   ├── app/                   # Application package
-│   │   ├── blueprints/        # Route blueprints
-│   │   ├── models/            # Database models
-│   │   ├── services/          # Business logic
-│   │   ├── utils/             # Utility functions
-│   │   ├── migrations/        # Database migrations
-│   │   └── __init__.py        # App factory
-│   ├── tests/                 # Test suite
-│   │   ├── test_models.py     # Model tests
-│   │   ├── test_api.py        # API tests
-│   │   └── conftest.py        # Pytest configuration
-│   ├── requirements.txt        # Python dependencies
-│   ├── Dockerfile             # Container definition
-│   └── wsgi.py                # WSGI entry point
-├── frontend/                  # React application
-│   ├── src/                   # Source files
-│   ├── public/                # Static assets
-│   └── package.json           # NPM dependencies
-├── docker-compose.yml         # Multi-container orchestration
-├── .github/workflows/         # CI/CD pipelines
-├── DEPLOYMENT_GUIDE.md        # Production deployment guide
-└── README.md                  # This file
+├── backend/                      # Flask backend
+│   ├── app/
+│   │   ├── __init__.py          # App factory
+│   │   ├── api/
+│   │   │   ├── __init__.py
+│   │   │   └── routes.py        # API endpoints
+│   │   ├── config/
+│   │   │   ├── __init__.py
+│   │   │   ├── development.py
+│   │   │   ├── production.py
+│   │   │   └── testing.py
+│   │   ├── models/
+│   │   │   ├── __init__.py
+│   │   │   ├── user.py
+│   │   │   ├── job_posting.py
+│   │   │   ├── candidate.py
+│   │   │   └── match.py
+│   │   ├── services/
+│   │   ├── utils/
+│   │   └── tests/
+│   ├── requirements.txt
+│   ├── Dockerfile
+│   └── main.py
+├── frontend/                     # React frontend
+│   ├── src/
+│   │   ├── App.js
+│   │   ├── index.js
+│   │   └── components/
+│   ├── public/
+│   │   └── index.html
+│   ├── package.json
+│   └── Dockerfile
+├── .github/
+│   └── workflows/
+│       ├── backend.yml          # Backend CI/CD
+│       └── frontend.yml         # Frontend CI/CD
+├── docker-compose.yml
+├── .env.example
+├── .gitignore
+└── README.md
 ```
+
+## Prerequisites
+
+- Docker & Docker Compose
+- Node.js 18+ (for local frontend development)
+- Python 3.11+ (for local backend development)
+- PostgreSQL 15+ (or use Docker)
 
 ## Getting Started
 
-### Prerequisites
+### Option 1: Using Docker Compose (Recommended)
 
-- Docker and Docker Compose
-- Python 3.8+
-- Node.js 14+
-- PostgreSQL 12+
-- Redis 6+
-
-### Quick Start with Docker
-
+1. Clone the repository:
 ```bash
-# Clone the repository
-git clone https://github.com/maksimmishakov/mismatch-recruiter.git
+git clone https://github.com/your-username/mismatch-recruiter.git
 cd mismatch-recruiter
-
-# Setup environment
-cp .env.example .env
-
-# Start services
-docker-compose up -d
-
-# Run database migrations
-docker-compose exec backend flask db upgrade
-
-# Verify health
-curl http://localhost:5000/api/health
 ```
 
-### Local Development
+2. Create environment file:
+```bash
+cp .env.example .env
+```
+
+3. Build and start containers:
+```bash
+docker-compose up --build
+```
+
+4. Access the application:
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:5000/api
+- Database: localhost:5432
+
+### Option 2: Local Development
+
+#### Backend Setup
 
 ```bash
-# Backend setup
 cd backend
 python -m venv venv
-source venv/bin/activate
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
+cp ../.env.example ../.env
+python main.py
+```
 
-# Run migrations
-flask db upgrade
+#### Frontend Setup
 
-# Start development server
-flask run
-
-# Frontend setup (in another terminal)
+```bash
 cd frontend
 npm install
 npm start
 ```
 
-## Testing
+## API Endpoints
 
-```bash
-# Run all tests
-pytest
+### Authentication
+- `POST /api/auth/register` - Register new user
+- `POST /api/auth/login` - Login user
 
-# Run with coverage
-pytest --cov=app backend/tests/
+### Health
+- `GET /api/health` - API health check
 
-# Run specific test file
-pytest backend/tests/test_models.py
+## Database Models
 
-# Run specific test
-pytest backend/tests/test_models.py::TestUserModel::test_user_creation
-```
+### User
+- Stores user account information
+- Fields: id, email, username, hashed_password, full_name, role, is_active, created_at
 
-## Database Migrations
+### Candidate
+- Job candidate profiles
+- Fields: id, first_name, last_name, email, skills, experience_years, github_url, linkedin_url, etc.
 
-```bash
-# Create a new migration
-flask db migrate -m "Add user table"
+### JobPosting
+- Job opportunities
+- Fields: id, title, description, company, location, salary_min, salary_max, required_skills, etc.
 
-# Apply migrations
-flask db upgrade
-
-# Revert to previous version
-flask db downgrade
-```
-
-## API Documentation
-
-### Health Check
-```
-GET /api/health
-```
-
-### Candidates
-```
-GET /api/candidates              # List all candidates
-POST /api/candidates            # Create new candidate
-GET /api/candidates/<id>        # Get candidate by ID
-PUT /api/candidates/<id>        # Update candidate
-DELETE /api/candidates/<id>     # Delete candidate
-```
-
-### Jobs
-```
-GET /api/jobs                    # List all jobs
-POST /api/jobs                  # Create new job
-GET /api/jobs/<id>              # Get job by ID
-PUT /api/jobs/<id>              # Update job
-DELETE /api/jobs/<id>           # Delete job
-```
-
-### Matches
-```
-GET /api/matches                 # List all matches
-POST /api/matches               # Create new match
-GET /api/matches/<id>           # Get match by ID
-PUT /api/matches/<id>           # Update match status
-```
-
-## Deployment
-
-See [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) for comprehensive production deployment instructions including:
-
-- Docker Compose deployment
-- Direct server deployment (Ubuntu/Debian)
-- Nginx reverse proxy configuration
-- Systemd service setup
-- SSL/TLS configuration
-- Monitoring and logging
-- Backup and recovery procedures
+### Match
+- Matches between candidates and jobs
+- Fields: id, candidate_id, job_posting_id, match_score, skill_match, experience_match, location_match, status
 
 ## CI/CD Pipeline
 
-The project uses GitHub Actions for continuous integration and deployment:
+### Backend Tests
+- Runs on: Python 3.11, PostgreSQL 15
+- Tests: pytest with coverage
+- Linting: flake8
+- Triggers: Push/PR to main or develop, changes in backend/ directory
 
-- **backend-test.yml**: Runs Python tests on every push
-- **backend-lint.yml**: Checks code quality and style
-- **frontend-test.yml**: Runs Node.js tests
-
-Workflows are triggered on:
-- Push to main/develop branches
-- Pull requests
-- Manual workflow dispatch
-
-## Security
-
-- ✅ CSRF protection enabled
-- ✅ Secure password hashing with Werkzeug
-- ✅ Environment-based configuration
-- ✅ SQL injection prevention via ORM
-- ✅ Rate limiting
-- ✅ HTTPS/TLS support
-- ✅ Secrets management
+### Frontend Tests
+- Runs on: Node.js 18
+- Build: React build process
+- Artifacts: Upload build files
+- Triggers: Push/PR to main or develop, changes in frontend/ directory
 
 ## Configuration
 
-Configuration is managed via environment variables. Copy `.env.example` to `.env` and update with your values:
+### Environment Variables
 
 ```bash
-FLASK_ENV=production
-FLASK_DEBUG=0
-SECRET_KEY=<your-secret-key>
-DATABASE_URL=postgresql://user:pass@host:5432/db
-REDIS_URL=redis://host:6379/0
+# Database
+DATABASE_URL=postgresql://user:password@host:5432/database
+FLASK_ENV=development
+FLASK_DEBUG=True
+FLASK_PORT=5000
+
+# Security
+JWT_SECRET_KEY=your-secret-key-here
+
+# Frontend
+REACT_APP_API_URL=http://localhost:5000/api
 ```
+
+## Development Workflow
+
+1. Create feature branch: `git checkout -b feature/your-feature`
+2. Make changes and commit: `git commit -am 'Add new feature'`
+3. Push to GitHub: `git push origin feature/your-feature`
+4. Create Pull Request on GitHub
+5. CI/CD pipeline runs automatically
+6. Merge when tests pass
+
+## Deployment
+
+### Production Deployment
+
+1. Update production environment variables
+2. Build Docker images:
+```bash
+docker build -t mismatch-recruiter-backend backend/
+docker build -t mismatch-recruiter-frontend frontend/
+```
+
+3. Push to container registry (Docker Hub, ECR, etc.)
+4. Deploy using orchestration tool (Docker Swarm, Kubernetes, etc.)
+
+## Testing
+
+### Backend Tests
+```bash
+cd backend
+pytest
+pytest --cov=app  # With coverage
+```
+
+### Frontend Tests
+```bash
+cd frontend
+npm test
+npm run build  # Build for production
+```
+
+## Security Considerations
+
+- JWT tokens for API authentication
+- Password hashing with bcrypt
+- CORS protection
+- Environment variable secrets management
+- SQL injection prevention via ORM
+- Input validation on all endpoints
+
+## Performance Optimization
+
+- Database indexing on frequently queried columns
+- PostgreSQL connection pooling
+- React component lazy loading
+- API response caching
+- Production-grade WSGI server (Gunicorn)
 
 ## Monitoring & Logging
 
-- Application logs in `/var/log/mismatch/`
-- Docker logs: `docker-compose logs -f`
-- Systemd logs: `journalctl -u mismatch-recruiter -f`
-- Sentry integration for error tracking
-
-## Troubleshooting
-
-**Database connection error:**
-```bash
-# Check database is running
-docker-compose ps db
-
-# Recreate database
-docker-compose down -v && docker-compose up db
-```
-
-**Port already in use:**
-```bash
-# Find process using port 5000
-lsof -i :5000
-
-# Kill process
-kill -9 <PID>
-```
+- Application logging
+- Error tracking
+- Performance metrics
+- API response times
 
 ## Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## Code Quality Standards
-
-- Python: PEP 8 via `black` and `flake8`
-- JavaScript: ESLint configuration included
-- Minimum test coverage: 80%
-- All PRs must pass CI pipeline
+2. Create feature branch
+3. Follow code style guidelines
+4. Write tests for new features
+5. Submit pull request
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Authors
-
-- Maksim Mishakov - Initial project setup
+MIT License - See LICENSE file for details
 
 ## Support
 
-For issues, questions, or suggestions, please:
-
-1. Check existing issues
-2. Create a new issue with clear description
-3. Include error logs and environment details
-
-## Changelog
-
-See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
-
-## Production Status
-
-✅ **PRODUCTION READY**
-
-- [x] Database migrations implemented
-- [x] Comprehensive test suite
-- [x] CI/CD pipelines configured
-- [x] Deployment documentation
-- [x] Security best practices
-- [x] Performance optimization
-- [x] Monitoring setup
+For issues, feature requests, or questions:
+- GitHub Issues: https://github.com/your-username/mismatch-recruiter/issues
+- Email: support@mismatchrecruiter.com

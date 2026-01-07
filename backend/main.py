@@ -1,0 +1,15 @@
+import os
+from app import create_app, db
+from app.models import User, Candidate, JobPosting, Match
+
+app = create_app(os.getenv('FLASK_ENV', 'development'))
+
+if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
+    
+    app.run(
+        host='0.0.0.0',
+        port=int(os.getenv('FLASK_PORT', 5000)),
+        debug=os.getenv('FLASK_DEBUG', False)
+    )

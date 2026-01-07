@@ -1,20 +1,9 @@
-.env
-deploy.sh
-*.key
-*.secret
-__pycache__/
-*.pyc
-.DS_Store
-
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
-env/
-venv/
-ENV/
 build/
 develop-eggs/
 dist/
@@ -27,32 +16,15 @@ parts/
 sdist/
 var/
 wheels/
-pip-wheel-metadata/
-share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+PIPFILE.lock
 
-# Testing
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
-
-# Flask
-instance/
-.webassets-cache
-
-# Environments
-.env
-.venv
+# Virtual Environment
+venv/
+env/
+ENV/
 env.bak/
 venv.bak/
 
@@ -64,28 +36,30 @@ venv.bak/
 *~
 .DS_Store
 
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Node modules
+node_modules/
+npm-debug.log
+yarn-error.log
+.npm
+.yarn
+
+# React
+build/
+.cache/
+
 # Logs
-*.log
 logs/
-*.pot
+*.log
 
 # Database
 *.db
 *.sqlite
 *.sqlite3
-
-# OS
-Thumbs.db
-.DS_Store
-
-# Node
-node_modules/
-npm-debug.log
-yarn-error.log
-
-# Build outputs
-frontend/build/
-*.dist
 
 # Docker
 .dockerignore

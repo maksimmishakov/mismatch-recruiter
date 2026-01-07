@@ -1,43 +1,39 @@
-"""Candidate model for job candidates."""
 from app import db
 from datetime import datetime
 
-
 class Candidate(db.Model):
-    """Model for storing candidate information."""
     __tablename__ = 'candidates'
     
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, index=True)
-    name = db.Column(db.String(120), nullable=False)
-    email = db.Column(db.String(120), nullable=False)
-    phone = db.Column(db.String(20), nullable=True)
-    skills = db.Column(db.JSON, default=list)
-    experience_years = db.Column(db.Integer, default=0)
-    bio = db.Column(db.Text, nullable=True)
-    resume_url = db.Column(db.String(500), nullable=True)
-    salary_expectation = db.Column(db.Integer, nullable=True)
-    location = db.Column(db.String(120), nullable=True)
+    first_name = db.Column(db.String(100), nullable=False)
+    last_name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False, index=True)
+    phone = db.Column(db.String(20))
+    location = db.Column(db.String(200))
+    bio = db.Column(db.Text)
+    skills = db.Column(db.JSON)  # List of skills
+    experience_years = db.Column(db.Integer)
+    github_url = db.Column(db.String(500))
+    linkedin_url = db.Column(db.String(500))
+    portfolio_url = db.Column(db.String(500))
+    is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    # Relationships
-    matches = db.relationship('Match', backref='candidate', lazy=True, cascade='all, delete-orphan')
-    
     def to_dict(self):
-        """Convert candidate to dictionary."""
         return {
             'id': self.id,
-            'user_id': self.user_id,
-            'name': self.name,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
             'email': self.email,
             'phone': self.phone,
+            'location': self.location,
+            'bio': self.bio,
             'skills': self.skills,
             'experience_years': self.experience_years,
-            'bio': self.bio,
-            'resume_url': self.resume_url,
-            'salary_expectation': self.salary_expectation,
-            'location': self.location,
-            'created_at': self.created_at.isoformat() if self.created_at else None,
-            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+            'github_url': self.github_url,
+            'linkedin_url': self.linkedin_url,
+            'portfolio_url': self.portfolio_url,
+            'is_active': self.is_active,
+            'created_at': self.created_at.isoformat(),
         }
