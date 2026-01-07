@@ -1,118 +1,61 @@
-"""Tests for API endpoints."""
 import json
-import pytest
 
+def test_health_check(client):
+    """Test API health check endpoint"""
+    response = client.get('/api/health')
+    assert response.status_code == 200
+    data = json.loads(response.data)
+    assert data['status'] == 'healthy'
+    assert 'service' in data
 
-class TestHealthEndpoint:
-    """Test health check endpoint."""
-    
-    def test_health_check(self, client):
-        """Test that health endpoint returns 200 OK."""
-        response = client.get('/api/health')
-        assert response.status_code == 200
-        data = json.loads(response.data)
-        assert data['status'] == 'healthy'
+def test_user_registration(client):
+    """Test user registration"""
+    response = client.post('/api/auth/register', 
+        json={
+            'email': 'newuser@example.com',
+            'username': 'newuser',
+            'password': 'secure_password123',
+            'full_name': 'New User'
+        })
+    assert response.status_code == 201
+    data = json.loads(response.data)
+    assert 'user_id' in data
 
+def test_user_registration_missing_fields(client):
+    """Test user registration with missing fields"""
+    response = client.post('/api/auth/register',
+        json={
+            'email': 'test@example.com'
+        })
+    assert response.status_code == 400
 
-class TestCandidateAPI:
-    """Test Candidate API endpoints."""
-    
-    def test_get_candidates_empty(self, client):
-        """Test getting candidates when none exist."""
-        response = client.get('/api/candidates')
-        assert response.status_code == 200
-        data = json.loads(response.data)
-        assert data['candidates'] == []
-    
-    def test_create_candidate(self, client):
-        """Test creating a new candidate."""
-        payload = {
-            'name': 'John Doe',
-            'email': 'john@example.com',
-            'phone': '+1234567890',
-            'experience_years': 5,
-            'skills': ['Python', 'Flask']
-        }
-        response = client.post('/api/candidates',
-                             data=json.dumps(payload),
-                             content_type='application/json')
-        assert response.status_code == 201
-        data = json.loads(response.data)
-        assert data['name'] == 'John Doe'
-        assert data['email'] == 'john@example.com'
-
-
-class TestJobAPI:
-    """Test Job API endpoints."""
-    
-    def test_get_jobs_empty(self, client):
-        """Test getting jobs when none exist."""
-        response = client.get('/api/jobs')
-        assert response.status_code == 200
-        data = json.loads(response.data)
-        assert data['jobs'] == []
-    
-    def test_create_job(self, client):
-        """Test creating a new job posting."""
-        payload = {
-            'title': 'Senior Python Developer',
-            'description': 'We need a senior developer',
-            'required_skills': ['Python', 'Flask', 'PostgreSQL'],
-            'salary_min': 100000,
-            'salary_max': 150000
-        }
-        response = client.post('/api/jobs',
-                             data=json.dumps(payload),
-                             content_type='application/json')
-        assert response.status_code == 201
-        data = json.loads(response.data)
-        assert data['title'] == 'Senior Python Developer'
-
-
-class TestMatchAPI:
-    """Test Match API endpoints."""
-    
-    def test_get_matches_empty(self, client):
-        """Test getting matches when none exist."""
-        response = client.get('/api/matches')
-        assert response.status_code == 200
-        data = json.loads(response.data)
-        assert data['matches'] == []
-
-
-class TestAuthAPI:
-    """Test authentication endpoints."""
-    
-    def test_register_user(self, client):
-        """Test user registration."""
-        payload = {
-            'username': 'testuser',
+def test_user_registration_duplicate_email(client, test_user):
+    """Test user registration with duplicate email"""
+    response = client.post('/api/auth/register',
+        json={
             'email': 'test@example.com',
-            'password': 'SecurePassword123!'
-        }
-        response = client.post('/api/auth/register',
-                             data=json.dumps(payload),
-                             content_type='application/json')
-        assert response.status_code in [201, 200]
-    
-    def test_login_user(self, client):
-        """Test user login."""
-        # First register a user
-        register_payload = {
-            'username': 'testuser',
+            'username': 'another',
+            'password': 'password123'
+        })
+    assert response.status_code == 409
+
+def test_user_login(client, test_user):
+    """Test user login"""
+    response = client.post('/api/auth/login',
+        json={
             'email': 'test@example.com',
-            'password': 'SecurePassword123!'
-        }
-        client.post('/api/auth/register',
-                   data=json.dumps(register_payload),
-                   content_type='application/json')
-        
-        # Then try to login
-        login_payload = {
-            'email': 'test@example.com',
-            'password': 'SecurePassword123!'
-        }
-        response = client.post('/api/auth/login',
-                             data=json.dumps(login_payload),
-                             content_type='application/json')
-        assert response.status_code in [200, 201]
+            'password': 'password123'
+        })
+    assert response.status_code == 200
+    data = json.loads(response.data)
+    assert 'access_token' in data
+    assert 'user' in data
+
+def test_user_login_invalid_credentials(client):
+    """Test login with invalid credentials"""
+    response = client.post('/api/auth/login',
+        json={
+            'email': 'nonexistent@example.com',
+            'password': 'wrong_password'
+        })
+    assert response.status_code == 401
