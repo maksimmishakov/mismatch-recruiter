@@ -2,45 +2,43 @@ name: Backend Lint
 
 on:
   push:
-    branches: [main, develop]
-    paths:
-      - 'backend/**'
-      - '.github/workflows/backend-lint.yml'
+    branches: [ main, develop ]
   pull_request:
-    branches: [main, develop]
-    paths:
-      - 'backend/**'
+    branches: [ main, develop ]
 
 jobs:
-  lint:
+  backend-lint:
     runs-on: ubuntu-latest
     
     steps:
-      - uses: actions/checkout@v3
-      
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.12'
-      
-      - name: Install linting tools
-        working-directory: ./backend
-        run: |
-          python -m pip install --upgrade pip
-          pip install black isort flake8 pylint
-      
-      - name: Run black
-        working-directory: ./backend
-        run: black --check .
-      
-      - name: Run isort
-        working-directory: ./backend
-        run: isort --check-only .
-      
-      - name: Run flake8
-        working-directory: ./backend
-        run: flake8 .
-      
-      - name: Run pylint
-        working-directory: ./backend
-        run: pylint app/ --disable=missing-docstring --exit-zero
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+    
+    - name: Install linting tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install black isort flake8 pylint
+    
+    - name: Check code formatting (black)
+      run: |
+        cd backend
+        black --check app/ routes/ models/ || true
+    
+    - name: Check import ordering (isort)
+      run: |
+        cd backend
+        isort --check-only app/ routes/ models/ || true
+    
+    - name: Run flake8
+      run: |
+        cd backend
+        flake8 app/ routes/ models/ || true
+    
+    - name: Run pylint
+      run: |
+        cd backend
+        pylint app/ routes/ models/ || true

@@ -2,26 +2,20 @@ name: Deploy to Amvera
 
 on:
   push:
-    branches: [main]
-  workflow_dispatch:
+    branches: [ main ]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     
     steps:
-      - uses: actions/checkout@v3
-      
-      - name: Push to Amvera
-        run: |
-          git config user.email 'ci@example.com'
-          git config user.name 'CI Bot'
-          git remote add amvera https://${{ secrets.AMVERA_TOKEN }}@git.amvera.ru/mismatch-recruiter.git 2>/dev/null || true
-          git push amvera main --force
-      
-      - name: Trigger Amvera Deployment
-        run: |
-          curl -X POST https://api.amvera.ru/deploy \
-            -H 'Authorization: Bearer ${{ secrets.AMVERA_API_KEY }}' \
-            -H 'Content-Type: application/json' \
-            -d '{ "branch": "main" }'
+    - uses: actions/checkout@v3
+    
+    - name: Deploy to Amvera
+      env:
+        AMVERA_TOKEN: ${{ secrets.AMVERA_TOKEN }}
+      run: |
+        curl -X POST https://api.amvera.io/v1/deployment/trigger \
+          -H "Authorization: Bearer $AMVERA_TOKEN" \
+          -H "Content-Type: application/json" \
+          -d '{"branch":"main","environment":"production"}'
