@@ -1,11 +1,20 @@
 import pytest
-from app import create_app
+import os
+from app import create_app, db
 
 @pytest.fixture
 def app():
-    """Create and configure test app."""
+    """Create application for testing."""
+    os.environ['FLASK_ENV'] = 'testing'
+    os.environ['DATABASE_URL'] = 'sqlite:///:memory:'
+    
     app = create_app('testing')
-    return app
+    
+    with app.app_context():
+        db.create_all()
+        yield app
+        db.session.remove()
+        db.drop_all()
 
 @pytest.fixture
 def client(app):
@@ -14,5 +23,5 @@ def client(app):
 
 @pytest.fixture
 def runner(app):
-    """CLI runner for the app."""
+    """Test runner for the app."""
     return app.test_cli_runner()
