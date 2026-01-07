@@ -1,221 +1,295 @@
-# Production Deployment Guide
+# MisMatch Recruiter - Deployment Guide
 
-## Overview
-This guide provides comprehensive instructions for deploying the MisMatch Recruiter application to production environments.
+## Pre-Deployment Checklist
 
-## Prerequisites
-- Docker and Docker Compose installed
-- PostgreSQL 12+ or database service
-- Python 3.8+
-- Redis instance for caching
-- Domain name and SSL certificate
+### Infrastructure Requirements
+- [ ] Server with Docker and Docker Compose installed
+- [ ] PostgreSQL 15+ (or use Docker image)
+- [ ] Node.js 18+ for frontend builds
+- [ ] Python 3.11+ for backend development
+- [ ] SSL/TLS certificates for HTTPS
+- [ ] Domain name configured
+- [ ] DNS records pointing to server
 
-## Environment Configuration
+### Security Requirements
+- [ ] Generate secure JWT_SECRET_KEY
+- [ ] Set secure database password
+- [ ] Configure firewall rules
+- [ ] Enable CORS for frontend domain only
+- [ ] Set secure cookie flags
+- [ ] Enable HTTPS
+- [ ] Configure security headers
 
-### 1. Prepare Environment Variables
+## Deployment Steps
+
+### 1. Prepare Server
+
 ```bash
-cp .env.example .env
+# Update system packages
+sudo apt-get update && sudo apt-get upgrade -y
+
+# Install Docker
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+
+# Install Docker Compose
+sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+
+# Verify installation
+docker --version
+docker-compose --version
 ```
 
-Edit `.env` with production values:
-```
-FLASK_ENV=production
-FLASK_DEBUG=0
-SECRET_KEY=<generate-secure-key>
-DATABASE_URL=postgresql://user:password@db-host:5432/db_name
-REDIS_URL=redis://redis-host:6379/0
-```
+### 2. Clone Repository
 
-### 2. Generate Secret Key
 ```bash
-python -c "import secrets; print(secrets.token_hex(32))"
-```
-
-## Docker Deployment
-
-### Build Images
-```bash
-docker-compose build
-```
-
-### Run Services
-```bash
-docker-compose up -d
-```
-
-### Database Migrations
-```bash
-docker-compose exec backend flask db upgrade
-```
-
-### Health Check
-```bash
-curl http://localhost:5000/api/health
-```
-
-## Direct Server Deployment
-
-### 1. System Setup
-```bash
-# Install system dependencies
-sudo apt-get update
-sudo apt-get install -y python3-pip postgresql postgresql-contrib redis-server nginx
-
-# Create application user
-sudo useradd -m -s /bin/bash recruiter
-```
-
-### 2. Application Setup
-```bash
-# Clone repository
 cd /opt
-sudo git clone https://github.com/maksimmishakov/mismatch-recruiter.git
-sudo chown -R recruiter:recruiter mismatch-recruiter
+sudo git clone https://github.com/your-username/mismatch-recruiter.git
+cd mismatch-recruiter
 ```
 
-### 3. Python Environment
+### 3. Configure Environment
+
 ```bash
-cd /opt/mismatch-recruiter
-sudo -u recruiter python3 -m venv venv
-sudo -u recruiter venv/bin/pip install -r backend/requirements.txt
+# Create production environment file
+sudo cp .env.example .env
+
+# Edit with secure values
+sudo nano .env
 ```
 
-### 4. Database Setup
+Required environment variables:
 ```bash
-# Create database
-sudo -u postgres createdb mismatch_db
-sudo -u postgres createuser recruiter -P
-sudo -u postgres psql mismatch_db -c "GRANT ALL PRIVILEGES ON DATABASE mismatch_db TO recruiter;"
-
-# Run migrations
-sudo -u recruiter venv/bin/python backend/wsgi.py db upgrade
+DATABASE_URL=postgresql://user:password@db:5432/mismatch_recruiter
+FLASK_ENV=production
+FLASK_DEBUG=False
+JWT_SECRET_KEY=<generate-secure-key>
+REACT_APP_API_URL=https://api.yourdomain.com
 ```
 
-### 5. Gunicorn Setup
+### 4. Build Docker Images
+
 ```bash
-# Create systemd service
-sudo tee /etc/systemd/system/mismatch-recruiter.service << EOF
-[Unit]
-Description=MisMatch Recruiter Application
-After=network.target
+# Build images
+docker-compose build
 
-[Service]
-Type=notify
-User=recruiter
-WorkingDirectory=/opt/mismatch-recruiter
-ExecStart=/opt/mismatch-recruiter/venv/bin/gunicorn \\
-    --workers 4 \\
-    --worker-class sync \\
-    --bind 127.0.0.1:5000 \\
-    --timeout 30 \\
-    backend.wsgi:app
-
-Restart=always
-RestartSec=10
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-# Enable and start service
-sudo systemctl daemon-reload
-sudo systemctl enable mismatch-recruiter
-sudo systemctl start mismatch-recruiter
+# Or pull pre-built images if available
+docker pull mismatch-recruiter-backend:latest
+docker pull mismatch-recruiter-frontend:latest
 ```
 
-### 6. Nginx Configuration
+### 5. Start Services
+
 ```bash
-sudo tee /etc/nginx/sites-available/mismatch-recruiter << 'EOF'
-upstream mismatch_app {
-    server 127.0.0.1:5000;
+# Start all services in background
+docker-compose up -d
+
+# Verify services are running
+docker-compose ps
+
+# View logs
+docker-compose logs -f backend
+docker-compose logs -f frontend
+```
+
+### 6. Initialize Database
+
+```bash
+# Run database migrations
+docker-compose exec backend python -m flask db upgrade
+
+# Or create tables directly
+docker-compose exec backend python -c "from app import create_app, db; app = create_app(); app.app_context().push(); db.create_all()"
+```
+
+### 7. Configure Nginx (Reverse Proxy)
+
+Create `/etc/nginx/sites-available/mismatch-recruiter`:
+
+```nginx
+upstream backend {
+    server backend:5000;
+}
+
+upstream frontend {
+    server frontend:3000;
 }
 
 server {
     listen 80;
-    server_name your-domain.com;
-    return 301 https://$server_name$request_uri;
-}
-
-server {
-    listen 443 ssl http2;
-    server_name your-domain.com;
-    
-    ssl_certificate /etc/letsencrypt/live/your-domain.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/your-domain.com/privkey.pem;
-    
-    client_max_body_size 16M;
+    server_name api.yourdomain.com;
     
     location / {
-        proxy_pass http://mismatch_app;
+        proxy_pass http://backend;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
     }
+}
+
+server {
+    listen 80;
+    server_name yourdomain.com www.yourdomain.com;
     
-    location /static/ {
-        alias /opt/mismatch-recruiter/frontend/build/static/;
-        expires 1y;
+    location / {
+        proxy_pass http://frontend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     }
 }
-EOF
-
-# Enable site
-sudo ln -s /etc/nginx/sites-available/mismatch-recruiter /etc/nginx/sites-enabled/
-sudo nginx -t
-sudo systemctl restart nginx
 ```
 
-## Monitoring
+### 8. Enable SSL/TLS with Let's Encrypt
 
-### Application Logs
 ```bash
-# Docker
-docker-compose logs -f backend
+# Install Certbot
+sudo apt-get install certbot python3-certbot-nginx -y
 
-# Systemd
-sudo journalctl -u mismatch-recruiter -f
+# Generate certificates
+sudo certbot certonly --nginx -d yourdomain.com -d www.yourdomain.com -d api.yourdomain.com
+
+# Update Nginx configuration with SSL
+sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com -d api.yourdomain.com
 ```
 
-### Health Checks
+### 9. Configure Monitoring
+
 ```bash
-curl https://your-domain.com/api/health
+# Install and start Prometheus
+docker run -d --name prometheus prom/prometheus:latest
+
+# Install and start Grafana
+docker run -d --name grafana -p 3001:3000 grafana/grafana:latest
 ```
 
-## Security Checklist
+### 10. Setup Logging
 
-- [ ] SECRET_KEY changed from default
-- [ ] DATABASE_URL uses secure connection
-- [ ] SSL certificate installed
-- [ ] CORS properly configured
-- [ ] Rate limiting enabled
-- [ ] CSRF protection enabled
-- [ ] Security headers configured
-- [ ] Database backups configured
-- [ ] Log rotation configured
-- [ ] Firewall rules updated
+```bash
+# Install ELK Stack (optional)
+docker-compose -f docker-compose.elk.yml up -d
+```
 
-## Backup Strategy
+## Backup and Recovery
 
 ### Database Backup
+
 ```bash
-postgresql_backup.sh --db mismatch_db --user recruiter
+# Backup PostgreSQL database
+docker-compose exec db pg_dump -U recruiter_user mismatch_recruiter > backup.sql
+
+# Restore from backup
+cat backup.sql | docker-compose exec -T db psql -U recruiter_user mismatch_recruiter
 ```
 
-### Regular Backups
-Configure daily backups with:
+### Volume Backup
+
 ```bash
-0 2 * * * /opt/mismatch-recruiter/scripts/backup.sh
+# Backup persistent volumes
+docker run --rm -v mismatch-recruiter_postgres_data:/data -v $(pwd):/backup \
+  ubuntu tar czf /backup/postgres_backup.tar.gz -C /data .
 ```
 
-## Rollback Procedure
+## Monitoring and Maintenance
 
-1. Identify previous working version
-2. Checkout previous commit
-3. Run database migrations (if needed)
-4. Restart application
-5. Verify health checks pass
+### Health Checks
 
-## Support
+```bash
+# Check backend health
+curl http://localhost:5000/api/health
 
-For issues or questions, contact the development team.
+# Check frontend
+curl http://localhost:3000
+
+# View container logs
+docker-compose logs --tail=100 backend
+```
+
+### Performance Optimization
+
+1. **Database Optimization**
+   - Create indexes on frequently queried columns
+   - Use connection pooling
+   - Regular VACUUM and ANALYZE
+
+2. **Application Optimization**
+   - Enable caching (Redis)
+   - Compress API responses
+   - Implement pagination
+   - Use CDN for static assets
+
+3. **Infrastructure Optimization**
+   - Horizontal scaling with load balancing
+   - Auto-scaling based on metrics
+   - Resource limits in Docker
+
+### Log Management
+
+```bash
+# View logs
+docker-compose logs --tail=100 -f backend
+
+# Export logs
+docker-compose logs backend > backend.log
+
+# Setup log rotation
+sudo nano /etc/logrotate.d/mismatch-recruiter
+```
+
+## Scaling
+
+### Horizontal Scaling
+
+```bash
+# Scale backend service to 3 instances
+docker-compose up -d --scale backend=3
+
+# Use load balancer to distribute traffic
+# (Requires Nginx or HAProxy configuration)
+```
+
+### Database Replication
+
+1. Setup PostgreSQL streaming replication
+2. Configure hot standby
+3. Setup automated failover
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Port Already in Use**
+   ```bash
+   sudo lsof -i :5000
+   sudo kill -9 <PID>
+   ```
+
+2. **Database Connection Issues**
+   ```bash
+   docker-compose exec db psql -U recruiter_user -c "SELECT version();"
+   ```
+
+3. **Out of Disk Space**
+   ```bash
+   docker system prune -a  # Remove unused images
+   docker volume prune     # Remove unused volumes
+   ```
+
+4. **Memory Issues**
+   ```bash
+   docker stats  # Monitor memory usage
+   ```
+
+## Maintenance Schedule
+
+- **Daily**: Monitor logs and metrics
+- **Weekly**: Database optimization (VACUUM, ANALYZE)
+- **Monthly**: Security updates and patches
+- **Quarterly**: Full system backup and recovery test
+- **Annually**: Capacity planning and infrastructure review
+
+## Contact & Support
+
+For deployment issues, contact: ops@mismatchrecruiter.com
