@@ -1,169 +1,72 @@
 version: '3.8'
 
 services:
-  # PostgreSQL Database
   postgres:
     image: postgres:15-alpine
-    container_name: mismatch-recruiter-db
+    container_name: mismatch-postgres
     environment:
-      POSTGRES_USER: ${DB_USER:-postgres}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
-      POSTGRES_DB: ${DB_NAME:-mismatch_db}
-      POSTGRES_INITDB_ARGS: "-c log_statement=all -c log_duration=on"
-    ports:
-      - "${DB_PORT:-5432}:5432"
+      POSTGRES_USER: mismatch
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dev-password}
+      POSTGRES_DB: mismatch
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./scripts/init_db.sql:/docker-entrypoint-initdb.d/01-init.sql
+    ports:
+      - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
+      test: ["CMD-SHELL", "pg_isready -U mismatch"]
       interval: 10s
       timeout: 5s
       retries: 5
     networks:
       - mismatch-network
-    restart: unless-stopped
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
 
-  # Redis Cache
-  redis:
-    image: redis:7-alpine
-    container_name: mismatch-recruiter-cache
-    ports:
-      - "${REDIS_PORT:-6379}:6379"
-    volumes:
-      - redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - mismatch-network
-    restart: unless-stopped
-    command: redis-server --appendonly yes
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
-  # Prometheus Monitoring
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: mismatch-recruiter-prometheus
-    ports:
-      - "${PROMETHEUS_PORT:-9090}:9090"
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-      - prometheus_data:/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--storage.tsdb.retention.time=30d'
-    healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9090/status"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - mismatch-network
-    restart: unless-stopped
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
-  # Grafana Dashboards
-  grafana:
-    image: grafana/grafana:latest
-    container_name: mismatch-recruiter-grafana
-    ports:
-      - "${GRAFANA_PORT:-3000}:3000"
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: mismatch-backend
     environment:
-      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
-      GF_INSTALL_PLUGINS: "grafana-clock-panel"
-    volumes:
-      - grafana_data:/var/lib/grafana
-      - ./grafana/provisioning:/etc/grafana/provisioning
-    healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/api/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - mismatch-network
+      FLASK_ENV: ${FLASK_ENV:-development}
+      FLASK_DEBUG: ${FLASK_DEBUG:-False}
+      DATABASE_URL: postgresql://mismatch:${POSTGRES_PASSWORD:-dev-password}@postgres:5432/mismatch
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-dev-secret-key-change-me}
+      CORS_ORIGINS: http://localhost:5173,http://127.0.0.1:5173
+      LOG_LEVEL: ${LOG_LEVEL:-DEBUG}
     depends_on:
-      - prometheus
-    restart: unless-stopped
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
-  # ELK Stack - Elasticsearch
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.0.0
-    container_name: mismatch-recruiter-elasticsearch
-    environment:
-      discovery.type: single-node
-      xpack.security.enabled: "false"
-      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+      postgres:
+        condition: service_healthy
     ports:
-      - "${ELASTICSEARCH_PORT:-9200}:9200"
+      - "5000:5000"
     volumes:
-      - elasticsearch_data:/usr/share/elasticsearch/data
+      - ./backend:/app
     healthcheck:
-      test: ["CMD-SHELL", "curl -s http://localhost:9200 >/dev/null || exit 1"]
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 3
     networks:
       - mismatch-network
-    restart: unless-stopped
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
 
-  # ELK Stack - Kibana
-  kibana:
-    image: docker.elastic.co/kibana/kibana:8.0.0
-    container_name: mismatch-recruiter-kibana
-    ports:
-      - "${KIBANA_PORT:-5601}:5601"
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: mismatch-frontend
     environment:
-      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+      VITE_APP_API_URL: http://localhost:5000/api
     depends_on:
-      - elasticsearch
-    healthcheck:
-      test: ["CMD-SHELL", "curl -s http://localhost:5601/api/status >/dev/null || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      - backend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
     networks:
       - mismatch-network
-    restart: unless-stopped
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
+
+volumes:
+  postgres_data:
 
 networks:
   mismatch-network:
     driver: bridge
-
-volumes:
-  postgres_data:
-  redis_data:
-  prometheus_data:
-  grafana_data:
-  elasticsearch_data:

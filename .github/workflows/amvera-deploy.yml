@@ -1,0 +1,31 @@
+name: Deploy to Amvera
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Deploy to Amvera
+        uses: amvera-io/git-push-action@master
+        with:
+          username: ${{ secrets.AMVERA_USERNAME }}
+          password: ${{ secrets.AMVERA_PASSWORD }}
+          git_remote_url: git@git.amvera.io:${{ secrets.AMVERA_APP_ID }}.git
+          branch: main
+
+      - name: Notify deployment
+        if: success()
+        run: echo "✅ Deployment to Amvera successful"
+
+      - name: Notify failure
+        if: failure()
+        run: echo "❌ Deployment to Amvera failed"
