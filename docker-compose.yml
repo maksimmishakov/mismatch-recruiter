@@ -37,7 +37,7 @@ services:
     volumes:
       - ./backend:/app
       - /app/__pycache__
-    command: python app.py
+    command: gunicorn --bind 0.0.0.0:5000 --workers 4 --timeout 30 wsgi:app
 
   frontend:
     build:

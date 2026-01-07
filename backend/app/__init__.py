@@ -1,10 +1,10 @@
+import os
 from flask import Flask
-from flask_cors import CORS
+from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
+from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from flask_sqlalchemy import SQLAlchemy
-import os
 
 db = SQLAlchemy()
 jwt = JWTManager()
@@ -29,6 +29,18 @@ def create_app(config_name=None):
     
     from app.errors import register_error_handlers
     register_error_handlers(app)
+    
+    # Register route blueprints
+    from app.routes import auth_bp, candidates_bp, jobs_bp, matches_bp
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(candidates_bp)
+    app.register_blueprint(jobs_bp)
+    app.register_blueprint(matches_bp)
+    
+    # Register health check endpoint
+    @app.route('/health')
+    def health_check():
+        return {'status': 'ok', 'message': 'Service is running'}, 200
     
     with app.app_context():
         db.create_all()
