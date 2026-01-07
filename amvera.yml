@@ -1,38 +1,51 @@
-meta:
-  name: mismatch-recruiter
-  description: AI-powered recruitment platform
-  version: 1.0.0
-resources:
-  instances: 2
-  cpu: 2000m
-  memory: 2Gi
-  storage: 10Gi
+# Amvera Cloud configuration
+appId: mismatch-recruiter
+language: python3.12
+
+# Build configuration
 build:
-  type: docker-compose
-  files:
-    - docker-compose.yml
-environment:
+  containerName: mismatch-backend
+  dockerfilePath: backend/Dockerfile
+
+# Environment variables
+env:
   FLASK_ENV: production
+  FLASK_DEBUG: "False"
   LOG_LEVEL: INFO
-deployment:
-  strategy: rolling
-  maxSurge: 1
-  maxUnavailable: 0
-health:
-  http:
-    path: /api/health
+
+# Services
+services:
+  backend:
+    replicas: 2
+    resources:
+      cpu: 1000m
+      memory: 512Mi
     port: 5000
-  initialDelay: 10
-  periodSeconds: 30
-  timeoutSeconds: 10
-  failureThreshold: 3
-monitoring:
-  sentry:
-    enabled: true
-  metrics:
-    enabled: true
-backup:
-  database:
-    enabled: true
-    schedule: '0 2 * * *'
-    retention: 30
+    healthcheck:
+      path: /health
+      interval: 30s
+      timeout: 10s
+
+  postgres:
+    image: postgres:15-alpine
+    resources:
+      cpu: 500m
+      memory: 256Mi
+    env:
+      POSTGRES_DB: mismatch
+      POSTGRES_USER: mismatch
+
+# Volumes
+volumes:
+  postgres_data:
+    size: 5Gi
+
+# Networking
+networking:
+  ssl: true
+  domain: mismatch-recruiter.amvera.io
+
+# Auto deployment
+deployment:
+  branch: main
+  auto: true
