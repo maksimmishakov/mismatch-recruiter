@@ -1,20 +1,20 @@
----
-version: null
-meta:
-  environment: python
-  toolchain:
-    name: pip
-    version: 3.11
-build:
-  requirementsPath: requirements.txt
-  useCache: true
-run:
-<<<<<<< HEAD
-  scriptName: app.py
-  persistenceMount: /data
-  containerPort: 80
-serviceType: compute
-=======
-  command: gunicorn app:app --bind 0.0.0.0:80
-  containerPort: 80
->>>>>>> bf92ef7458baa6e02f8b2d24df29d304c808207c
+project: mismatch-recruiter
+
+env:
+  - name: DATABASE_URL
+    value: postgresql://user:pass@db:5432/mismatch_db
+  - name: REDIS_URL
+    value: redis://redis:6379/0
+  - name: FLASK_ENV
+    value: production
+
+services:
+  - name: backend
+    image: mismatch-recruiter:backend
+    port: 5000
+    healthcheck:
+      path: /health
+      timeout: 10
+    autoscaling:
+      minInstances: 1
+      maxInstances: 3
