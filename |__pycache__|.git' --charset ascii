@@ -1,0 +1,20 @@
+[33me3c4425[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeat/week2-ci-cd[m[33m, [m[1;31morigin/feat/week2-ci-cd[m[33m)[m feat: add Alembic database migrations
+[33mbbbd768[m ci: setup GitHub Actions workflows and Docker infrastructure
+[33mca9d463[m[33m ([m[1;31morigin/feat/week3-authentication-integration[m[33m, [m[1;32mfeat/week3-authentication-integration[m[33m)[m feat: Implement JWT authentication system - Week 3 Day 1
+[33mf40f6c3[m[33m ([m[1;31morigin/main[m[33m, [m[1;32mmain[m[33m)[m ci/infra: Add GitHub Actions workflows, Docker setup, and CI/CD configuration
+[33m6529692[m[33m ([m[1;31morigin/feat/week2-alembic-locust[m[33m, [m[1;32mfeat/week2-alembic-locust[m[33m)[m feat: add Alembic migrations and Locust load testing
+[33m2bf0a24[m docs: comprehensive production readiness plan 90% → 99%
+[33mb4bf217[m docs: Complete implementation roadmap with all 6 phases and deployment guide"
+[33m733ef24[m feat: Enhance MisMatch Dashboard with improved animations and interactivity
+[33m743b40e[m feat: Deploy production-ready MisMatch Dashboard with full API integration
+[33m0aefed5[m feat: Complete MisMatch Dashboard - Full functionality with API integration, real-time updates, and enterprise features
+[33m8a6b942[m feat: Add automated system diagnostic script
+[33m5bd1391[m docs: Add quick diagnostic checklist for rapid system verification
+[33me224b87[m docs: Add comprehensive system diagnostics and error checking guide
+[33m168fb5e[m deps: Add all required Python dependencies
+[33mabf8ad7[m docs: Complete working setup guide with actual commands
+[33m8f0dab0[m fix: Create minimal working Flask app with proper error handling
+[33mb61e786[m Update with correct index-2.html design
+[33m12107dd[m rebrand: RankPO → MisMatch - Smart Recruitment Platform
+[33md35472c[m test: verify UI and file upload functionality
+[33m135de56[m feat: add UI for resume upload and API integration

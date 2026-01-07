@@ -1,32 +1,32 @@
+"""Load testing with Locust."""
 from locust import HttpUser, task, between
 import random
 
-class APIUser(HttpUser):
-    """Simulated user for load testing."""
+class MisMatchUser(HttpUser):
     wait_time = between(1, 3)
-
+    
+    def on_start(self):
+        """Called when a Locust user starts executing those tasks."""
+        self.access_token = None
+    
     @task(3)
-    def health_check(self):
+    def view_health(self):
         """Check health endpoint."""
-        self.client.get('/health')
-
+        self.client.get("/health")
+    
     @task(2)
-    def get_candidates(self):
-        """Get list of candidates."""
-        self.client.get('/api/v1/candidates')
-
+    def view_candidates(self):
+        """View list of candidates with pagination."""
+        page = random.randint(1, 5)
+        self.client.get(f"/api/candidates?page={page}&per_page=20")
+    
     @task(2)
-    def search_candidates(self):
-        """Search candidates by skill."""
-        skill = random.choice(['Python', 'JavaScript', 'React', 'Node.js', 'PostgreSQL'])
-        self.client.get(f'/api/v1/candidates/search?skill={skill}')
-
+    def view_jobs(self):
+        """View list of jobs."""
+        page = random.randint(1, 5)
+        self.client.get(f"/api/jobs?page={page}&per_page=20")
+    
     @task(1)
-    def create_match(self):
-        """Create a new match."""
-        payload = {
-            'job_id': random.randint(1, 100),
-            'candidate_id': random.randint(1, 1000),
-            'score': random.uniform(0.5, 1.0)
-        }
-        self.client.post('/api/v1/matches', json=payload)
+    def view_matches(self):
+        """View list of matches."""
+        self.client.get("/api/matches")
