@@ -1,7 +1,10 @@
+"""Job model for job postings."""
 from app import db
 from datetime import datetime
 
+
 class Job(db.Model):
+    """Model for storing job postings."""
     __tablename__ = 'jobs'
     
     id = db.Column(db.Integer, primary_key=True)
@@ -18,16 +21,23 @@ class Job(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
+    # Relationships
     matches = db.relationship('Match', backref='job', lazy=True, cascade='all, delete-orphan')
     
     def to_dict(self):
+        """Convert job to dictionary."""
         return {
             'id': self.id,
+            'user_id': self.user_id,
             'title': self.title,
             'description': self.description,
             'required_skills': self.required_skills,
+            'min_experience': self.min_experience,
             'min_salary': self.min_salary,
             'max_salary': self.max_salary,
             'location': self.location,
-            'status': self.status
+            'employment_type': self.employment_type,
+            'status': self.status,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }
