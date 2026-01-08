@@ -1,10 +1,17 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
-from app import db
+# db is imported lazily to avoid circular imports
+from flask import current_app
+
 from app.models import User, Candidate, JobPosting, Match
 from datetime import timedelta
 
 api_bp = Blueprint('api', __name__)
+
+def get_db():
+    """Get database instance from current app"""
+    from app import db
+    return db
 
 # ============== MATCHING ALGORITHM ==============
 
@@ -45,8 +52,8 @@ def register():
     )
     user.set_password(data['password'])
     
-    db.session.add(user)
-    db.session.commit()
+    get_db().session.add(user)
+    get_db().session.commit()
     
     return jsonify({'user_id': user.id, 'email': user.email}), 201
 
@@ -108,8 +115,8 @@ def create_candidate():
         portfolio_url=data.get('portfolio_url', '')
     )
     
-    db.session.add(candidate)
-    db.session.commit()
+    get_db().session.add(candidate)
+    get_db().session.commit()
     
     return jsonify({'id': candidate.id, 'candidate': candidate.to_dict()}), 201
 
@@ -157,7 +164,7 @@ def update_candidate(candidate_id):
     if 'portfolio_url' in data:
         candidate.portfolio_url = data['portfolio_url']
     
-    db.session.commit()
+    get_db().session.commit()
     return jsonify({'message': 'Candidate updated', 'candidate': candidate.to_dict()}), 200
 
 @api_bp.route('/candidates/<int:candidate_id>', methods=['DELETE'])
@@ -168,8 +175,8 @@ def delete_candidate(candidate_id):
     if not candidate:
         return jsonify({'error': 'Candidate not found'}), 404
     
-    db.session.delete(candidate)
-    db.session.commit()
+    get_db().session.delete(candidate)
+    get_db().session.commit()
     
     return jsonify({'message': 'Candidate deleted'}), 200
 
@@ -202,8 +209,8 @@ def create_job():
         job_type=data.get('job_type', 'full-time')
     )
     
-    db.session.add(job)
-    db.session.commit()
+    get_db().session.add(job)
+    get_db().session.commit()
     
     return jsonify({'id': job.id, 'job': job.to_dict()}), 201
 
@@ -245,7 +252,7 @@ def update_job(job_id):
     if 'job_type' in data:
         job.job_type = data['job_type']
     
-    db.session.commit()
+    get_db().session.commit()
     return jsonify({'message': 'Job updated', 'job': job.to_dict()}), 200
 
 @api_bp.route('/jobs/<int:job_id>', methods=['DELETE'])
@@ -256,8 +263,8 @@ def delete_job(job_id):
     if not job:
         return jsonify({'error': 'Job not found'}), 404
     
-    db.session.delete(job)
-    db.session.commit()
+    get_db().session.delete(job)
+    get_db().session.commit()
     
     return jsonify({'message': 'Job deleted'}), 200
 
@@ -307,8 +314,8 @@ def create_match():
         status='pending'
     )
     
-    db.session.add(match)
-    db.session.commit()
+    get_db().session.add(match)
+    get_db().session.commit()
     
     return jsonify({'id': match.id, 'match_score': match_score, 'match': match.to_dict()}), 201
 
