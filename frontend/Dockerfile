@@ -3,30 +3,23 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-# Copy package files
-COPY frontend/package*.json ./
+COPY package*.json ./
 
-# Install dependencies
 RUN npm ci
 
-# Copy source code
-COPY frontend/ .
+COPY . .
 
-# Build production bundle
 RUN npm run build
 
-# Stage 2: Serve with Node
+# Stage 2: Serve optimized build
 FROM node:18-alpine
 
 WORKDIR /app
 
-# Install serve to serve static files
 RUN npm install -g serve
 
-# Copy build from previous stage
 COPY --from=builder /app/build ./build
 
 EXPOSE 3000
 
-# Serve production build
 CMD ["serve", "-s", "build", "-l", "3000"]
