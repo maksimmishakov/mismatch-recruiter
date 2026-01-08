@@ -12,7 +12,7 @@ api_bp = Blueprint('api', __name__)
 
 def get_db():
     """Get database instance from current app"""
-    from app import db
+    from ..database import db
     return db
 
 # ============== MATCHING ALGORITHM ==============

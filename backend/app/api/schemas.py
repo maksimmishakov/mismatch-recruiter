@@ -79,4 +79,4 @@ class MatchCreateSchema(BaseModel):
     job_id: int = Field(..., gt=0)
 
 class MatchUpdateSchema(BaseModel):
-    status: str = Field(..., regex='^(pending|accepted|rejected)$')
+    status: str = Field(..., pattern='^(pending|pattern="^(pending|accepted|rejected)$|rejected)$')
