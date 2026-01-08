@@ -29,6 +29,7 @@ def create_app(config_name='development'):
     app.register_blueprint(api_bp, url_prefix='/api')
     
     # Create tables
+        from .models import User, Candidate, JobPosting, Match
     with app.app_context():
         db.create_all()
     
