@@ -2,7 +2,7 @@ from ..database import db
 from datetime import datetime
 from passlib.context import CryptContext
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto", truncate_error=False)
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto", truncate_error=True)
 class User(db.Model):
     __tablename__ = 'users'
     
