@@ -2,7 +2,7 @@ from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_sqlalchemy import SQLAlchemy
-from app.config import Config
+from app.config import config
 
 db = SQLAlchemy()
 jwt = JWTManager()
@@ -11,14 +11,7 @@ def create_app(config_name='development'):
     app = Flask(__name__)
     
     # Configuration
-    if config_name == 'testing':
-        from app.config import TestingConfig
-        app.config.from_object(TestingConfig)
-    elif config_name == 'production':
-        from app.config import ProductionConfig
-        app.config.from_object(ProductionConfig)
-    else:
-        app.config.from_object(Config)
+    app.config.from_object(config.get(config_name, config['default']))
     
     # Initialize extensions
     db.init_app(app)
