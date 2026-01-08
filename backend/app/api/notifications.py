@@ -1,59 +1,61 @@
-"""Notification API endpoints."""
-from flask import Blueprint, jsonify, request
-from flask_jwt_extended import jwt_required, get_jwt_identity
-from app.models import Notification, db
-import logging
+from flask import Blueprint, request, jsonify
+from datetime import datetime
 
-bp = Blueprint('notifications', __name__, url_prefix='/api/notifications')
-logger = logging.getLogger(__name__)
+notifications_bp = Blueprint('notifications', __name__)
 
-@bp.route('/list', methods=['GET'])
-@jwt_required()
-def list_notifications():
-    """Get user notifications."""
-    userid = get_jwt_identity()
-    limit = int(request.args.get('limit', 20))
-    offset = int(request.args.get('offset', 0))
-    
+@notifications_bp.route('/send', methods=['POST'])
+def send_notification():
+    """Send a notification to a user"""
     try:
-        notifications = Notification.query.filter_by(userid=userid) \
-            .order_by(Notification.created_at.desc()) \
-            .limit(limit).offset(offset).all()
-        total = Notification.query.filter_by(userid=userid).count()
-        unread = Notification.query.filter_by(userid=userid, read=False).count()
+        data = request.get_json()
+        
+        # Validate required fields
+        if not data.get('user_id') or not data.get('message'):
+            return jsonify({'error': 'Missing required fields'}), 400
+        
+        # Placeholder for actual notification logic
+        notification = {
+            'id': 'notif_' + str(datetime.now().timestamp()),
+            'user_id': data.get('user_id'),
+            'message': data.get('message'),
+            'type': data.get('type', 'info'),
+            'sent_at': datetime.now().isoformat(),
+            'status': 'sent'
+        }
+        
+        return jsonify(notification), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@notifications_bp.route('/list/<user_id>', methods=['GET'])
+def list_notifications(user_id):
+    """List all notifications for a user"""
+    try:
+        limit = request.args.get('limit', 20, type=int)
+        offset = request.args.get('offset', 0, type=int)
+        
+        # Placeholder for database query
+        notifications = []
         
         return jsonify({
-            'notifications': [n.to_dict() for n in notifications],
-            'total': total,
-            'unread': unread
+            'notifications': notifications,
+            'user_id': user_id,
+            'total': 0,
+            'limit': limit,
+            'offset': offset
         }), 200
     except Exception as e:
-        logger.error(f'Error fetching notifications: {e}')
         return jsonify({'error': str(e)}), 500
 
-@bp.route('/<int:notification_id>/mark-read', methods=['POST'])
-@jwt_required()
-def mark_read(notification_id):
-    """Mark notification as read."""
-    userid = get_jwt_identity()
+@notifications_bp.route('/mark-read/<notification_id>', methods=['POST'])
+def mark_as_read(notification_id):
+    """Mark a notification as read"""
     try:
-        notification = Notification.query.filter_by(id=notification_id, userid=userid).first_or_404()
-        notification.read = True
-        db.session.commit()
-        return jsonify(notification.to_dict()), 200
+        # Placeholder for database update
+        return jsonify({
+            'notification_id': notification_id,
+            'status': 'read',
+            'updated_at': datetime.now().isoformat()
+        }), 200
     except Exception as e:
-        logger.error(f'Error marking notification as read: {e}')
-        return jsonify({'error': str(e)}), 500
-
-@bp.route('/mark-all-read', methods=['POST'])
-@jwt_required()
-def mark_all_read():
-    """Mark all notifications as read."""
-    userid = get_jwt_identity()
-    try:
-        Notification.query.filter_by(userid=userid, read=False).update({'read': True})
-        db.session.commit()
-        return jsonify({'success': True}), 200
-    except Exception as e:
-        logger.error(f'Error marking all as read: {e}')
         return jsonify({'error': str(e)}), 500
