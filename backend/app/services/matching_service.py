@@ -1,133 +1,211 @@
-# Matching service for candidate-job matching algorithms
-from typing import Tuple, Optional
-from app.models import Candidate, JobPosting
+"""Advanced matching service for candidates and vacancies."""
+import numpy as np
+from typing import List, Dict, Tuple, Optional
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.feature_extraction.text import TfidfVectorizer
+import logging
+
+logger = logging.getLogger(__name__)
 
 class MatchingService:
-    """Service for calculating match scores between candidates and jobs"""
+    """Advanced matching engine using ML algorithms."""
     
-    @staticmethod
-    def calculate_skill_match(candidate: Candidate, job: JobPosting) -> float:
-        """
-        Calculate skill match score (0.0 - 1.0)
-        Based on intersection of candidate skills and required skills
-        """
-        if not job.required_skills:
-            return 0.5  # Default if no skills required
+    def __init__(self):
+        """Initialize matching service."""
+        self.vectorizer = TfidfVectorizer(max_features=100)
+        self.weights = {
+            'skills': 0.3,
+            'experience': 0.2,
+            'location': 0.15,
+            'salary': 0.15,
+            'education': 0.1,
+            'culture_fit': 0.1
+        }
+    
+    def match_candidate_to_vacancy(self, candidate: Dict, vacancy: Dict) -> Tuple[float, Dict]:
+        """Match single candidate to vacancy."""
+        details = {}
+        total_score = 0
         
-        if not candidate.skills:
-            return 0.0  # No match if candidate has no skills
+        # Skills matching
+        skills_score = self.match_skills(
+            candidate.get('skills', []),
+            vacancy.get('required_skills', [])
+        )
+        details['skills'] = skills_score
+        total_score += skills_score * self.weights['skills']
         
-        required_skills = set(s.lower() for s in job.required_skills)
-        candidate_skills = set(s.lower() for s in candidate.skills)
+        # Experience matching
+        exp_score = self.match_experience(
+            candidate.get('years_experience', 0),
+            vacancy.get('experience_required', 0)
+        )
+        details['experience'] = exp_score
+        total_score += exp_score * self.weights['experience']
         
+        # Location matching
+        location_score = self.match_location(
+            candidate.get('location', ''),
+            vacancy.get('location', '')
+        )
+        details['location'] = location_score
+        total_score += location_score * self.weights['location']
+        
+        # Salary matching
+        salary_score = self.match_salary(
+            candidate.get('salary_expectation', 0),
+            vacancy.get('salary_range', {})
+        )
+        details['salary'] = salary_score
+        total_score += salary_score * self.weights['salary']
+        
+        # Education matching
+        education_score = self.match_education(
+            candidate.get('education', {}),
+            vacancy.get('education_required', '')
+        )
+        details['education'] = education_score
+        total_score += education_score * self.weights['education']
+        
+        # Culture fit
+        culture_score = self.calculate_culture_fit(candidate, vacancy)
+        details['culture_fit'] = culture_score
+        total_score += culture_score * self.weights['culture_fit']
+        
+        return total_score, details
+    
+    def match_skills(self, candidate_skills: List[str], required_skills: List[str]) -> float:
+        """Match candidate skills with required skills."""
         if not required_skills:
-            return 0.5
+            return 100.0
         
-        matched_skills = required_skills.intersection(candidate_skills)
-        score = len(matched_skills) / len(required_skills)
-        return min(score, 1.0)
-    
-    @staticmethod
-    def calculate_experience_match(candidate: Candidate, job: JobPosting) -> float:
-        """
-        Calculate experience match score (0.0 - 1.0)
-        Based on candidate's experience vs required experience
-        """
-        if not job.experience_required:
-            return 0.5
+        candidate_set = {s.lower().strip() for s in candidate_skills}
+        required_set = {s.lower().strip() for s in required_skills}
         
-        candidate_exp = candidate.experience_years or 0
-        required_exp = job.experience_required or 0
-        
-        if candidate_exp >= required_exp:
-            return 1.0  # Meets or exceeds requirement
-        
-        # Partial credit for having some experience
-        if required_exp == 0:
-            return 0.5
-        
-        score = candidate_exp / required_exp
-        return max(min(score, 1.0), 0.0)
-    
-    @staticmethod
-    def calculate_salary_match(candidate: Candidate, job: JobPosting) -> float:
-        """
-        Calculate salary match score (0.0 - 1.0)
-        Based on candidate's salary expectation vs job salary range
-        """
-        if not job.salary_min or not job.salary_max:
-            return 0.5  # Unknown salary match
-        
-        candidate_salary = candidate.salary_expectation or 0
-        
-        if candidate_salary == 0:
-            return 0.5  # No expectation provided
-        
-        # Perfect match if within range
-        if job.salary_min <= candidate_salary <= job.salary_max:
-            return 1.0
-        
-        # Below minimum
-        if candidate_salary < job.salary_min:
-            gap = job.salary_min - candidate_salary
-            max_gap = job.salary_min * 0.3  # Allow 30% below
-            if gap <= max_gap:
-                score = 1.0 - (gap / max_gap) * 0.5
-                return max(score, 0.0)
+        if not candidate_set:
             return 0.0
         
-        # Above maximum
-        if candidate_salary > job.salary_max:
-            gap = candidate_salary - job.salary_max
-            max_gap = job.salary_max * 0.3  # Allow 30% above
-            if gap <= max_gap:
-                score = 1.0 - (gap / max_gap) * 0.5
-                return max(score, 0.0)
-            return 0.0
+        # Jaccard similarity
+        intersection = len(candidate_set & required_set)
+        union = len(candidate_set | required_set)
+        jaccard_score = (intersection / union * 100) if union > 0 else 0
+        
+        return jaccard_score
     
-    @staticmethod
-    def calculate_location_match(candidate: Candidate, job: JobPosting) -> float:
-        """
-        Calculate location match score (0.0 - 1.0)
-        Simple exact match for now
-        """
-        if not job.location or not candidate.location:
-            return 0.5  # Unknown
+    def match_experience(self, candidate_years: int, required_years: int) -> float:
+        """Match years of experience."""
+        if required_years == 0:
+            return 100.0
         
-        # Exact match
-        if job.location.lower() == candidate.location.lower():
-            return 1.0
-        
-        # Partial match (same city)
-        if job.location.lower().split(',')[0] == candidate.location.lower().split(',')[0]:
-            return 0.8
-        
-        return 0.0
+        if candidate_years >= required_years:
+            return min(100.0, (candidate_years / required_years) * 100)
+        else:
+            return (candidate_years / required_years) * 80
     
-    @staticmethod
-    def calculate_overall_match(candidate: Candidate, job: JobPosting) -> Tuple[float, float, float, float, float]:
-        """
-        Calculate overall match and component scores
-        Returns: (overall_score, skill, experience, salary, location)
-        """
-        skill_score = MatchingService.calculate_skill_match(candidate, job)
-        experience_score = MatchingService.calculate_experience_match(candidate, job)
-        salary_score = MatchingService.calculate_salary_match(candidate, job)
-        location_score = MatchingService.calculate_location_match(candidate, job)
+    def match_location(self, candidate_loc: str, vacancy_loc: str) -> float:
+        """Match location."""
+        if not vacancy_loc:
+            return 100.0
         
-        # Weighted average
-        weights = {
-            'skill': 0.35,
-            'experience': 0.25,
-            'salary': 0.25,
-            'location': 0.15
+        candidate_loc = candidate_loc.lower().strip()
+        vacancy_loc = vacancy_loc.lower().strip()
+        
+        if candidate_loc == vacancy_loc:
+            return 100.0
+        elif 'remote' in vacancy_loc:
+            return 100.0 if 'remote' in candidate_loc else 80.0
+        else:
+            return 70.0
+    
+    def match_salary(self, candidate_exp: int, vacancy_range: Dict) -> float:
+        """Match salary expectations."""
+        min_salary = vacancy_range.get('min', 0)
+        max_salary = vacancy_range.get('max', float('inf'))
+        
+        if min_salary == 0 or max_salary == float('inf'):
+            return 100.0
+        
+        if candidate_exp <= max_salary:
+            return 100.0
+        else:
+            return max(0.0, 100.0 - ((candidate_exp - max_salary) / max_salary) * 50)
+    
+    def match_education(self, candidate_edu: Dict, required_edu: str) -> float:
+        """Match education level."""
+        if not required_edu:
+            return 100.0
+        
+        education_levels = {
+            'highschool': 1,
+            'bachelor': 2,
+            'master': 3,
+            'phd': 4
         }
         
-        overall = (
-            skill_score * weights['skill'] +
-            experience_score * weights['experience'] +
-            salary_score * weights['salary'] +
-            location_score * weights['location']
-        )
+        candidate_level = education_levels.get(candidate_edu.get('level', 'highschool').lower(), 1)
+        required_level = education_levels.get(required_edu.lower(), 2)
         
-        return overall, skill_score, experience_score, salary_score, location_score
+        if candidate_level >= required_level:
+            return 100.0
+        else:
+            return (candidate_level / required_level) * 100
+    
+    def calculate_culture_fit(self, candidate: Dict, vacancy: Dict) -> float:
+        """Calculate culture fit score."""
+        score = 50.0
+        
+        # Values alignment
+        candidate_values = set(candidate.get('values', []))
+        company_values = set(vacancy.get('company_values', []))
+        
+        if company_values:
+            values_match = len(candidate_values & company_values)
+            score += (values_match / len(company_values)) * 30
+        else:
+            score += 30
+        
+        # Work style
+        candidate_style = candidate.get('work_style', '')
+        vacancy_style = vacancy.get('work_style', '')
+        
+        if candidate_style == vacancy_style:
+            score += 20
+        else:
+            score += 10
+        
+        return min(100.0, score)
+    
+    def batch_match_candidates(self, candidates: List[Dict], vacancy: Dict, limit: int = 10) -> List[Tuple]:
+        """Match multiple candidates to vacancy."""
+        matches = []
+        for candidate in candidates:
+            score, details = self.match_candidate_to_vacancy(candidate, vacancy)
+            matches.append((candidate, score, details))
+        
+        matches.sort(key=lambda x: x[1], reverse=True)
+        return matches[:limit]
+    
+    def get_matching_stats(self, matches: List[Tuple]) -> Dict:
+        """Get statistics about matching results."""
+        if not matches:
+            return {
+                'total': 0,
+                'average_score': 0,
+                'high_match': 0,
+                'medium_match': 0,
+                'low_match': 0
+            }
+        
+        scores = [score for _, score, _ in matches]
+        return {
+            'total': len(matches),
+            'average_score': sum(scores) / len(scores),
+            'high_match': sum(1 for s in scores if s >= 80),
+            'medium_match': sum(1 for s in scores if 50 <= s < 80),
+            'low_match': sum(1 for s in scores if s < 50),
+            'max_score': max(scores),
+            'min_score': min(scores)
+        }
+
+# Initialize global service
+matching_service = MatchingService()
