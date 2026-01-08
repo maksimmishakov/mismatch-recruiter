@@ -1,10 +1,8 @@
-import os
-from app import create_app, db
-from app.models import User, Candidate, JobPosting, Match
+"""WSGI entry point for production."""
 
-app = create_app(os.getenv('FLASK_ENV', 'production'))
+from app import create_app
 
-if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
+app = create_app()
+
+if __name__ == "__main__":
     app.run()

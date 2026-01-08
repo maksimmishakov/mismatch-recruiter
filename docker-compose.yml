@@ -1,19 +1,18 @@
-version: '3.9'
+version: '3.8'
 
 services:
-  db:
-    image: postgres:15-alpine
-    container_name: mismatch_db
+  postgres:
+    image: postgres:15
     environment:
-      POSTGRES_USER: recruiter_user
-      POSTGRES_PASSWORD: secure_password
-      POSTGRES_DB: mismatch_recruiter
+      POSTGRES_USER: mismatch_user
+      POSTGRES_PASSWORD: mismatch_password
+      POSTGRES_DB: mismatch_db
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U recruiter_user"]
+      test: ["CMD-SHELL", "pg_isready -U mismatch_user -d mismatch_db"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -22,28 +21,28 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: mismatch_backend
-    environment:
-      DATABASE_URL: postgresql://recruiter_user:secure_password@db:5432/mismatch_recruiter
-      FLASK_ENV: development
-      JWT_SECRET_KEY: dev-secret-key-change-in-production
     ports:
       - "5000:5000"
+    environment:
+      DATABASE_URL: postgresql://mismatch_user:mismatch_password@postgres:5432/mismatch_db
+      FLASK_ENV: development
+      FLASK_APP: wsgi.py
+      SECRET_KEY: your-secret-key-change-in-production
     depends_on:
-      db:
+      postgres:
         condition: service_healthy
     volumes:
       - ./backend:/app
+    command: python wsgi.py
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: mismatch_frontend
     ports:
       - "3000:3000"
     environment:
-      REACT_APP_API_URL: http://localhost:5000/api
+      VITE_API_URL: http://localhost:5000/api
     depends_on:
       - backend
     volumes:
