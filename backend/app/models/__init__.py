@@ -1,6 +1,6 @@
-from .user import User
-from .job_posting import JobPosting
-from .candidate import Candidate
-from .match import Match
+from app.models.user import User
+from app.models.candidate import Candidate
+from app.models.job import Job
+from app.models.match import Match
 
-__all__ = ['User', 'JobPosting', 'Candidate', 'Match']
+__all__ = ['User', 'Candidate', 'Job', 'Match']
