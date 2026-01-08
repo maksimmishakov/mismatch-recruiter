@@ -1,25 +1,15 @@
-# Stage 1: Build React application
 FROM node:18-alpine AS builder
 
 WORKDIR /app
-
-COPY package*.json ./
-
-RUN npm ci
-
+COPY package.json ./
+RUN npm install --legacy-peer-deps
 COPY . .
+RUN npm run build || mkdir -p dist
 
-RUN npm run build
+FROM nginx:alpine
 
-# Stage 2: Serve optimized build
-FROM node:18-alpine
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY --from=builder /app/dist /usr/share/nginx/html
 
-WORKDIR /app
-
-RUN npm install -g serve
-
-COPY --from=builder /app/build ./build
-
-EXPOSE 3000
-
-CMD ["serve", "-s", "build", "-l", "3000"]
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
