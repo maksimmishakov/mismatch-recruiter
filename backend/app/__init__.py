@@ -30,7 +30,6 @@ def create_app(config_name='development'):
     
     # Create tables
     with app.app_context():
-        from .models import User, Candidate, JobPosting, Match
         db.create_all()
     
     return app
