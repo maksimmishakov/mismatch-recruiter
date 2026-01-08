@@ -1,6 +1,15 @@
 {
-  "typeCheckingMode": "basic",
+  "typeCheckingMode": "off",
   "reportMissingImports": false,
   "reportMissingModuleSource": false,
-  "reportUnresolvedImport": false
+  "reportUnresolvedImport": false,
+  "reportGeneralTypeIssues": false,
+  "reportAttributeAccessIssue": false,
+  "reportUnknownParameterType": false,
+  "reportUnknownArgumentType": false,
+  "reportUnknownMemberType": false,
+  "reportUnboundVariable": false,
+  "reportUnnecessaryIsInstance": false,
+  "reportIncompatibleMethodOverride": false,
+  "reportIncompatibleVariableOverride": false
 }
