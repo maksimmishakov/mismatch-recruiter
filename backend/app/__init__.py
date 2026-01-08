@@ -1,35 +1,36 @@
 from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
-from .database import db
+from flask_sqlalchemy import SQLAlchemy
+from app.config import Config
 
+db = SQLAlchemy()
 jwt = JWTManager()
 
 def create_app(config_name='development'):
     app = Flask(__name__)
     
-    # Load configuration
-    if config_name == 'production':
-        from .config.production import ProductionConfig
-        app.config.from_object(ProductionConfig)
-    elif config_name == 'testing':
-        from .config.testing import TestingConfig
+    # Configuration
+    if config_name == 'testing':
+        from app.config import TestingConfig
         app.config.from_object(TestingConfig)
+    elif config_name == 'production':
+        from app.config import ProductionConfig
+        app.config.from_object(ProductionConfig)
     else:
-        from .config.development import DevelopmentConfig
-        app.config.from_object(DevelopmentConfig)
+        app.config.from_object(Config)
     
     # Initialize extensions
     db.init_app(app)
     jwt.init_app(app)
-    CORS(app, resources={r"/api/*": {"origins": "*"}})
+    CORS(app)
     
-    # Register blueprints
-    from .api.routes import api_bp
-    app.register_blueprint(api_bp, url_prefix='/api')
-    
-    # Create tables
+    # Create database tables
     with app.app_context():
         db.create_all()
+    
+    # Register blueprints
+    from app.api.routes import api_bp
+    app.register_blueprint(api_bp, url_prefix='/api')
     
     return app
