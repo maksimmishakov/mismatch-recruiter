@@ -4,6 +4,8 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 from flask import current_app
 from ..models import User, Candidate, JobPosting, Match
 from datetime import timedelta
+from .schemas import UserRegisterSchema, UserLoginSchema, CandidateCreateSchema, JobCreateSchema, MatchCreateSchema
+from pydantic import ValidationError
 
 api_bp = Blueprint('api', __name__)
 

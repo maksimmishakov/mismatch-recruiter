@@ -3,6 +3,7 @@ from datetime import datetime
 from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto", truncate_error=True)
+
 class User(db.Model):
     __tablename__ = 'users'
     
@@ -15,6 +16,10 @@ class User(db.Model):
     role = db.Column(db.String(20), default='user')  # 'admin', 'recruiter', 'user'
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationships for cascade delete
+    candidates = db.relationship('Candidate', backref='user', lazy=True, cascade='all, delete-orphan')
+    jobs = db.relationship('JobPosting', backref='user', lazy=True, cascade='all, delete-orphan')
     
     def set_password(self, password: str):
         self.hashed_password = pwd_context.hash(password)
