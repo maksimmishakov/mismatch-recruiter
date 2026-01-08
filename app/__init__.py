@@ -16,21 +16,11 @@ def create_app(config_name='development'):
     app.config['CORS_ORIGINS'] = os.getenv('CORS_ORIGINS', '*').split(',')
     app.config['ENV'] = os.getenv('FLASK_ENV', 'development')
     app.config['DEBUG'] = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///mismatch.db')
     
     # Initialize extensions
     db.init_app(app)
     jwt.init_app(app)
     CORS(app)
-    
-    # Register blueprints
-    from .api.routes import api_bp
-    from .api.matching import matching_bp
-    from .api.analytics import analytics_bp
-    from .api.notifications import notifications_bp
-    
-    app.register_blueprint(api_bp, url_prefix='/api')
-    app.register_blueprint(matching_bp, url_prefix='/api/matching')
-    app.register_blueprint(analytics_bp, url_prefix='/api/analytics')
-    app.register_blueprint(notifications_bp, url_prefix='/api/notifications')
     
     return app
