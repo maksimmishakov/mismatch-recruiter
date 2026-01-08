@@ -33,7 +33,6 @@ services:
         condition: service_healthy
     volumes:
       - ./backend:/app
-    command: python wsgi.py
 
   frontend:
     build:
