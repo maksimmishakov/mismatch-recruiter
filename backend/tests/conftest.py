@@ -1,18 +1,14 @@
 """Pytest configuration and fixtures for testing."""
-import os
+
 import pytest
-from flask import Flask
-from app import create_app
-from app.extensions import db
+from backend.app import create_app
+from backend.app.database import db
+import os
 
 
 @pytest.fixture(scope='session')
 def app():
-    """Create and configure a Flask test app."""
-    os.environ['FLASK_ENV'] = 'testing'
-    os.environ['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
-    os.environ['SECRET_KEY'] = 'test-secret-key'
-    
+    """Create application for testing."""
     app = create_app('testing')
     
     with app.app_context():
@@ -22,21 +18,21 @@ def app():
         db.drop_all()
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture
 def client(app):
-    """Flask test client."""
+    """Provides a test client for the app."""
     return app.test_client()
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture
 def runner(app):
-    """Flask CLI runner."""
+    """Provides a CLI test runner."""
     return app.test_cli_runner()
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture
 def db_session(app):
-    """Database session for tests."""
+    """Provides database session for tests."""
     with app.app_context():
         yield db.session
         db.session.rollback()
