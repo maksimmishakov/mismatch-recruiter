@@ -6,6 +6,8 @@ from ..models import User, Candidate, JobPosting, Match
 from datetime import timedelta
 from .schemas import UserRegisterSchema, UserLoginSchema, CandidateCreateSchema, JobCreateSchema, MatchCreateSchema
 from pydantic import ValidationError
+from .database import db
+from sqlalchemy import func
 
 api_bp = Blueprint('api', __name__)
 
