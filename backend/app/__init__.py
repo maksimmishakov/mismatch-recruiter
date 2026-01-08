@@ -18,10 +18,6 @@ def create_app(config_name='development'):
     jwt.init_app(app)
     CORS(app)
     
-    # Create database tables
-    with app.app_context():
-        db.create_all()
-    
     # Register blueprints
     from app.api.routes import api_bp
     app.register_blueprint(api_bp, url_prefix='/api')
