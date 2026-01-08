@@ -2,7 +2,7 @@ from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_sqlalchemy import SQLAlchemy
-from app.config import config
+import os
 
 db = SQLAlchemy()
 jwt = JWTManager()
@@ -10,8 +10,12 @@ jwt = JWTManager()
 def create_app(config_name='development'):
     app = Flask(__name__)
     
-    # Configuration
-    app.config.from_object(config.get(config_name, config['default']))
+    # Load configuration from environment
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql://localhost/mismatch_dev')
+    app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'your-secret-key-change-this-in-production')
+    app.config['CORS_ORIGINS'] = os.getenv('CORS_ORIGINS', '**').split(',')
+    app.config['ENV'] = os.getenv('FLASK_ENV', 'development')
+    app.config['DEBUG'] = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
     
     # Initialize extensions
     db.init_app(app)
