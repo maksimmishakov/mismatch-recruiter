@@ -15,6 +15,50 @@ def get_db():
 
 # ============== MATCHING ALGORITHM ==============
 
+
+def calculate_skill_match(candidate, job):
+    """Calculate skill match percentage"""
+    if not job.required_skills or len(job.required_skills) == 0:
+        return 0.5  # Default if no skills required
+    
+    if not candidate.skills or len(candidate.skills) == 0:
+        return 0.0  # No match if candidate has no skills
+    
+    matched = len([s for s in candidate.skills if s in job.required_skills])
+    return min(1.0, (matched / len(job.required_skills)))
+
+
+def calculate_experience_match(candidate, job):
+    """Calculate experience match: 5 years = 100%"""
+    if not job.experience_level:
+        return 0.5  # Default
+    
+    # Simple logic: more years = better match
+    years_needed = 1 if job.experience_level == 'junior' else 3 if job.experience_level == 'mid' else 5
+    match_ratio = min(1.0, candidate.experience_years / years_needed)
+    return match_ratio
+
+
+def calculate_salary_match(candidate, job):
+    """Calculate salary match: 1.0 if expectation within range, 0.0 otherwise"""
+    if not job.salary_min or not job.salary_max:
+        return 0.5  # Default if job salary not specified
+    
+    candidate_salary = candidate.salary_expectation or 0
+    if candidate_salary == 0:
+        return 0.5  # Default if candidate didn't specify
+    
+    if job.salary_min <= candidate_salary <= job.salary_max:
+        return 1.0  # Perfect match
+    elif candidate_salary < job.salary_min:
+        # Candidate wants less - partial match
+        return max(0.0, 1.0 - ((job.salary_min - candidate_salary) / job.salary_min) * 0.5)
+    else:  # candidate_salary > job.salary_max
+        # Candidate wants more - partial match
+        return max(0.0, 1.0 - ((candidate_salary - job.salary_max) / candidate_salary) * 0.5)
+
+
+
 def calculate_match_score(candidate, job):
     """Calculate match score: 60% skills, 40% experience"""
     if not job.required_skills or len(job.required_skills) == 0:
@@ -309,9 +353,10 @@ def create_match():
         job_posting_id=data['job_id'],
         match_score=match_score,
         skill_match=calculate_skill_match(candidate, job),
-        experience_match=calculate_experience_match(candidate, job),
-        location_match=1.0 if candidate.location and job.location and candidate.location.lower() == job.location.lower() else 0.0,
-        status='pending'
+              experience_match=calculate_experience_match(candidate, job),
+      salary_match=calculate_salary_match(candidate, job),
+      location_match=1.0 if candidate.location and job.location and candidate.location.lower() == job.location.lower() else 0.0,
+      status='pending'
     )
     
     get_db().session.add(match)
