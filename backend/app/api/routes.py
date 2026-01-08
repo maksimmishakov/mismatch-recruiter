@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 # Database imported lazily to avoid circular imports
 from flask import current_app
-from app.models import User, Candidate, JobPosting, Match
+from ..models import User, Candidate, JobPosting, Match
 from datetime import timedelta
 
 api_bp = Blueprint('api', __name__)
