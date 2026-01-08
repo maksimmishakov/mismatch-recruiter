@@ -410,3 +410,87 @@ def calculate_experience_match(candidate, job):
 def health_check():
     """Health check endpoint"""
     return jsonify({'status': 'healthy', 'service': 'mismatch-recruiter-api'}), 200
+
+
+# ============== MATCH DETAIL ROUTES ==============
+
+@api_bp.route('/matches/<int:match_id>', methods=['GET'])
+@jwt_required()
+def get_match(match_id):
+    """Get specific match by ID"""
+    match = Match.query.get(match_id)
+    if not match:
+        return jsonify({'error': 'Match not found'}), 404
+    return jsonify(match.to_dict()), 200
+
+@api_bp.route('/matches/<int:match_id>', methods=['PUT'])
+@jwt_required()
+def update_match(match_id):
+    """Update match status"""
+    match = Match.query.get(match_id)
+    if not match:
+        return jsonify({'error': 'Match not found'}), 404
+    
+    data = request.get_json()
+    if 'status' in data:
+        if data['status'] not in ['pending', 'accepted', 'rejected']:
+            return jsonify({'error': 'Invalid status'}), 400
+        match.status = data['status']
+    
+    db.session.commit()
+    return jsonify({'message': 'Match updated', 'match': match.to_dict()}), 200
+
+@api_bp.route('/matches/<int:match_id>', methods=['DELETE'])
+@jwt_required()
+def delete_match(match_id):
+    """Delete match"""
+    match = Match.query.get(match_id)
+    if not match:
+        return jsonify({'error': 'Match not found'}), 404
+    
+    db.session.delete(match)
+    db.session.commit()
+    
+    return jsonify({'message': 'Match deleted'}), 200
+
+# ============== STATS & AUTH ROUTES ==============
+
+@api_bp.route('/stats', methods=['GET'])
+@jwt_required()
+def get_stats():
+    """Get recruitment statistics"""
+    total_candidates = Candidate.query.count()
+    total_jobs = JobPosting.query.count()
+    total_matches = Match.query.count()
+    
+    matches_pending = Match.query.filter_by(status='pending').count()
+    matches_accepted = Match.query.filter_by(status='accepted').count()
+    matches_rejected = Match.query.filter_by(status='rejected').count()
+    
+    avg_match_score = db.session.query(
+        func.avg(Match.match_score)
+    ).scalar() or 0
+    
+    return jsonify({
+        'candidates': total_candidates,
+        'jobs': total_jobs,
+        'matches': total_matches,
+        'matches_by_status': {
+            'pending': matches_pending,
+            'accepted': matches_accepted,
+            'rejected': matches_rejected,
+        },
+        'average_match_score': round(avg_match_score, 2),
+    }), 200
+
+@api_bp.route('/auth/refresh', methods=['POST'])
+@jwt_required()
+def refresh_token():
+    """Refresh JWT token"""
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    
+    new_token = create_access_token(identity=user.id)
+    return jsonify({'access_token': new_token}), 200
