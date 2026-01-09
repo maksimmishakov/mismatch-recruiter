@@ -1,64 +1,61 @@
-from flask import Blueprint, request, jsonify
-from datetime import datetime, timedelta
+"""Analytics endpoints."""
+from flask import Blueprint, jsonify, request
+from flask_jwt_extended import jwt_required
+from app.services.analytics_service import AnalyticsService
+import logging
 
-analytics_bp = Blueprint('analytics', __name__)
+bp = Blueprint('analytics', __name__, url_prefix='/api/analytics')
+logger = logging.getLogger(__name__)
 
-@analytics_bp.route('/dashboard', methods=['GET'])
+@bp.route('/dashboard', methods=['GET'])
+@jwt_required()
 def dashboard():
-    """Get analytics dashboard data"""
+    """Get dashboard metrics."""
+    days = request.args.get('days', 30, type=int)
+   
     try:
-        dashboard_data = {
-            'totalUsers': 150,
-            'successRate': 82,
-            'matchesCreated': 320,
-            'averageScore': 7.85,
-            'trendsData': [
-                {'name': 'Week 1', 'matches': 45, 'users': 12},
-                {'name': 'Week 2', 'matches': 52, 'users': 18},
-                {'name': 'Week 3', 'matches': 68, 'users': 25},
-                {'name': 'Week 4', 'matches': 75, 'users': 28}
-            ],
-            'distributionData': [
-                {'name': 'Excellent', 'value': 120},
-                {'name': 'Good', 'value': 150},
-                {'name': 'Fair', 'value': 50}
-            ]
-        }
-        return jsonify(dashboard_data), 200
+        metrics = AnalyticsService.get_dashboard_metrics(days)
+        return jsonify({'metrics': metrics}), 200
     except Exception as e:
+        logger.error(f"Error fetching dashboard metrics: {e}")
         return jsonify({'error': str(e)}), 500
 
-@analytics_bp.route('/metrics', methods=['GET'])
-def metrics():
-    """Get detailed metrics"""
+@bp.route('/funnel', methods=['GET'])
+@jwt_required()
+def funnel():
+    """Get user funnel metrics."""
+    days = request.args.get('days', 30, type=int)
+   
     try:
-        metrics_data = {
-            'engagement_rate': 0.78,
-            'retention_rate': 0.85,
-            'conversion_rate': 0.42,
-            'average_response_time': 2.3
-        }
-        return jsonify(metrics_data), 200
+        funnel_data = AnalyticsService.get_user_funnel_metrics(days)
+        return jsonify({'funnel': funnel_data}), 200
     except Exception as e:
+        logger.error(f"Error fetching funnel metrics: {e}")
         return jsonify({'error': str(e)}), 500
 
-@analytics_bp.route('/report', methods=['POST'])
-def generate_report():
-    """Generate analytics report"""
+@bp.route('/match-quality', methods=['GET'])
+@jwt_required()
+def match_quality():
+    """Get match quality metrics."""
+    days = request.args.get('days', 30, type=int)
+   
     try:
-        data = request.get_json()
-        start_date = data.get('start_date')
-        end_date = data.get('end_date')
-        
-        report_data = {
-            'period': f'{start_date} to {end_date}',
-            'summary': {
-                'total_matches': 320,
-                'total_users': 150,
-                'average_success_rate': 0.82
-            },
-            'generated_at': datetime.now().isoformat()
-        }
-        return jsonify(report_data), 200
+        quality_data = AnalyticsService.get_match_quality_metrics(days)
+        return jsonify({'quality': quality_data}), 200
     except Exception as e:
+        logger.error(f"Error fetching quality metrics: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@bp.route('/timeline', methods=['GET'])
+@jwt_required()
+def timeline():
+    """Get metrics over time."""
+    days = request.args.get('days', 30, type=int)
+    interval = request.args.get('interval', 'day')
+   
+    try:
+        timeline_data = AnalyticsService.get_time_series_metrics(days, interval)
+        return jsonify({'timeline': timeline_data}), 200
+    except Exception as e:
+        logger.error(f"Error fetching timeline metrics: {e}")
         return jsonify({'error': str(e)}), 500
