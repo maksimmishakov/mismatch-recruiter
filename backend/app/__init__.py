@@ -1,20 +1,22 @@
 from flask import Flask
-from flask_cors import CORS
-from flask_jwt_extended import JWTManager
 from flask_sqlalchemy import SQLAlchemy
-from app.config import Config
+from flask_jwt_extended import JWTManager
+from flask_cors import CORS
+import os
+from dotenv import load_dotenv
+from app.config import Config, DevelopmentConfig, ProductionConfig
+
+load_dotenv()
 
 db = SQLAlchemy()
 jwt = JWTManager()
 
-def create_app(config_name='development'):
+def create_app():
     app = Flask(__name__)
     
-    # Configuration
-    if config_name == 'testing':
-        from app.config import TestingConfig
-        app.config.from_object(TestingConfig)
-    elif config_name == 'production':
+    # Load configuration
+    config_name = os.getenv('FLASK_ENV', 'development')
+    if config_name == 'production':
         from app.config import ProductionConfig
         app.config.from_object(ProductionConfig)
     else:

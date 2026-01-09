@@ -105,3 +105,4 @@ System is stable and ready for integration testing. All prerequisites met:
 
 **Status**: READY FOR INTEGRATION TESTING ✅
 
+docker-compose ps
