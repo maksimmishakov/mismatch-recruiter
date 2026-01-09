@@ -1,4 +1,4 @@
-from app.models import User, Candidate, JobPosting, Match
+from app.models import User, Candidate, Job, Match
 from app import db
 
 def test_user_model(app):
@@ -33,8 +33,8 @@ def test_candidate_model(app):
     assert 'Python' in candidate.skills
 
 def test_job_posting_model(app):
-    """Test JobPosting model"""
-    job = JobPosting(
+    """Test Job model"""
+    job = Job(
         title='Python Developer',
         description='We are looking for a Python developer',
         company='TechCorp',

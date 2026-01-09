@@ -63,7 +63,7 @@ class CandidateResponse(BaseModel):
         from_attributes = True
 
 # ============== JOB SCHEMAS ==============
-class JobPostingCreateRequest(BaseModel):
+class JobCreateRequest(BaseModel):
     title: str = Field(..., min_length=1)
     description: str
     location: Optional[str] = None
@@ -73,7 +73,7 @@ class JobPostingCreateRequest(BaseModel):
     experience_required: Optional[int] = Field(None, ge=0)
     job_type: Optional[str] = None
 
-class JobPostingResponse(BaseModel):
+class JobResponse(BaseModel):
     id: int
     title: str
     description: str
@@ -110,4 +110,4 @@ class MatchResponse(BaseModel):
 
 class MatchDetailResponse(MatchResponse):
     candidate: Optional[CandidateResponse] = None
-    job: Optional[JobPostingResponse] = None
+    job: Optional[JobResponse] = None
