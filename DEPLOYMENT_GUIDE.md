@@ -1,295 +1,228 @@
-# MisMatch Recruiter - Deployment Guide
+# MisMatch Recruiter - Comprehensive Deployment Guide
 
-## Pre-Deployment Checklist
+## Project Overview
 
-### Infrastructure Requirements
-- [ ] Server with Docker and Docker Compose installed
-- [ ] PostgreSQL 15+ (or use Docker image)
-- [ ] Node.js 18+ for frontend builds
-- [ ] Python 3.11+ for backend development
-- [ ] SSL/TLS certificates for HTTPS
-- [ ] Domain name configured
-- [ ] DNS records pointing to server
+MisMatch Recruiter is a comprehensive recruitment matching platform featuring advanced candidate-job matching, real-time analytics, and enterprise-grade monitoring.
 
-### Security Requirements
-- [ ] Generate secure JWT_SECRET_KEY
-- [ ] Set secure database password
-- [ ] Configure firewall rules
-- [ ] Enable CORS for frontend domain only
-- [ ] Set secure cookie flags
-- [ ] Enable HTTPS
-- [ ] Configure security headers
+## Architecture Overview
 
-## Deployment Steps
+### System Components
 
-### 1. Prepare Server
+#### Backend
+- **Framework**: Flask with SQLAlchemy ORM
+- **API Gateway**: Nginx reverse proxy with load balancing
+- **Database**: PostgreSQL with connection pooling
+- **Cache**: Redis for session and data caching
+- **Message Queue**: Celery with RabbitMQ for async tasks
+- **Search**: Elasticsearch for full-text search
 
-```bash
-# Update system packages
-sudo apt-get update && sudo apt-get upgrade -y
+#### Frontend  
+- **Framework**: React with Vite build system
+- **State Management**: Redux
+- **API Client**: Axios with interceptors
+- **Testing**: Jest and React Testing Library
 
-# Install Docker
-curl -fsSL https://get.docker.com -o get-docker.sh
-sudo sh get-docker.sh
+#### Infrastructure
+- **Container Orchestration**: Kubernetes / Docker Swarm
+- **CI/CD**: GitHub Actions
+- **Monitoring**: Prometheus + Grafana
+- **Logging**: ELK Stack (Elasticsearch, Logstash, Kibana)
+- **IaC**: Terraform for AWS provisioning
 
-# Install Docker Compose
-sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-sudo chmod +x /usr/local/bin/docker-compose
+## Deployment Prerequisites
 
-# Verify installation
-docker --version
-docker-compose --version
-```
+### System Requirements
+- Docker & Docker Compose
+- Kubernetes cluster (optional)
+- AWS credentials (for cloud deployment)
+- Python 3.9+
+- Node.js 16+
 
-### 2. Clone Repository
+### Environment Setup
 
 ```bash
-cd /opt
-sudo git clone https://github.com/your-username/mismatch-recruiter.git
-cd mismatch-recruiter
+# Install dependencies
+pip install -r backend/requirements.txt
+cd frontend && npm install
+
+# Set environment variables
+cp .env.example .env
+# Edit .env with your configuration
 ```
 
-### 3. Configure Environment
+## Local Development Deployment
 
-```bash
-# Create production environment file
-sudo cp .env.example .env
-
-# Edit with secure values
-sudo nano .env
-```
-
-Required environment variables:
-```bash
-DATABASE_URL=postgresql://user:password@db:5432/mismatch_recruiter
-FLASK_ENV=production
-FLASK_DEBUG=False
-JWT_SECRET_KEY=<generate-secure-key>
-REACT_APP_API_URL=https://api.yourdomain.com
-```
-
-### 4. Build Docker Images
+### Using Docker Compose
 
 ```bash
 # Build images
 docker-compose build
 
-# Or pull pre-built images if available
-docker pull mismatch-recruiter-backend:latest
-docker pull mismatch-recruiter-frontend:latest
+# Start services
+docker-compose up
+
+# Access applications
+# Frontend: http://localhost:3000
+# Backend API: http://localhost:5000
+# Grafana: http://localhost:3000 (admin/admin)
+# Kibana: http://localhost:5601
 ```
 
-### 5. Start Services
+### Database Setup
 
 ```bash
-# Start all services in background
-docker-compose up -d
+# Run migrations
+flask db upgrade
 
-# Verify services are running
-docker-compose ps
-
-# View logs
-docker-compose logs -f backend
-docker-compose logs -f frontend
+# Seed initial data
+python backend/scripts/seed_data.py
 ```
 
-### 6. Initialize Database
+## Production Deployment
+
+### AWS Deployment with Terraform
 
 ```bash
-# Run database migrations
-docker-compose exec backend python -m flask db upgrade
+# Initialize Terraform
+cd infrastructure/terraform
+terraform init
 
-# Or create tables directly
-docker-compose exec backend python -c "from app import create_app, db; app = create_app(); app.app_context().push(); db.create_all()"
+# Plan deployment
+terraform plan -var-file=prod.tfvars
+
+# Apply infrastructure
+terraform apply -var-file=prod.tfvars
 ```
 
-### 7. Configure Nginx (Reverse Proxy)
-
-Create `/etc/nginx/sites-available/mismatch-recruiter`:
-
-```nginx
-upstream backend {
-    server backend:5000;
-}
-
-upstream frontend {
-    server frontend:3000;
-}
-
-server {
-    listen 80;
-    server_name api.yourdomain.com;
-    
-    location / {
-        proxy_pass http://backend;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-
-server {
-    listen 80;
-    server_name yourdomain.com www.yourdomain.com;
-    
-    location / {
-        proxy_pass http://frontend;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    }
-}
-```
-
-### 8. Enable SSL/TLS with Let's Encrypt
+### Kubernetes Deployment
 
 ```bash
-# Install Certbot
-sudo apt-get install certbot python3-certbot-nginx -y
+# Build and push images
+docker build -t recruiter-backend:latest .
+docker push your-registry/recruiter-backend:latest
 
-# Generate certificates
-sudo certbot certonly --nginx -d yourdomain.com -d www.yourdomain.com -d api.yourdomain.com
-
-# Update Nginx configuration with SSL
-sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com -d api.yourdomain.com
+# Deploy to Kubernetes
+kubectl apply -f k8s/
+kubectl rollout status deployment/recruiter-backend
 ```
 
-### 9. Configure Monitoring
+## Configuration Management
 
-```bash
-# Install and start Prometheus
-docker run -d --name prometheus prom/prometheus:latest
+### Environment Variables
 
-# Install and start Grafana
-docker run -d --name grafana -p 3001:3000 grafana/grafana:latest
+```env
+# Database
+DATABASE_URL=postgresql://user:pass@host:5432/mismatch
+
+# Redis
+REDIS_HOST=localhost
+REDIS_PORT=6379
+
+# Elasticsearch
+ELASTICSEARCH_HOST=localhost:9200
+
+# Monitoring
+PROMETHEUS_URL=http://localhost:9090
+GRAFANA_URL=http://localhost:3000
+
+# Security
+SECRET_KEY=your-secret-key
+JWT_SECRET=your-jwt-secret
 ```
 
-### 10. Setup Logging
+## Monitoring and Observability
+
+### Grafana Dashboards
+
+1. **Main Dashboard**: Overall system health and metrics
+2. **Performance Dashboard**: Request latency, DB queries, CPU/Memory
+3. **Error Tracking**: Error rates, stack traces, alert history
+
+### Alert Configuration
+
+- High error rate (>5%): Critical
+- High latency (p95 > 1s): Warning
+- DB connection pool exhaustion (>90%): Critical
+- Memory usage (>85%): Warning
+
+### Log Aggregation
+
+Access logs at: http://localhost:5601 (Kibana)
+
+## Performance Optimization
+
+### Caching Strategy
+
+- Redis for application cache (TTL: 1 hour)
+- Browser cache for static assets (TTL: 1 week)
+- CDN for media files
+
+### Database Optimization
+
+- Connection pooling: 10-50 connections
+- Query optimization with indexes
+- Read replicas for analytics queries
+
+### API Rate Limiting
+
+- 100 requests/hour per IP
+- 1000 requests/hour per authenticated user
+- Priority queue for premium users
+
+## Security Considerations
+
+1. **Authentication**: JWT with refresh tokens
+2. **Authorization**: Role-based access control (RBAC)
+3. **Encryption**: TLS 1.3 for all communications
+4. **Data Protection**: Encryption at rest using AWS KMS
+5. **DDoS Protection**: AWS Shield + WAF
+6. **Secret Management**: AWS Secrets Manager
+
+## Backup and Disaster Recovery
+
+### Backup Strategy
+
+- Daily automated database backups
+- Point-in-time recovery (30-day retention)
+- Cross-region backup replication
+
+### Recovery Procedures
 
 ```bash
-# Install ELK Stack (optional)
-docker-compose -f docker-compose.elk.yml up -d
-```
-
-## Backup and Recovery
-
-### Database Backup
-
-```bash
-# Backup PostgreSQL database
-docker-compose exec db pg_dump -U recruiter_user mismatch_recruiter > backup.sql
-
 # Restore from backup
-cat backup.sql | docker-compose exec -T db psql -U recruiter_user mismatch_recruiter
+aws rds restore-db-instance-from-db-snapshot \
+  --db-instance-identifier mismatch-recruiter \
+  --db-snapshot-identifier backup-snapshot-id
 ```
-
-### Volume Backup
-
-```bash
-# Backup persistent volumes
-docker run --rm -v mismatch-recruiter_postgres_data:/data -v $(pwd):/backup \
-  ubuntu tar czf /backup/postgres_backup.tar.gz -C /data .
-```
-
-## Monitoring and Maintenance
-
-### Health Checks
-
-```bash
-# Check backend health
-curl http://localhost:5000/api/health
-
-# Check frontend
-curl http://localhost:3000
-
-# View container logs
-docker-compose logs --tail=100 backend
-```
-
-### Performance Optimization
-
-1. **Database Optimization**
-   - Create indexes on frequently queried columns
-   - Use connection pooling
-   - Regular VACUUM and ANALYZE
-
-2. **Application Optimization**
-   - Enable caching (Redis)
-   - Compress API responses
-   - Implement pagination
-   - Use CDN for static assets
-
-3. **Infrastructure Optimization**
-   - Horizontal scaling with load balancing
-   - Auto-scaling based on metrics
-   - Resource limits in Docker
-
-### Log Management
-
-```bash
-# View logs
-docker-compose logs --tail=100 -f backend
-
-# Export logs
-docker-compose logs backend > backend.log
-
-# Setup log rotation
-sudo nano /etc/logrotate.d/mismatch-recruiter
-```
-
-## Scaling
-
-### Horizontal Scaling
-
-```bash
-# Scale backend service to 3 instances
-docker-compose up -d --scale backend=3
-
-# Use load balancer to distribute traffic
-# (Requires Nginx or HAProxy configuration)
-```
-
-### Database Replication
-
-1. Setup PostgreSQL streaming replication
-2. Configure hot standby
-3. Setup automated failover
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **Port Already in Use**
-   ```bash
-   sudo lsof -i :5000
-   sudo kill -9 <PID>
-   ```
+1. **High Memory Usage**
+   - Check for memory leaks
+   - Increase connection pool timeout
+   - Review slow queries
 
-2. **Database Connection Issues**
-   ```bash
-   docker-compose exec db psql -U recruiter_user -c "SELECT version();"
-   ```
+2. **Database Connection Errors**
+   - Verify connection pool settings
+   - Check database availability
+   - Review network security groups
 
-3. **Out of Disk Space**
-   ```bash
-   docker system prune -a  # Remove unused images
-   docker volume prune     # Remove unused volumes
-   ```
-
-4. **Memory Issues**
-   ```bash
-   docker stats  # Monitor memory usage
-   ```
+3. **API Timeouts**
+   - Check query performance
+   - Enable caching
+   - Scale horizontally
 
 ## Maintenance Schedule
 
-- **Daily**: Monitor logs and metrics
-- **Weekly**: Database optimization (VACUUM, ANALYZE)
-- **Monthly**: Security updates and patches
-- **Quarterly**: Full system backup and recovery test
-- **Annually**: Capacity planning and infrastructure review
+- **Daily**: Monitor logs and alerts
+- **Weekly**: Database maintenance, security updates
+- **Monthly**: Performance review, capacity planning
+- **Quarterly**: Disaster recovery drills
 
-## Contact & Support
+## Support and Documentation
 
-For deployment issues, contact: ops@mismatchrecruiter.com
+- API Documentation: `/api/docs`
+- Architecture Documentation: `/docs/architecture`
+- Troubleshooting Guide: `/docs/troubleshooting`
