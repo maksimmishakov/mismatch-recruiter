@@ -1,6 +1,18 @@
-from ..user import User
-from ..candidate import Candidate
-from ..job_posting import JobPosting
-from ..match import Match
+"""Database models for MisMatch Recruiter."""
 
-__all__ = ['User', 'Candidate', 'JobPosting', 'Match']
+from flask_sqlalchemy import SQLAlchemy
+
+db = SQLAlchemy()
+
+from app.models.user import User, UserRole
+from app.models.candidate import Candidate  
+from app.models.job import Job
+from app.models.match import Match
+
+__all__ = [
+    'db',
+    'User', 'UserRole',
+    'Candidate',
+    'Job',
+    'Match',
+]

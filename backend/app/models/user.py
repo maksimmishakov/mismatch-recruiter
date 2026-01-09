@@ -1,39 +1,48 @@
-from ..database import db
 from datetime import datetime
-from passlib.context import CryptContext
+from sqlalchemy import Boolean, DateTime, String, Enum
+import enum
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto", truncate_error=True)
+from app.models import db
+
+
+class UserRole(enum.Enum):
+    """User roles for RBAC."""
+    ADMIN = 'admin'
+    RECRUITER = 'recruiter'
+    CANDIDATE = 'candidate'
+    VIEWER = 'viewer'
+
 
 class User(db.Model):
+    """User model for authentication."""
     __tablename__ = 'users'
     
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True, nullable=False, index=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    hashed_password = db.Column(db.String(255), nullable=False)
-    full_name = db.Column(db.String(200))
-    is_active = db.Column(db.Boolean, default=True)
-    role = db.Column(db.String(20), default='user')  # 'admin', 'recruiter', 'user'
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    username = db.Column(String(120), unique=True, nullable=False, index=True)
+    email = db.Column(String(120), unique=True, nullable=False, index=True)
+    password_hash = db.Column(String(255), nullable=False)
+    first_name = db.Column(String(120))
+    last_name = db.Column(String(120))
+    role = db.Column(Enum(UserRole), default=UserRole.VIEWER, nullable=False)
+    is_active = db.Column(Boolean, default=True, nullable=False)
+    created_at = db.Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = db.Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    # Relationships for cascade delete
-    candidates = db.relationship('Candidate', backref='user', lazy=True, cascade='all, delete-orphan')
-    jobs = db.relationship('JobPosting', backref='user', lazy=True, cascade='all, delete-orphan')
+    # Relationships
+    candidates = db.relationship('Candidate', backref='recruiter', lazy=True, foreign_keys='Candidate.recruiter_id')
     
-    def set_password(self, password: str):
-        self.hashed_password = pwd_context.hash(password)
-    
-    def verify_password(self, password: str) -> bool:
-        return pwd_context.verify(password, self.hashed_password)
+    def __repr__(self):
+        return f'<User {self.username}>'
     
     def to_dict(self):
+        """Convert to dictionary."""
         return {
             'id': self.id,
-            'email': self.email,
             'username': self.username,
-            'full_name': self.full_name,
+            'email': self.email,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'role': self.role.value,
             'is_active': self.is_active,
-            'role': self.role,
             'created_at': self.created_at.isoformat(),
         }
