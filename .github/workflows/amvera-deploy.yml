@@ -15,7 +15,7 @@ jobs:
       env:
         AMVERA_TOKEN: ${{ secrets.AMVERA_TOKEN }}
       run: |
-        curl -X POST https://api.amvera.io/v1/deployment/trigger \
+        curl -k -X POST https://api.amvera.io/v1/deployment/trigger \
           -H "Authorization: Bearer $AMVERA_TOKEN" \
           -H "Content-Type: application/json" \
           -d '{"branch":"main","environment":"production"}'
