@@ -59,7 +59,7 @@ def test_recruiter(db_session):
         email='recruiter@example.com',
         username='recruiter_test',
         password_hash='hashed_password',
-        full_name='Test Recruiter',
+        first_name='Test', last_name='Recruiter',
         role='RECRUITER',
         is_active=True
     )
@@ -76,7 +76,7 @@ def test_candidate(db_session):
         email='candidate@example.com',
         username='candidate_test',
         password_hash='hashed_password',
-        full_name='Test Candidate',
+        first_name='Test', last_name='Candidate',
         role='CANDIDATE',
         is_active=True
     )
