@@ -1,3 +1,4 @@
+from sqlalchemy.pool import NullPool
 """Configuration module for MisMatch Recruiter."""
 
 import os
