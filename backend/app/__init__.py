@@ -4,7 +4,7 @@ import logging
 from flask import Flask, jsonify
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
-from app.config import Config, ProductionConfig, DevelopmentConfig
+from app.config import Config, ProductionConfig, DevelopmentConfig, TestingConfig
 from app.models import db
 
 logging.basicConfig(level=logging.INFO)
@@ -17,10 +17,15 @@ def create_app(config_name='development'):
     # Load configuration
     if config_name == 'production':
         app.config.from_object(ProductionConfig)
+    elif config_name == 'testing':
+        app.config.from_object(TestingConfig)
     elif config_name == 'development':
         app.config.from_object(DevelopmentConfig)
     else:
         app.config.from_object(Config)
+
+
+        
     
     # Initialize extensions
     db.init_app(app)

@@ -3,6 +3,7 @@
 import pytest
 import sys
 import os
+from sqlalchemy.pool import NullPool
 
 # Add backend directory to Python path
 backend_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -15,6 +16,10 @@ from app.database import db
 def app():
     """Create application for testing."""
     app = create_app('testing')
+        # Configure SQLAlchemy to use NullPool for SQLite to avoid pool_size errors
+    app.config['SQLALCHEMY_ENGINE_OPTIONS']['poolclass'] = NullPool
+
+
     
     with app.app_context():
         db.create_all()

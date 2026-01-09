@@ -10,10 +10,12 @@ class DevelopmentConfig:
     CORS_ORIGINS = ['http://localhost:3000', 'http://localhost:5173']
     LOG_LEVEL = 'DEBUG'
     SENTRY_DSN = os.getenv('SENTRY_DSN', '')
+    SQLALCHEMY_ENGINE_OPTIONS = {}
 
 class TestingConfig(DevelopmentConfig):
     TESTING = True
-    DATABASE_URL = 'sqlite:///:memory:'
+    SQLALCHEMY_ENGINE_OPTIONS = {'connect_args': {'check_same_thread': False}}
+    DATABASE_URL = 'sqlite:///memory:'
 
 class ProductionConfig:
     FLASK_ENV = 'production'
@@ -21,13 +23,9 @@ class ProductionConfig:
     TESTING = False
     DATABASE_URL = os.getenv('DATABASE_URL')
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
+    JSON_SORT_KEYS = False
     CORS_ORIGINS = os.getenv('CORS_ORIGINS', '').split(',')
     LOG_LEVEL = 'INFO'
     SENTRY_DSN = os.getenv('SENTRY_DSN', '')
 
-config = {
-    'development': DevelopmentConfig,
-    'testing': TestingConfig,
-    'production': ProductionConfig,
-    'default': DevelopmentConfig
-}
+Config = DevelopmentConfig
