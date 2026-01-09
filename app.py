@@ -334,7 +334,7 @@ if __name__ == '__main__':
     init_db()
     
     # Run Flask
-    port = int(os.getenv('PORT', 5000))
+    port = int(os.getenv('PORT', 80))
     debug = os.getenv('FLASK_ENV') == 'development'
     
     print(f"""

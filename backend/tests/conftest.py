@@ -7,8 +7,8 @@ import os
 # Add backend directory to Python path
 backend_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, backend_path)
-from backend.app import create_app
-from backend.app.database import db
+from app import create_app
+from app.database import db
 
 
 @pytest.fixture(scope='session')
