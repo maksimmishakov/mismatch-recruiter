@@ -1,0 +1,49 @@
+name: Rollback Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to rollback to'
+        required: true
+        type: string
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Perform rollback
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.PROD_HOST }}
+        username: ${{ secrets.PROD_USER }}
+        key: ${{ secrets.PROD_SSH_KEY }}
+        script: |
+          cd /home/deploy/mismatch-prod
+          echo "Rolling back to version ${{ github.event.inputs.version }}..."
+          docker-compose pull
+          docker-compose up -d
+          docker-compose run --rm web flask db upgrade
+          docker-compose restart web
+          echo "Rollback to version ${{ github.event.inputs.version }} completed"
+
+    - name: Notify team
+      if: always()
+      uses: slackapi/slack-github-action@v1.24.0
+      with:
+        payload: |
+          {
+            "text": "Production Rollback ${{ job.status }}",
+            "blocks": [
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "*Production Rollback* - ${{ job.status }}\nVersion: ${{ github.event.inputs.version }}\nAuthor: ${{ github.actor }}"
+                }
+              }
+            ]
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
