@@ -1,0 +1,185 @@
+openapi: 3.0.0
+info:
+  title: MisMatch Recruiter API
+  version: 1.0.0
+  description: AI-powered recruitment platform for e-commerce companies
+  contact:
+    name: MisMatch Team
+    url: https://mismatch-recruiter.ru
+  license:
+    name: MIT
+
+servers:
+  - url: https://api.mismatch-recruiter.ru/api
+    description: Production Server
+  - url: https://staging-api.mismatch-recruiter.ru/api
+    description: Staging Server
+  - url: http://localhost:5000/api
+    description: Development Server
+
+security:
+  - BearerAuth: []
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Notification:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        user_id:
+          type: integer
+          example: 1
+        message:
+          type: string
+          example: "New match found"
+        read:
+          type: boolean
+          example: false
+        created_at:
+          type: string
+          format: date-time
+
+    AnalyticsMetrics:
+      type: object
+      properties:
+        total_users:
+          type: integer
+        total_candidates:
+          type: integer
+        total_vacancies:
+          type: integer
+        application_rate:
+          type: number
+          format: float
+
+paths:
+  /notifications/list:
+    get:
+      summary: Get user notifications
+      tags: [Notifications]
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: List of notifications
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  notifications:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Notification'
+                  total:
+                    type: integer
+                  unread:
+                    type: integer
+
+  /notifications/mark-read/{id}:
+    post:
+      summary: Mark notification as read
+      tags: [Notifications]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Notification marked as read
+
+  /notifications/mark-all-read:
+    post:
+      summary: Mark all notifications as read
+      tags: [Notifications]
+      responses:
+        '200':
+          description: All notifications marked as read
+
+  /analytics/dashboard:
+    get:
+      summary: Get dashboard metrics
+      tags: [Analytics]
+      parameters:
+        - name: days
+          in: query
+          schema:
+            type: integer
+            default: 30
+      responses:
+        '200':
+          description: Dashboard metrics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metrics:
+                    $ref: '#/components/schemas/AnalyticsMetrics'
+
+  /analytics/funnel:
+    get:
+      summary: Get user funnel metrics
+      tags: [Analytics]
+      parameters:
+        - name: days
+          in: query
+          schema:
+            type: integer
+            default: 30
+      responses:
+        '200':
+          description: Funnel metrics
+
+  /analytics/match-quality:
+    get:
+      summary: Get match quality metrics
+      tags: [Analytics]
+      parameters:
+        - name: days
+          in: query
+          schema:
+            type: integer
+            default: 30
+      responses:
+        '200':
+          description: Match quality metrics
+
+  /analytics/timeline:
+    get:
+      summary: Get metrics over time
+      tags: [Analytics]
+      parameters:
+        - name: days
+          in: query
+          schema:
+            type: integer
+            default: 30
+        - name: interval
+          in: query
+          schema:
+            type: string
+            enum: [day, week, month]
+            default: day
+      responses:
+        '200':
+          description: Time series metrics
