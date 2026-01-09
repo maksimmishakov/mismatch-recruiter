@@ -47,3 +47,83 @@ def db_session(app):
     with app.app_context():
         yield db.session
         db.session.rollback()
+
+
+# Fixtures for test data
+
+@pytest.fixture
+def test_recruiter(db_session):
+    """Fixture for a test recruiter user."""
+    from app.models import User
+    recruiter = User(
+        email='recruiter@example.com',
+        username='recruiter_test',
+        password_hash='hashed_password',
+        full_name='Test Recruiter',
+        role='RECRUITER',
+        is_active=True
+    )
+    db_session.add(recruiter)
+    db_session.commit()
+    return recruiter
+
+
+@pytest.fixture
+def test_candidate(db_session):
+    """Fixture for a test candidate user."""
+    from app.models import User, Candidate
+    candidate_user = User(
+        email='candidate@example.com',
+        username='candidate_test',
+        password_hash='hashed_password',
+        full_name='Test Candidate',
+        role='CANDIDATE',
+        is_active=True
+    )
+    db_session.add(candidate_user)
+    db_session.commit()
+    
+    candidate = Candidate(
+        user_id=candidate_user.id,
+        bio='Experienced software engineer',
+        skills=['Python', 'JavaScript', 'React'],
+        experience_years=5,
+        location='San Francisco, CA'
+    )
+    db_session.add(candidate)
+    db_session.commit()
+    return candidate
+
+
+@pytest.fixture
+def test_job(db_session, test_recruiter):
+    """Fixture for a test job posting."""
+    from app.models import Job
+    job = Job(
+        recruiter_id=test_recruiter.id,
+        title='Senior Python Developer',
+        description='Looking for experienced Python developer',
+        requirements=['Python', 'JavaScript', 'React'],
+        location='San Francisco, CA',
+        salary_min=120000,
+        salary_max=160000,
+        is_active=True
+    )
+    db_session.add(job)
+    db_session.commit()
+    return job
+
+
+@pytest.fixture
+def test_match(db_session, test_candidate, test_job):
+    """Fixture for a test match between candidate and job."""
+    from app.models import Match
+    match = Match(
+        candidate_id=test_candidate.id,
+        job_id=test_job.id,
+        match_score=0.85,
+        status='pending'
+    )
+    db_session.add(match)
+    db_session.commit()
+    return match
