@@ -1,64 +1,50 @@
-# Lazy loading of configuration based on FLASK_ENV
+"""Configuration module for MisMatch Recruiter."""
+
 import os
+from datetime import timedelta
 
-FLASK_ENV = os.getenv('FLASK_ENV', 'development').lower()
+class Config:
+    """Base configuration."""
+    # Flask config
+    SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
+    DEBUG = False
+    TESTING = False
+    
+    # Database
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'postgresql://user:password@localhost/mismatch')
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_ENGINE_OPTIONS = {'pool_size': 10, 'pool_recycle': 3600}
+    
+    # JWT
+    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'jwt-secret-key-change-in-production')
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=24)
+    
+    # CORS
+    CORS_ORIGINS = os.environ.get('CORS_ORIGINS', 'http://localhost:3000').split(',')
+    
+    # API Config
+    JSON_SORT_KEYS = False
+    JSONIFY_PRETTYPRINT_REGULAR = False
 
-def get_config():
-    """Get the appropriate configuration based on FLASK_ENV."""
-    if FLASK_ENV == 'production':
-        from .production import ProductionConfig
-        return ProductionConfig()
-    elif FLASK_ENV == 'staging':
-        from .staging import StagingConfig
-        return StagingConfig()
-    elif FLASK_ENV == 'testing':
-        from .testing import TestingConfig
-        return TestingConfig()
-    else:
-        from .development import DevelopmentConfig
-        return DevelopmentConfig()
 
-# For backward compatibility with 'from app.config import Config' style imports
-# We'll import based on the FLASK_ENV at initialization time
-try:
-    if FLASK_ENV == 'production':
-        from .production import ProductionConfig as Config
-    elif FLASK_ENV == 'staging':
-        from .staging import StagingConfig as Config
-    elif FLASK_ENV == 'testing':
-        from .testing import TestingConfig as Config
-    else:
-        from .development import DevelopmentConfig as Config
-except ValueError:
-    # If environment variables are not set, default to DevelopmentConfig
-    from .development import DevelopmentConfig as Config
+class DevelopmentConfig(Config):
+    """Development configuration."""
+    DEBUG = True
+    TESTING = False
 
-# Also export all config classes for direct access if needed
-try:
-    from .development import DevelopmentConfig
-except ImportError:
-    DevelopmentConfig = None
 
-try:
-    from .production import ProductionConfig
-except (ImportError, ValueError):
-    ProductionConfig = None
+class TestingConfig(Config):
+    """Testing configuration."""
+    DEBUG = True
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
 
-try:
-    from .staging import StagingConfig
-except (ImportError, ValueError):
-    StagingConfig = None
 
-try:
-    from .testing import TestingConfig
-except (ImportError, ValueError):
-    TestingConfig = None
+class ProductionConfig(Config):
+    """Production configuration."""
+    DEBUG = False
+    TESTING = False
 
-__all__ = [
-    'Config',
-    'get_config',
-    'DevelopmentConfig',
-    'ProductionConfig',
-    'StagingConfig',
-    'TestingConfig',
-]
+
+# Export for use
+__all__ = ['Config', 'DevelopmentConfig', 'TestingConfig', 'ProductionConfig']
