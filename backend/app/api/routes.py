@@ -3,7 +3,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 
 api_bp = Blueprint('api', __name__)
 
@@ -118,3 +118,68 @@ def jobs_for_candidate(candidate_id):
     except Exception as e:
         logger.error(f"Error getting jobs for candidate: {e}")
         return jsonify({'error': 'Candidate not found'}), 404
+
+# Auth endpoints
+@api_bp.route('/auth/register', methods=['POST'])
+def register():
+    """Register a new user."""
+    try:
+        data = request.get_json()
+        
+        # Validate required fields
+        if not all(k in data for k in ('email', 'username', 'password')):
+            return jsonify({'error': 'Missing required fields'}), 400
+        
+        # Check if user already exists
+        existing_user = db.session.query(User).filter_by(email=data['email']).first()
+        if existing_user:
+            return jsonify({'error': 'Email already registered'}), 409
+        
+        # Create new user
+        new_user = User(
+            email=data['email'],
+            username=data['username'],
+            password_hash=data['password'],  # In production, hash the password
+            role='candidate'
+        )
+        db.session.add(new_user)
+        db.session.commit()
+        
+        return jsonify({
+            'message': 'User registered successfully',
+            'user_id': new_user.id,
+            'email': new_user.email
+        }), 201
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f'Registration error: {str(e)}')
+        return jsonify({'error': str(e)}), 500
+
+@api_bp.route('/auth/login', methods=['POST'])
+def login():
+    """User login endpoint."""
+    try:
+        data = request.get_json()
+        
+        # Validate required fields
+        if not data.get('email') or not data.get('password'):
+            return jsonify({'error': 'Email and password required'}), 400
+        
+        # Find user
+        user = db.session.query(User).filter_by(email=data['email']).first()
+        if not user:
+            return jsonify({'error': 'Invalid credentials'}), 401
+        
+        # In production, verify hashed password
+        if user.password_hash != data['password']:
+            return jsonify({'error': 'Invalid credentials'}), 401
+        
+        return jsonify({
+            'message': 'Login successful',
+            'user_id': user.id,
+            'email': user.email,
+            'token': f'token_{user.id}'  # Simplified token
+        }), 200
+    except Exception as e:
+        logger.error(f'Login error: {str(e)}')
+        return jsonify({'error': str(e)}), 500
