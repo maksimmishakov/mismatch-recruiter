@@ -6,7 +6,7 @@ def test_user_model(app):
     user = User(
         email='test@example.com',
         username='testuser',
-        full_name='Test User'
+        first_name='Test', last_name='User'
     )
     user.set_password('password123')
     db.session.add(user)

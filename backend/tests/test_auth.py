@@ -13,7 +13,7 @@ class TestAuthEndpoints:
             'email': 'test@example.com',
             'password': 'TestPass123!',
             'username': 'testuser',
-            'full_name': 'Test User'
+            'first_name': 'Test', 'last_name': 'User'
         }
         
         response = client.post(
@@ -33,7 +33,7 @@ class TestAuthEndpoints:
             'email': 'test@example.com',
             'password': 'TestPass123!',
             'username': 'testuser',
-            'full_name': 'Test User'
+            'first_name': 'Test', 'last_name': 'User'
         }
         
         # First registration
@@ -58,7 +58,7 @@ class TestAuthEndpoints:
             'email': 'invalid-email',
             'password': 'TestPass123!',
             'username': 'testuser',
-            'full_name': 'Test User'
+            'first_name': 'Test', 'last_name': 'User'
         }
         
         response = client.post(
@@ -75,7 +75,7 @@ class TestAuthEndpoints:
             'email': 'test@example.com',
             'password': 'weak',  # No uppercase, no digits, no special chars
             'username': 'testuser',
-            'full_name': 'Test User'
+            'first_name': 'Test', 'last_name': 'User'
         }
         
         response = client.post(
@@ -93,7 +93,7 @@ class TestAuthEndpoints:
             'email': 'test@example.com',
             'password': 'TestPass123!',
             'username': 'testuser',
-            'full_name': 'Test User'
+            'first_name': 'Test', 'last_name': 'User'
         }
         client.post(
             '/api/auth/register',
@@ -137,7 +137,7 @@ class TestAuthEndpoints:
             'email': 'test@example.com',
             'password': 'TestPass123!',
             'username': 'testuser',
-            'full_name': 'Test User'
+            'first_name': 'Test', 'last_name': 'User'
         }
         client.post(
             '/api/auth/register',
