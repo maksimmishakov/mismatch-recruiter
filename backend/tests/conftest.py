@@ -9,7 +9,6 @@ from sqlalchemy.pool import NullPool
 backend_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, backend_path)
 from app import create_app
-from app.database import db
 
 
 @pytest.fixture(scope='session')
@@ -21,6 +20,7 @@ def app():
 
 
     
+    from app.models import db
     with app.app_context():
         db.create_all()
         yield app
@@ -43,6 +43,7 @@ def runner(app):
 @pytest.fixture
 def db_session(app):
     """Provides database session for tests."""
+    from app.models import db
     with app.app_context():
         yield db.session
         db.session.rollback()
