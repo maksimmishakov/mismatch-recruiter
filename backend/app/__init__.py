@@ -52,7 +52,7 @@ def create_app(config_name='development'):
     @app.route('/health', methods=['GET'])
     def health():
         return jsonify({
-            'status': 'healthy',
+            'status': 'ok',
             'message': 'MisMatch Recruiter API is running'
         }), 200
     
