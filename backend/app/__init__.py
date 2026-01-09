@@ -11,13 +11,11 @@ load_dotenv()
 db = SQLAlchemy()
 jwt = JWTManager()
 
-def create_app():
+def create_app(config_name='development'):
     app = Flask(__name__)
     
     # Load configuration
-    config_name = os.getenv('FLASK_ENV', 'development')
     if config_name == 'production':
-        from app.config import ProductionConfig
         app.config.from_object(ProductionConfig)
     else:
         app.config.from_object(Config)
@@ -27,9 +25,14 @@ def create_app():
     jwt.init_app(app)
     CORS(app)
     
-    # Create database tables
-    with app.app_context():
-        db.create_all()
+    # Try to create database tables, but don't fail if unable
+    try:
+        with app.app_context():
+            db.create_all()
+    except Exception as e:
+        print(f"Warning: Could not create database tables at startup: {e}")
+        # Don't fail - application should still start
+        pass
     
     # Register blueprints
     from app.api.routes import api_bp
