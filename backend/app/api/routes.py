@@ -1,3 +1,8 @@
+from app.models import db, User, Candidate, Job, Match
+import logging
+
+logger = logging.getLogger(__name__)
+
 from flask import Blueprint, jsonify
 
 api_bp = Blueprint('api', __name__)
