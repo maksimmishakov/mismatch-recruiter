@@ -65,7 +65,11 @@ def create_app(config_name=None):
     
     # Register blueprints
     from app.api import api_bp
+    from app.api import notifications_bp
+from app.api import analytics_bp
     app.register_blueprint(api_bp, url_prefix='/api')
+    app.register_blueprint(notifications_bp)
+    app.register_blueprint(analytics_bp)
     
     # Error handlers
     @app.errorhandler(404)
