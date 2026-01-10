@@ -30,7 +30,7 @@ def create_app(config_name: str = 'development') -> Flask:
     
     # Create database tables
     with app.app_context():
-                from app.models import User, Candidate, Job, Match
+            from app.models import User, Candidate, Job, Match
         try:
             db.create_all()
             logger.info("Database tables created successfully")
