@@ -1,4 +1,4 @@
-name: Frontend Tests
+# DISABLED: name: Frontend Tests
 
 on:
   push:

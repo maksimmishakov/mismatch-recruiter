@@ -49,9 +49,9 @@ def create_app(config_name: str = 'development') -> Flask:
         logger.warning(f"Could not register API blueprints: {e}")
     
     # Health check endpoint
-    @app.route('/health', methods=['GET'])
+    @app.route('/api/health', methods=['GET'])
     def health() -> Tuple[Dict[str, Any], int]:
-        return {'status': 'ok', 'message': 'MisMatch Recruiter API is running'}, 200
+        return {'status': 'healthy', 'message': 'MisMatch Recruiter API is running!', 'service': 'mismatch-api'}, 200
     
     # Error handlers
     @app.errorhandler(404)

@@ -1,8 +1,12 @@
 from datetime import datetime
 from sqlalchemy import Boolean, DateTime, String, Enum
 import enum
+from passlib.context import CryptContext
 
 from app.models import db
+
+# Password context for hashing
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 class UserRole(enum.Enum):
@@ -46,3 +50,11 @@ class User(db.Model):
             'is_active': self.is_active,
             'created_at': self.created_at.isoformat(),
         }
+    def set_password(self, password: str) -> None:
+        """Hash and set password."""
+        self.password_hash = pwd_context.hash(password)
+
+    def check_password(self, password: str) -> bool:
+        """Verify password against hash."""
+        return pwd_context.verify(password, self.password_hash)
+

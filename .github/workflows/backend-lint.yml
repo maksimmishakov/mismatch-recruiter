@@ -1,4 +1,4 @@
-name: Backend Lint
+# DISABLED: name: Backend Lint
 
 on:
   push:

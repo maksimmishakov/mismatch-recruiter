@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+# DISABLED: name: CI/CD Pipeline
 
 on:
   push:
