@@ -25,6 +25,9 @@ def create_app(config_name: str = 'development') -> Flask:
     
     # Initialize extensions
     db.init_app(app)
+        
+    # Import models so they are registered with SQLAlchemy
+    from app.models import User, Candidate, Job, Match
     
     # Create database tables
     with app.app_context():
