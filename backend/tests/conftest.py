@@ -44,9 +44,20 @@ def runner(app):
 def db_session(app):
     """Provides database session for tests."""
     from app.database import db
+    
     with app.app_context():
+        # Ensure tables are created
+        db.create_all()
         yield db.session
-        db.session.rollback()
+        
+        # Rollback any changes after test
+        try:
+            db.session.rollback()
+        except:
+            pass
+        finally:
+            db.session.remove()
+
 
 
 # Fixtures for test data
@@ -58,11 +69,12 @@ def test_recruiter(db_session):
     recruiter = User(
         email='recruiter@example.com',
         username='recruiter_test',
-        password_hash='hashed_password',
+        
         first_name='Test', last_name='Recruiter',
         role='RECRUITER',
         is_active=True
     )
+    recruiter.set_password('test123')
     db_session.add(recruiter)
     db_session.commit()
     return recruiter
@@ -75,11 +87,12 @@ def test_candidate(db_session):
     candidate_user = User(
         email='candidate@example.com',
         username='candidate_test',
-        password_hash='hashed_password',
+        
         first_name='Test', last_name='Candidate',
         role='CANDIDATE',
         is_active=True
     )
+    candidate_user.set_password('test123')
     db_session.add(candidate_user)
     db_session.commit()
     
@@ -127,3 +140,38 @@ def test_match(db_session, test_candidate, test_job):
     db_session.add(match)
     db_session.commit()
     return match
+
+
+# Additional fixtures for test_candidates
+@pytest.fixture
+def sample_candidate(db_session):
+    """Create a sample candidate for testing."""
+    from app.models import Candidate
+    candidate = Candidate(
+        name='Jane Doe',
+        email='jane@example.com',
+        phone='555-0123',
+        location='New York',
+        skills=['Python', 'JavaScript'],
+        experience_years=3
+    )
+    db_session.add(candidate)
+    db_session.commit()
+    return candidate
+
+
+@pytest.fixture
+def sample_recruiter(db_session):
+    """Create a sample recruiter for testing."""
+    from app.models import User
+    user = User(
+        username='recruiter1',
+        email='recruiter@company.com',
+        first_name='John',
+        last_name='Smith',
+        role='RECRUITER'
+    )
+    user.set_password('test123')
+    db_session.add(user)
+    db_session.commit()
+    return user
