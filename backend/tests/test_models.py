@@ -1,5 +1,5 @@
 from app.models import User, Candidate, Job, Match
-from app import db
+from app.database import db
 
 def test_user_model(app):
     """Test User model"""
