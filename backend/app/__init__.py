@@ -1,38 +1,31 @@
-"""Flask application factory for MisMatch Recruiter."""
-import os
+from flask import Flask
+from app.database import db
 import logging
-from flask import Flask, jsonify
-from flask_cors import CORS
-from flask_jwt_extended import JWTManager
-from app.config import Config, ProductionConfig, DevelopmentConfig, TestingConfig
-from app.models import db
+import os
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def create_app(config_name='development'):
-    """Create and configure the Flask application."""
+    """Application factory function."""
     app = Flask(__name__)
     
-    # Load configuration
-    if config_name == 'production':
-        app.config.from_object(ProductionConfig)
-    elif config_name == 'testing':
+    # Load configuration based on config name
+    if config_name == 'testing':
+        from app.config import TestingConfig
         app.config.from_object(TestingConfig)
-    elif config_name == 'development':
-        app.config.from_object(DevelopmentConfig)
+    elif config_name == 'production':
+        from app.config import ProductionConfig
+        app.config.from_object(ProductionConfig)
     else:
-        app.config.from_object(Config)
-
-
-        
+        # Default development config
+        app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///mismatch.db')
+        app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+        app.config['DEBUG'] = True
     
     # Initialize extensions
     db.init_app(app)
-    CORS(app)
-    jwt = JWTManager(app)
     
-    # Create app context and initialize database
+    # Create database tables
     with app.app_context():
         try:
             db.create_all()
@@ -42,27 +35,31 @@ def create_app(config_name='development'):
     
     # Register API blueprints
     try:
-        from app.api.routes import api_bp
-        app.register_blueprint(api_bp, url_prefix='/api')
-        logger.info("API blueprint registered")
+        from app.routes.auth import auth_bp
+        from app.routes.candidates import candidates_bp
+        from app.routes.jobs import jobs_bp
+        
+        app.register_blueprint(auth_bp)
+        app.register_blueprint(candidates_bp)
+        app.register_blueprint(jobs_bp)
+        
+        logger.info("API blueprints registered")
     except Exception as e:
-        logger.warning(f"Could not register API blueprint: {e}")
+        logger.warning(f"Could not register API blueprints: {e}")
     
     # Health check endpoint
     @app.route('/health', methods=['GET'])
     def health():
-        return jsonify({
-            'status': 'ok',
-            'message': 'MisMatch Recruiter API is running'
-        }), 200
+        return {'status': 'ok', 'message': 'MisMatch Recruiter API is running'}, 200
     
     # Error handlers
     @app.errorhandler(404)
     def not_found(error):
-        return jsonify({'error': 'Not found'}), 404
+        return {'error': 'Resource not found'}, 404
     
     @app.errorhandler(500)
     def internal_error(error):
-        return jsonify({'error': 'Internal server error'}), 500
+        logger.error(f'Internal error: {error}')
+        return {'error': 'Internal server error'}, 500
     
     return app
