@@ -2,10 +2,11 @@ from flask import Flask
 from app.database import db
 import logging
 import os
+from typing import Tuple, Dict, Any
 
 logger = logging.getLogger(__name__)
 
-def create_app(config_name='development'):
+def create_app(config_name: str = 'development') -> Flask:
     """Application factory function."""
     app = Flask(__name__)
     
@@ -49,16 +50,16 @@ def create_app(config_name='development'):
     
     # Health check endpoint
     @app.route('/health', methods=['GET'])
-    def health():
+    def health() -> Tuple[Dict[str, Any], int]:
         return {'status': 'ok', 'message': 'MisMatch Recruiter API is running'}, 200
     
     # Error handlers
     @app.errorhandler(404)
-    def not_found(error):
+    def not_found(error: Exception) -> Tuple[Dict[str, Any], int]:
         return {'error': 'Resource not found'}, 404
     
     @app.errorhandler(500)
-    def internal_error(error):
+    def internal_error(error: Exception) -> Tuple[Dict[str, Any], int]:
         logger.error(f'Internal error: {error}')
         return {'error': 'Internal server error'}, 500
     
