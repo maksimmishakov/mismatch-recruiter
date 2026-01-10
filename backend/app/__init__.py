@@ -43,9 +43,9 @@ def create_app(config_name: str = 'development') -> Flask:
         from app.routes.candidates import candidates_bp
         from app.routes.jobs import jobs_bp
         
-        app.register_blueprint(auth_bp)
-        app.register_blueprint(candidates_bp)
-        app.register_blueprint(jobs_bp)
+        app.register_blueprint(auth_bp, url_prefix='/api/auth')
+        app.register_blueprint(candidates_bp, url_prefix='/api/candidates')
+        app.register_blueprint(jobs_bp, url_prefix='/api/jobs')
         
         logger.info("API blueprints registered")
     except Exception as e:
