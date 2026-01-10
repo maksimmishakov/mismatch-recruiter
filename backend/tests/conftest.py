@@ -20,7 +20,7 @@ def app():
 
 
     
-    from app.models import db
+    from app.database import db
     with app.app_context():
         db.create_all()
         yield app
@@ -43,7 +43,7 @@ def runner(app):
 @pytest.fixture
 def db_session(app):
     """Provides database session for tests."""
-    from app.models import db
+    from app.database import db
     with app.app_context():
         yield db.session
         db.session.rollback()
