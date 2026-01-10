@@ -31,12 +31,12 @@ def create_app(config_name: str = 'development') -> Flask:
     # Create database tables
     with app.app_context():
             from app.models import User, Candidate, Job, Match
-        try:
-            db.create_all()
-            logger.info("Database tables created successfully")
-        except Exception as e:
-            logger.warning(f"Could not create database tables: {e}")
-    
+            try:
+                    db.create_all()
+                    logger.info("Database tables created successfully")
+            except Exception as e:
+                    logger.warning(f"Could not create database tables: {e}")
+            
     # Register API blueprints
     try:
         from app.routes.auth import auth_bp
