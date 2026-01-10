@@ -47,7 +47,7 @@ def db_session(app):
     with app.app_context():
         yield db.session
         db.session.rollback()
-                db.session.close()
+            db.session.close()
 
 
 # Fixtures for test data
