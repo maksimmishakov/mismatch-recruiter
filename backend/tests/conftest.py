@@ -11,7 +11,7 @@ sys.path.insert(0, backend_path)
 from app import create_app
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='function')
 def app():
     """Create application for testing."""
     app = create_app('testing')
@@ -47,6 +47,7 @@ def db_session(app):
     with app.app_context():
         yield db.session
         db.session.rollback()
+                db.session.close()
 
 
 # Fixtures for test data
