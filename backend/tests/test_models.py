@@ -8,19 +8,18 @@ def test_user_model(app):
         username='testuser',
         first_name='Test', last_name='User'
     )
-    user.set_password('password123')
+    user.set_password('test123')
     db.session.add(user)
     db.session.commit()
     
     assert user.id is not None
-    assert user.verify_password('password123')
+    assert user.verify_password('test123')
     assert not user.verify_password('wrongpassword')
 
 def test_candidate_model(app):
     """Test Candidate model"""
     candidate = Candidate(
-        first_name='John',
-        last_name='Doe',
+                name='John Doe',
         email='john@example.com',
         skills=['Python', 'Flask'],
         experience_years=5
