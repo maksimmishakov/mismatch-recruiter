@@ -1,0 +1,289 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.1, pytest-9.0.2, pluggy-1.6.0 -- /home/codespace/.python/current/bin/python
+cachedir: .pytest_cache
+rootdir: /workspaces/mismatch-recruiter/backend
+configfile: pytest.ini
+plugins: asyncio-1.3.0, anyio-4.12.0, cov-7.0.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 25 items
+
+tests/test_api.py::test_health_check PASSED                              [  4%]
+tests/test_api.py::test_user_registration PASSED                         [  8%]
+tests/test_api.py::test_user_registration_missing_fields PASSED          [ 12%]
+tests/test_api.py::test_user_registration_duplicate_email PASSED         [ 16%]
+tests/test_api.py::test_user_login FAILED                                [ 20%]
+tests/test_api.py::test_user_login_invalid_credentials PASSED            [ 24%]
+tests/test_auth.py::TestAuthEndpoints::test_register_success PASSED      [ 28%]
+tests/test_auth.py::TestAuthEndpoints::test_register_duplicate_email PASSED [ 32%]
+tests/test_auth.py::TestAuthEndpoints::test_register_invalid_email PASSED [ 36%]
+tests/test_auth.py::TestAuthEndpoints::test_register_weak_password PASSED [ 40%]
+tests/test_auth.py::TestAuthEndpoints::test_login_success PASSED         [ 44%]
+tests/test_auth.py::TestAuthEndpoints::test_login_invalid_credentials PASSED [ 48%]
+tests/test_auth.py::TestAuthEndpoints::test_get_current_user PASSED      [ 52%]
+tests/test_candidates.py::TestCandidatesEndpoints::test_get_candidates_empty PASSED [ 56%]
+tests/test_candidates.py::TestCandidatesEndpoints::test_create_candidate_missing_data PASSED [ 60%]
+tests/test_candidates.py::TestCandidatesEndpoints::test_create_candidate_valid_data FAILED [ 64%]
+tests/test_health.py::test_health_check PASSED                           [ 68%]
+tests/test_integration.py::TestIntegrationFlow::test_health_endpoint_returns_ok PASSED [ 72%]
+tests/test_integration.py::TestIntegrationFlow::test_api_candidates_endpoints_accessible PASSED [ 76%]
+tests/test_integration.py::TestIntegrationFlow::test_error_handling_for_invalid_json FAILED [ 80%]
+tests/test_integration.py::TestPerformance::test_health_check_response_time PASSED [ 84%]
+tests/test_models.py::test_user_model FAILED                             [ 88%]
+tests/test_models.py::test_candidate_model FAILED                        [ 92%]
+tests/test_models.py::test_job_posting_model PASSED                      [ 96%]
+tests/test_models.py::test_match_model ERROR                             [100%]
+
+==================================== ERRORS ====================================
+______________________ ERROR at setup of test_match_model ______________________
+/home/codespace/.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: in pytest_fixture_setup
+    return (yield)
+            ^^^^^
+tests/conftest.py:95: in test_candidate
+    candidate_user.set_password('test123')
+app/models/user.py:55: in set_password
+    self.password_hash = pwd_context.hash(password)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/site-packages/passlib/context.py:2258: in hash
+    return record.hash(secret, **kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/site-packages/passlib/utils/handlers.py:779: in hash
+    self.checksum = self._calc_checksum(secret)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/site-packages/passlib/handlers/bcrypt.py:591: in _calc_checksum
+    self._stub_requires_backend()
+/usr/local/python/3.12.1/lib/python3.12/site-packages/passlib/utils/handlers.py:2254: in _stub_requires_backend
+    cls.set_backend()
+/usr/local/python/3.12.1/lib/python3.12/site-packages/passlib/utils/handlers.py:2156: in set_backend
+    return owner.set_backend(name, dryrun=dryrun)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/site-packages/passlib/utils/handlers.py:2163: in set_backend
+    return cls.set_backend(name, dryrun=dryrun)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/site-packages/passlib/utils/handlers.py:2188: in set_backend
+    cls._set_backend(name, dryrun)
+/usr/local/python/3.12.1/lib/python3.12/site-packages/passlib/utils/handlers.py:2311: in _set_backend
+    super(SubclassBackendMixin, cls)._set_backend(name, dryrun)
+/usr/local/python/3.12.1/lib/python3.12/site-packages/passlib/utils/handlers.py:2224: in _set_backend
+    ok = loader(**kwds)
+         ^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/site-packages/passlib/handlers/bcrypt.py:626: in _load_backend_mixin
+    return mixin_cls._finalize_backend_mixin(name, dryrun)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/site-packages/passlib/handlers/bcrypt.py:421: in _finalize_backend_mixin
+    if detect_wrap_bug(IDENT_2A):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/site-packages/passlib/handlers/bcrypt.py:380: in detect_wrap_bug
+    if verify(secret, bug_hash):
+       ^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/site-packages/passlib/utils/handlers.py:792: in verify
+    return consteq(self._calc_checksum(secret), chk)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/site-packages/passlib/handlers/bcrypt.py:655: in _calc_checksum
+    hash = _bcrypt.hashpw(secret, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   ValueError: password cannot be longer than 72 bytes, truncate manually if necessary (e.g. my_password[:72])
+------------------------------ Captured log setup ------------------------------
+WARNING  passlib.handlers.bcrypt:bcrypt.py:622 (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/usr/local/python/3.12.1/lib/python3.12/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+=================================== FAILURES ===================================
+_______________________________ test_user_login ________________________________
+tests/test_api.py:49: in test_user_login
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <WrapperTestResponse streamed [401 UNAUTHORIZED]>.status_code
+___________ TestCandidatesEndpoints.test_create_candidate_valid_data ___________
+tests/test_candidates.py:13: in test_create_candidate_valid_data
+    response = client.post('/api/candidates', json=sample_candidate)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/werkzeug/test.py:1167: in post
+    return self.open(*args, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/flask/testing.py:228: in open
+    request = self._request_from_builder_args(args, kwargs)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/flask/testing.py:197: in _request_from_builder_args
+    builder = EnvironBuilder(self.application, *args, **kwargs)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/flask/testing.py:86: in __init__
+    super().__init__(path, base_url, *args, **kwargs)
+/home/codespace/.local/lib/python3.12/site-packages/werkzeug/test.py:370: in __init__
+    data = self.json_dumps(json)
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/flask/testing.py:94: in json_dumps
+    return self.app.json.dumps(obj, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/flask/json/provider.py:179: in dumps
+    return json.dumps(obj, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/json/__init__.py:238: in dumps
+    **kw).encode(obj)
+          ^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/json/encoder.py:200: in encode
+    chunks = self.iterencode(o, _one_shot=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/json/encoder.py:258: in iterencode
+    return _iterencode(o, 0)
+           ^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/flask/json/provider.py:121: in _default
+    raise TypeError(f"Object of type {type(o).__name__} is not JSON serializable")
+E   TypeError: Object of type Candidate is not JSON serializable
+___________ TestIntegrationFlow.test_error_handling_for_invalid_json ___________
+tests/test_integration.py:29: in test_error_handling_for_invalid_json
+    assert response.status_code in [400, 422]
+E   assert 500 in [400, 422]
+E    +  where 500 = <WrapperTestResponse streamed [500 INTERNAL SERVER ERROR]>.status_code
+------------------------------ Captured log call -------------------------------
+ERROR    app.routes.candidates:candidates.py:84 Error creating candidate: 400 Bad Request: Failed to decode JSON object: Expecting value: line 1 column 1 (char 0)
+_______________________________ test_user_model ________________________________
+tests/test_models.py:11: in test_user_model
+    user.set_password('test123')
+app/models/user.py:55: in set_password
+    self.password_hash = pwd_context.hash(password)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/site-packages/passlib/context.py:2258: in hash
+    return record.hash(secret, **kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/site-packages/passlib/utils/handlers.py:779: in hash
+    self.checksum = self._calc_checksum(secret)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/site-packages/passlib/handlers/bcrypt.py:591: in _calc_checksum
+    self._stub_requires_backend()
+/usr/local/python/3.12.1/lib/python3.12/site-packages/passlib/utils/handlers.py:2254: in _stub_requires_backend
+    cls.set_backend()
+/usr/local/python/3.12.1/lib/python3.12/site-packages/passlib/utils/handlers.py:2156: in set_backend
+    return owner.set_backend(name, dryrun=dryrun)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/site-packages/passlib/utils/handlers.py:2163: in set_backend
+    return cls.set_backend(name, dryrun=dryrun)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/site-packages/passlib/utils/handlers.py:2188: in set_backend
+    cls._set_backend(name, dryrun)
+/usr/local/python/3.12.1/lib/python3.12/site-packages/passlib/utils/handlers.py:2311: in _set_backend
+    super(SubclassBackendMixin, cls)._set_backend(name, dryrun)
+/usr/local/python/3.12.1/lib/python3.12/site-packages/passlib/utils/handlers.py:2224: in _set_backend
+    ok = loader(**kwds)
+         ^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/site-packages/passlib/handlers/bcrypt.py:626: in _load_backend_mixin
+    return mixin_cls._finalize_backend_mixin(name, dryrun)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/site-packages/passlib/handlers/bcrypt.py:421: in _finalize_backend_mixin
+    if detect_wrap_bug(IDENT_2A):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/site-packages/passlib/handlers/bcrypt.py:380: in detect_wrap_bug
+    if verify(secret, bug_hash):
+       ^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/site-packages/passlib/utils/handlers.py:792: in verify
+    return consteq(self._calc_checksum(secret), chk)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/site-packages/passlib/handlers/bcrypt.py:655: in _calc_checksum
+    hash = _bcrypt.hashpw(secret, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   ValueError: password cannot be longer than 72 bytes, truncate manually if necessary (e.g. my_password[:72])
+------------------------------ Captured log call -------------------------------
+WARNING  passlib.handlers.bcrypt:bcrypt.py:622 (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/usr/local/python/3.12.1/lib/python3.12/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+_____________________________ test_candidate_model _____________________________
+tests/test_models.py:31: in test_candidate_model
+    assert candidate.first_name == 'John'
+           ^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'Candidate' object has no attribute 'first_name'
+=============================== warnings summary ===============================
+../../../usr/local/python/3.12.1/lib/python3.12/site-packages/passlib/utils/__init__.py:854
+  /usr/local/python/3.12.1/lib/python3.12/site-packages/passlib/utils/__init__.py:854: DeprecationWarning: 'crypt' is deprecated and slated for removal in Python 3.13
+    from crypt import crypt as _crypt
+
+tests/test_api.py: 6 warnings
+tests/test_auth.py: 8 warnings
+tests/test_candidates.py: 2 warnings
+tests/test_models.py: 4 warnings
+  /home/codespace/.local/lib/python3.12/site-packages/sqlalchemy/sql/schema.py:3624: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    return util.wrap_callable(lambda ctx: fn(), fn)  # type: ignore
+
+tests/test_auth.py::TestAuthEndpoints::test_get_current_user
+  /workspaces/mismatch-recruiter/backend/app/routes/auth.py:148: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    user = User.query.get(user_id)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.12.1-final-0 ________________
+
+Name                                     Stmts   Miss  Cover   Missing
+----------------------------------------------------------------------
+app/__init__.py                             49     13    73%   17-24, 37-38, 51-52, 68, 72-73
+app/api/__init__.py                          0      0   100%
+app/api/analytics.py                        47     47     0%   2-61
+app/api/logging_middleware.py               10     10     0%   1-25
+app/api/matching.py                         30     30     0%   1-64
+app/api/notifications.py                    43     43     0%   2-79
+app/api/optimized_routes.py                 91     91     0%   3-149
+app/api/rate_limiter.py                      5      5     0%   1-12
+app/api/routes.py                           11      0   100%
+app/api/schemas.py                          65     65     0%   1-82
+app/config.py                               27     27     0%   1-31
+app/config/__init__.py                      27      0   100%
+app/config/base.py                          24     24     0%   1-50
+app/config/celery_config.py                 15     15     0%   1-27
+app/config/database.py                      15     15     0%   1-38
+app/config/development.py                   11     11     0%   1-13
+app/config/metrics.py                       11     11     0%   1-60
+app/config/production.py                    49     49     0%   2-87
+app/config/ratelimiter.py                    5      5     0%   1-15
+app/config/redis_config.py                  11     11     0%   1-30
+app/config/staging.py                       30     30     0%   2-72
+app/config/testing.py                       10     10     0%   1-11
+app/database.py                              2      0   100%
+app/errors.py                               14     14     0%   1-18
+app/logger.py                               12     12     0%   1-15
+app/migrations/__init__.py                   0      0   100%
+app/migrations/versions/001_initial.py      29     29     0%   7-99
+app/migrations/versions/__init__.py          0      0   100%
+app/models/__init__.py                       6      0   100%
+app/models/candidate.py                     29      2    93%   33, 37
+app/models/job.py                           25      2    92%   29, 33
+app/models/match.py                         27      2    93%   37, 41
+app/models/user.py                          32      3    91%   39, 43, 59
+app/routes/__init__.py                       5      0   100%
+app/routes/auth.py                          91     24    74%   67-69, 80, 89, 93-94, 111-113, 123, 129-131, 136, 141, 143-145, 150, 153, 164-166
+app/routes/candidates.py                    75     48    36%   28-30, 36-51, 63-75, 92-123, 129-143
+app/routes/jobs.py                          74     59    20%   14-29, 35-50, 56-85, 91-122, 128-142
+app/routes/matching.py                       5      1    80%   7
+app/schemas.py                              93     93     0%   2-113
+app/services/__init__.py                     0      0   100%
+app/services/advanced_matching.py           75     75     0%   3-141
+app/services/analytics_service.py           51     51     0%   2-119
+app/services/candidate_service.py           34     34     0%   1-62
+app/services/email_service.py               44     44     0%   3-121
+app/services/lamoda_client.py               55     55     0%   3-95
+app/services/matching_service.py           105    105     0%   2-223
+app/services/notification_service.py        33     33     0%   3-77
+app/tasks.py                                31     31     0%   1-44
+app/tests/__init__.py                        0      0   100%
+app/tests/conftest.py                       21     21     0%   2-28
+app/tests/test_api.py                       25     25     0%   3-67
+app/tests/test_health.py                    14     14     0%   1-20
+app/utils/__init__.py                        0      0   100%
+app/utils/logging_decorator.py              79     79     0%   3-149
+app/utils/pagination.py                     55     55     0%   3-116
+app/utils/rate_limiter.py                    5      5     0%   3-21
+app/validators.py                           52     52     0%   6-91
+----------------------------------------------------------------------
+TOTAL                                     1784   1480    17%
+Coverage HTML written to dir htmlcov
+=========================== short test summary info ============================
+FAILED tests/test_api.py::test_user_login - assert 401 == 200
+ +  where 401 = <WrapperTestResponse streamed [401 UNAUTHORIZED]>.status_code
+FAILED tests/test_candidates.py::TestCandidatesEndpoints::test_create_candidate_valid_data - TypeError: Object of type Candidate is not JSON serializable
+FAILED tests/test_integration.py::TestIntegrationFlow::test_error_handling_for_invalid_json - assert 500 in [400, 422]
+ +  where 500 = <WrapperTestResponse streamed [500 INTERNAL SERVER ERROR]>.status_code
+FAILED tests/test_models.py::test_user_model - ValueError: password cannot be longer than 72 bytes, truncate manually if necessary (e.g. my_password[:72])
+FAILED tests/test_models.py::test_candidate_model - AttributeError: 'Candidate' object has no attribute 'first_name'
+ERROR tests/test_models.py::test_match_model - ValueError: password cannot be longer than 72 bytes, truncate manually if necessary (e.g. my_password[:72])
+============== 5 failed, 19 passed, 22 warnings, 1 error in 2.57s ==============

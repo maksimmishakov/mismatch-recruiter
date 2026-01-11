@@ -29,6 +29,13 @@ class Candidate(db.Model):
     
     matches = db.relationship('Match', backref='candidate', lazy=True, cascade='all, delete-orphan')
     
+    @property
+    def first_name(self):
+        """Extract first name from full name."""
+        if self.name:
+            return self.name.split()[0]
+        return None
+
     def __repr__(self):
         return f'<Candidate {self.name}>'
     
