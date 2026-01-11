@@ -52,6 +52,9 @@ class User(db.Model):
         }
     def set_password(self, password: str) -> None:
         """Hash and set password."""
+        # Truncate password to 72 bytes (bcrypt limit)
+        if len(password) > 72:
+            password = password[:72]
         self.password_hash = pwd_context.hash(password)
 
     def check_password(self, password: str) -> bool:
