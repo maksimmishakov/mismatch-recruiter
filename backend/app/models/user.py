@@ -1,3 +1,38 @@
+python3 << 'ENDSCRIPT'
+import re
+
+# Fix 1: Add test_user fixture to conftest.py if it doesn't exist
+with open('tests/conftest.py', 'r') as f:
+    conftest_content = f.read()
+
+# Check if test_user fixture exists
+if '@pytest.fixture' not in conftest_content or 'def test_user' not in conftest_content:
+    # Find the end of file and add the test_user fixture
+    new_fixture = '''
+@pytest.fixture
+def test_user(db_session, app):
+    """Create a test user for authentication tests."""
+    from app.models import User, UserRole
+    user = User(
+        email='test@example.com',
+        username='testuser',
+        first_name='Test',
+        last_name='User',
+        role=UserRole.RECRUITER
+    )
+    user.set_password('password123')
+    db_session.add(user)
+    db_session.commit()
+    return user
+'''
+    conftest_content += new_fixture
+    with open('tests/conftest.py', 'w') as f:
+        f.write(conftest_content)
+    print('✓ Added test_user fixture to conftest.py')
+else:
+    print('✓ test_user fixture already exists')
+
+ENDSCRIPT
 from datetime import datetime
 from sqlalchemy import Boolean, DateTime, String, Enum
 import enum

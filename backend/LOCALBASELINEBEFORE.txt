@@ -1,0 +1,180 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.1, pytest-7.4.0, pluggy-1.6.0 -- /usr/local/python/3.12.1/bin/python3
+cachedir: .pytest_cache
+rootdir: /workspaces/mismatch-recruiter/backend
+configfile: pytest.ini
+testpaths: app/tests, tests
+plugins: anyio-4.12.0, flask-1.2.0, mock-3.11.1, cov-4.1.0
+collecting ... collected 33 items
+
+app/tests/test_api.py::test_health_check PASSED                          [  3%]
+app/tests/test_api.py::test_register PASSED                              [  6%]
+app/tests/test_api.py::test_register_duplicate_email FAILED              [  9%]
+app/tests/test_api.py::test_login ERROR                                  [ 12%]
+app/tests/test_api.py::test_login_invalid_credentials ERROR              [ 15%]
+app/tests/test_api.py::test_get_current_user ERROR                       [ 18%]
+app/tests/test_health.py::TestHealth::test_health_endpoint_success PASSED [ 21%]
+app/tests/test_health.py::TestHealth::test_health_endpoint_json_format PASSED [ 24%]
+tests/test_api.py::test_health_check PASSED                              [ 27%]
+tests/test_api.py::test_user_registration PASSED                         [ 30%]
+tests/test_api.py::test_user_registration_missing_fields PASSED          [ 33%]
+tests/test_api.py::test_user_registration_duplicate_email PASSED         [ 36%]
+tests/test_api.py::test_user_login FAILED                                [ 39%]
+tests/test_api.py::test_user_login_invalid_credentials PASSED            [ 42%]
+tests/test_auth.py::TestAuthEndpoints::test_register_success PASSED      [ 45%]
+tests/test_auth.py::TestAuthEndpoints::test_register_duplicate_email PASSED [ 48%]
+tests/test_auth.py::TestAuthEndpoints::test_register_invalid_email PASSED [ 51%]
+tests/test_auth.py::TestAuthEndpoints::test_register_weak_password PASSED [ 54%]
+tests/test_auth.py::TestAuthEndpoints::test_login_success PASSED         [ 57%]
+tests/test_auth.py::TestAuthEndpoints::test_login_invalid_credentials PASSED [ 60%]
+tests/test_auth.py::TestAuthEndpoints::test_get_current_user PASSED      [ 63%]
+tests/test_candidates.py::TestCandidatesEndpoints::test_get_candidates_empty PASSED [ 66%]
+tests/test_candidates.py::TestCandidatesEndpoints::test_create_candidate_missing_data PASSED [ 69%]
+tests/test_candidates.py::TestCandidatesEndpoints::test_create_candidate_valid_data FAILED [ 72%]
+tests/test_health.py::test_health_check PASSED                           [ 75%]
+tests/test_integration.py::TestIntegrationFlow::test_health_endpoint_returns_ok PASSED [ 78%]
+tests/test_integration.py::TestIntegrationFlow::test_api_candidates_endpoints_accessible PASSED [ 81%]
+tests/test_integration.py::TestIntegrationFlow::test_error_handling_for_invalid_json FAILED [ 84%]
+tests/test_integration.py::TestPerformance::test_health_check_response_time PASSED [ 87%]
+tests/test_models.py::test_user_model FAILED                             [ 90%]
+tests/test_models.py::test_candidate_model PASSED                        [ 93%]
+tests/test_models.py::test_job_posting_model PASSED                      [ 96%]
+tests/test_models.py::test_match_model ERROR                             [100%]
+
+==================================== ERRORS ====================================
+_________________________ ERROR at setup of test_login _________________________
+E   ValueError: password cannot be longer than 72 bytes, truncate manually if necessary (e.g. my_password[:72])
+------------------------------ Captured log setup ------------------------------
+WARNING  passlib.handlers.bcrypt:bcrypt.py:622 (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/usr/local/python/3.12.1/lib/python3.12/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+_______________ ERROR at setup of test_login_invalid_credentials _______________
+E   ValueError: password cannot be longer than 72 bytes, truncate manually if necessary (e.g. my_password[:72])
+------------------------------ Captured log setup ------------------------------
+WARNING  passlib.handlers.bcrypt:bcrypt.py:622 (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/usr/local/python/3.12.1/lib/python3.12/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+___________________ ERROR at setup of test_get_current_user ____________________
+E   ValueError: password cannot be longer than 72 bytes, truncate manually if necessary (e.g. my_password[:72])
+------------------------------ Captured log setup ------------------------------
+WARNING  passlib.handlers.bcrypt:bcrypt.py:622 (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/usr/local/python/3.12.1/lib/python3.12/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+______________________ ERROR at setup of test_match_model ______________________
+E   ValueError: password cannot be longer than 72 bytes, truncate manually if necessary (e.g. my_password[:72])
+------------------------------ Captured log setup ------------------------------
+WARNING  passlib.handlers.bcrypt:bcrypt.py:622 (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/usr/local/python/3.12.1/lib/python3.12/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+=================================== FAILURES ===================================
+/workspaces/mismatch-recruiter/backend/app/tests/test_api.py:34: assert 400 == 409
+/workspaces/mismatch-recruiter/backend/tests/test_api.py:49: assert 401 == 200
+/usr/local/python/3.12.1/lib/python3.12/site-packages/flask/json/provider.py:120: TypeError: Object of type Candidate is not JSON serializable
+/workspaces/mismatch-recruiter/backend/tests/test_integration.py:29: assert 500 in [400, 422]
+/usr/local/python/3.12.1/lib/python3.12/site-packages/passlib/handlers/bcrypt.py:655: ValueError: password cannot be longer than 72 bytes, truncate manually if necessary (e.g. my_password[:72])
+=============================== warnings summary ===============================
+../../../usr/local/python/3.12.1/lib/python3.12/site-packages/passlib/utils/__init__.py:854
+  /usr/local/python/3.12.1/lib/python3.12/site-packages/passlib/utils/__init__.py:854: DeprecationWarning: 'crypt' is deprecated and slated for removal in Python 3.13
+    from crypt import crypt as _crypt
+
+app/tests/test_api.py: 2 warnings
+tests/test_api.py: 6 warnings
+tests/test_auth.py: 8 warnings
+tests/test_candidates.py: 2 warnings
+tests/test_models.py: 4 warnings
+  /usr/local/python/3.12.1/lib/python3.12/site-packages/sqlalchemy/sql/schema.py:3584: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    return util.wrap_callable(lambda ctx: fn(), fn)  # type: ignore
+
+tests/test_auth.py::TestAuthEndpoints::test_get_current_user
+  /workspaces/mismatch-recruiter/backend/app/routes/auth.py:148: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    user = User.query.get(user_id)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+
+---------- coverage: platform linux, python 3.12.1-final-0 -----------
+Name                                     Stmts   Miss  Cover   Missing
+----------------------------------------------------------------------
+app/__init__.py                             49     13    73%   17-24, 37-38, 51-52, 68, 72-73
+app/api/__init__.py                          0      0   100%
+app/api/analytics.py                        47     47     0%   2-61
+app/api/logging_middleware.py               10     10     0%   1-25
+app/api/matching.py                         30     30     0%   1-64
+app/api/notifications.py                    43     43     0%   2-79
+app/api/optimized_routes.py                 91     91     0%   3-149
+app/api/rate_limiter.py                      5      5     0%   1-12
+app/api/routes.py                           11      0   100%
+app/api/schemas.py                          65     65     0%   1-82
+app/config.py                               27     27     0%   1-31
+app/config/__init__.py                      27      0   100%
+app/config/base.py                          24     24     0%   1-50
+app/config/celery_config.py                 15     15     0%   1-27
+app/config/database.py                      15     15     0%   1-38
+app/config/development.py                   11     11     0%   1-13
+app/config/metrics.py                       11     11     0%   1-60
+app/config/production.py                    49     49     0%   2-87
+app/config/ratelimiter.py                    5      5     0%   1-15
+app/config/redis_config.py                  11     11     0%   1-30
+app/config/staging.py                       30     30     0%   2-72
+app/config/testing.py                       10     10     0%   1-11
+app/database.py                              2      0   100%
+app/errors.py                               14     14     0%   1-18
+app/logger.py                               12     12     0%   1-15
+app/migrations/__init__.py                   0      0   100%
+app/migrations/versions/001_initial.py      29     29     0%   7-99
+app/migrations/versions/__init__.py          0      0   100%
+app/models/__init__.py                       6      0   100%
+app/models/candidate.py                     34      3    91%   37, 40, 44
+app/models/job.py                           25      2    92%   29, 33
+app/models/match.py                         27      2    93%   37, 41
+app/models/user.py                          34      4    88%   39, 43, 57, 62
+app/routes/__init__.py                       5      0   100%
+app/routes/auth.py                          91     24    74%   67-69, 80, 89, 93-94, 111-113, 123, 129-131, 136, 141, 143-145, 150, 153, 164-166
+app/routes/candidates.py                    75     48    36%   28-30, 36-51, 63-75, 92-123, 129-143
+app/routes/jobs.py                          74     59    20%   14-29, 35-50, 56-85, 91-122, 128-142
+app/routes/matching.py                       5      1    80%   7
+app/schemas.py                              93     93     0%   2-113
+app/services/__init__.py                     0      0   100%
+app/services/advanced_matching.py           75     75     0%   3-141
+app/services/analytics_service.py           51     51     0%   2-119
+app/services/candidate_service.py           34     34     0%   1-62
+app/services/email_service.py               44     44     0%   3-121
+app/services/lamoda_client.py               55     55     0%   3-95
+app/services/matching_service.py           105    105     0%   2-223
+app/services/notification_service.py        33     33     0%   3-77
+app/tasks.py                                31     31     0%   1-44
+app/tests/__init__.py                        0      0   100%
+app/tests/conftest.py                       21      3    86%   26-28
+app/tests/test_api.py                       25     10    60%   38-43, 47-51, 56-67
+app/tests/test_health.py                    14      0   100%
+app/utils/__init__.py                        0      0   100%
+app/utils/logging_decorator.py              79     79     0%   3-149
+app/utils/pagination.py                     55     55     0%   3-116
+app/utils/rate_limiter.py                    5      5     0%   3-21
+app/validators.py                           52     52     0%   6-91
+----------------------------------------------------------------------
+TOTAL                                     1791   1435    20%
+Coverage HTML written to dir htmlcov
+
+=========================== short test summary info ============================
+FAILED app/tests/test_api.py::test_register_duplicate_email - assert 400 == 409
+FAILED tests/test_api.py::test_user_login - assert 401 == 200
+FAILED tests/test_candidates.py::TestCandidatesEndpoints::test_create_candidate_valid_data
+FAILED tests/test_integration.py::TestIntegrationFlow::test_error_handling_for_invalid_json
+FAILED tests/test_models.py::test_user_model - ValueError: password cannot be...
+ERROR app/tests/test_api.py::test_login - ValueError: password cannot be long...
+ERROR app/tests/test_api.py::test_login_invalid_credentials - ValueError: pas...
+ERROR app/tests/test_api.py::test_get_current_user - ValueError: password can...
+ERROR tests/test_models.py::test_match_model - ValueError: password cannot be...
+============= 5 failed, 24 passed, 24 warnings, 4 errors in 2.38s ==============
