@@ -53,9 +53,9 @@ def test_user(app):
         user = User(
             username='testuser',
             email='test@example.com',
-            password_hash='hashedpassword',
             role=UserRole.RECRUITER,
         )
+        user.set_password('password123')
         db.session.add(user)
         db.session.commit()
         return user
