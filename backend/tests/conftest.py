@@ -175,3 +175,20 @@ def sample_recruiter(db_session):
     db_session.add(user)
     db_session.commit()
     return user
+
+@pytest.fixture
+def test_user(db_session, app):
+    """Create a test user for authentication tests."""
+    from app.models import User, UserRole
+    user = User(
+        email='test@example.com',
+        username='testuser',
+        first_name='Test',
+        last_name='User',
+        role=UserRole.RECRUITER,
+        is_active=True
+    )
+    user.set_password('password123')
+    db_session.add(user)
+    db_session.commit()
+    return user

@@ -1,4 +1,16 @@
 from flask import Flask
+from flask.json.provider import DefaultJSONProvider
+from datetime import datetime
+from decimal import Decimal
+
+class CustomJSONProvider(DefaultJSONProvider):
+    def default(self, o):
+        if hasattr(o, 'to_dict') and callable(getattr(o, 'to_dict')):
+            return o.to_dict()
+        if isinstance(o, (datetime, Decimal)):
+            return str(o)
+        return super().default(o)
+
 from app.database import db
 import logging
 import os
@@ -9,6 +21,7 @@ logger = logging.getLogger(__name__)
 def create_app(config_name: str = 'development') -> Flask:
     """Application factory function."""
     app = Flask(__name__)
+    app.json_provider_class = CustomJSONProvider
     
     # Load configuration based on config name
     if config_name == 'testing':
