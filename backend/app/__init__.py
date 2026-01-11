@@ -37,6 +37,7 @@ def create_app(config_name: str = 'development') -> Flask:
             except Exception as e:
                     logger.warning(f"Could not create database tables: {e}")
             
+git push origin main
     # Register API blueprints
     try:
         from app.routes.auth import auth_bp
