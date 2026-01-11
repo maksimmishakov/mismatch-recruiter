@@ -66,6 +66,7 @@ def test_candidate(app, test_user):
     with app.app_context():
         candidate = Candidate(
             name='John Doe',
+        first_name='John',
             email='john@example.com',
             skills=['Python', 'JavaScript'],
             experience_years=3,

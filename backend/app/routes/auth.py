@@ -58,6 +58,7 @@ def register():
         logger.info(f'User registered: {user.email}')
         
         return jsonify({
+            'user_id': user.id,
             'id': user.id,
             'username': user.username,
             'email': user.email
