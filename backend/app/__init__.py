@@ -37,7 +37,6 @@ def create_app(config_name: str = 'development') -> Flask:
             except Exception as e:
                     logger.warning(f"Could not create database tables: {e}")
             
-git push origin main
     # Register API blueprints
     try:
         from app.routes.auth import auth_bp
@@ -59,9 +58,9 @@ git push origin main
 
     
     # Health check endpoint without API prefix
-    @app.route('/health', methods=['GET'])
+    @app.route('/health', methods=["GET"])
     def health_simple() -> Tuple[Dict[str, Any], int]:
-        return {'status': 'ok'}, 200
+        return {"status": "ok"}, 200
     
     # Error handlers
     @app.errorhandler(404)
