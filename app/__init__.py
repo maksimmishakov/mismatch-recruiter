@@ -42,6 +42,19 @@ def create_app(config=None):
     # Create tables
     with app.app_context():
         db.create_all()
+
+        # Error handlers
+    from werkzeug.exceptions import BadRequest
+    
+    @app.errorhandler(BadRequest)
+    def handle_bad_request(error):
+        """Handle bad requests (e.g., invalid JSON)"""
+        return {'error': 'Bad Request', 'message': str(error.description)}, 400
+    
+    @app.errorhandler(422)
+    def handle_unprocessable_entity(error):
+        """Handle unprocessable entities"""
+        return {'error': 'Unprocessable Entity', 'message': str(error.description)}, 422
     
     return app
 
