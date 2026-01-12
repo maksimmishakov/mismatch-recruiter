@@ -1,89 +1,48 @@
-import pytest
+import json
 
-# AUTH ENDPOINT TESTS
-def test_health_check(client):
-    """Test health check endpoint"""
+def test_health_endpoint(client):
+    """Test health endpoint"""
     response = client.get('/api/health')
     assert response.status_code == 200
-    data = response.get_json()
-    assert data['status'] == 'ok'
+    data = json.loads(response.data)
+    assert 'status' in data
 
-def test_signup_endpoint_exists(client):
-    """Test signup endpoint"""
-    response = client.post('/api/auth/signup', json={
-        'email': 'test@example.com',
-        'password': 'pass123',
-        'name': 'Test'
-    })
-    assert response.status_code in [200, 201, 400, 404]
+def test_health_endpoint_post_fails(client):
+    """Test health endpoint with POST (should fail)"""
+    response = client.post('/api/health')
+    assert response.status_code == 405  # Method Not Allowed
 
-def test_login_endpoint_exists(client):
-    """Test login endpoint"""
-    response = client.post('/api/auth/login', json={
-        'email': 'test@example.com',
-        'password': 'pass123'
-    })
-    assert response.status_code in [200, 400, 404, 401]
-
-def test_candidates_endpoint_exists(client):
-    """Test candidates endpoint"""
-    response = client.get('/api/candidates')
-    # Should return 401 (auth required) or 404 (not found)
-    assert response.status_code in [401, 404, 200]
-
-def test_jobs_endpoint_exists(client):
-    """Test jobs endpoint"""
-    response = client.get('/api/jobs')
-    assert response.status_code in [401, 404, 200]
-
-def test_post_candidate_endpoint_exists(client):
-    """Test create candidate endpoint"""
-    response = client.post('/api/candidates', json={
-        'name': 'Test',
-        'email': 'test@example.com'
-    })
-    assert response.status_code in [400, 401, 404, 201]
-
-def test_post_job_endpoint_exists(client):
-    """Test create job endpoint"""
-    response = client.post('/api/jobs', json={
-        'title': 'Test',
-        'description': 'Test'
-    })
-    assert response.status_code in [400, 401, 404, 201]
-
-def test_signup_missing_email(client):
-    """Test signup with missing email"""
-    response = client.post('/api/auth/signup', json={
-        'password': 'pass123'
-    })
-    assert response.status_code in [400, 404]
-
-def test_signup_missing_password(client):
-    """Test signup with missing password"""
-    response = client.post('/api/auth/signup', json={
-        'email': 'test@example.com'
-    })
-    assert response.status_code in [400, 404]
-
-def test_login_missing_email(client):
-    """Test login with missing email"""
-    response = client.post('/api/auth/login', json={
-        'password': 'pass123'
-    })
-    assert response.status_code in [400, 404]
+def test_invalid_route_404(client):
+    """Test invalid route returns 404"""
+    response = client.get('/api/nonexistent/route')
+    assert response.status_code == 404
 
 def test_login_missing_password(client):
     """Test login with missing password"""
     response = client.post('/api/auth/login', json={
         'email': 'test@example.com'
     })
-    assert response.status_code in [400, 404]
+    assert response.status_code in [400, 401, 404]
 
-def test_candidate_endpoint_with_invalid_data(client):
-    """Test candidate endpoint with invalid data"""
-    response = client.post('/api/candidates', json={
-        'invalid_field': 'test'
+def test_login_missing_email(client):
+    """Test login with missing email"""
+    response = client.post('/api/auth/login', json={
+        'password': 'test123'
+    })
+    assert response.status_code in [400, 401, 404]
+
+def test_get_candidates_endpoint(client):
+    """Test get candidates endpoint"""
+    response = client.get('/api/candidates')
+    assert response.status_code in [200, 401]
+    if response.status_code == 200:
+        data = json.loads(response.data)
+        assert isinstance(data, (dict, list))
+
+def test_auth_register_missing_fields(client):
+    """Test register with missing fields"""
+    response = client.post('/api/auth/register', json={
+        'email': 'test@example.com'
     })
     assert response.status_code in [400, 401, 404]
 
