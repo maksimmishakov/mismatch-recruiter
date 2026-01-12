@@ -1,11 +1,6 @@
-from flask_sqlalchemy import SQLAlchemy
+from app.models.user import User
+from app.models.candidate import Candidate
+from app.models.job import Job
+from app.models.match import Match
 
-db = SQLAlchemy()
-
-# Import models after db is initialized to avoid circular imports
-from app.models.user import User  # noqa
-from app.models.candidate import Candidate  # noqa
-from app.models.job import Job  # noqa  
-from app.models.match import Match  # noqa
-
-__all__ = ['db', 'User', 'Candidate', 'Job', 'Match']
+__all__ = ['User', 'Candidate', 'Job', 'Match']
