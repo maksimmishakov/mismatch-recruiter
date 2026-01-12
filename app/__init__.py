@@ -1,64 +1,47 @@
-import os
-from flask import current_app,  Flask, jsonify
+from flask import Flask
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 db = SQLAlchemy()
 migrate = Migrate()
 
-def create_app(config_name='development'):
-    app = Flask(__name__)
+def create_app():
+    app = Flask(__name__, instance_relative_config=True)
     
     # Configuration
-    if config_name == 'testing':
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
-        app.config['TESTING'] = True
-    else:
-        app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///mismatch.db')
-    
-    app.config['ENV'] = os.getenv('FLASK_ENV', 'development')
-    app.config['DEBUG'] = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
-    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key')
-    app.config['CORS_ORIGINS'] = os.getenv('CORS_ORIGINS', '*')
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'postgresql://postgres:postgres@localhost:5432/lamoda')
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key')
+    app.config['JSON_SORT_KEYS'] = False
     
     # Initialize extensions
     db.init_app(app)
     migrate.init_app(app, db)
-    CORS(app, origins=app.config['CORS_ORIGINS'].split(','))
+    CORS(app, resources={r"/api/*": {"origins": "*"}})
     
-    with app.app_context():
-        from app.models import User, Candidate, Job, Match
-        db.create_all()
-        
-        # Register routes
-        register_routes(app)
-    
-    return app
-
-def register_routes(app):
-    """Register all API routes"""
+    # Register blueprints
+    from app.routes import auth_bp, candidates_bp, jobs_bp, matches_bp
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(candidates_bp)
+    app.register_blueprint(jobs_bp)
+    app.register_blueprint(matches_bp)
     
     # Health check endpoint
     @app.route('/api/health', methods=['GET'])
-    def health_check():
-        return jsonify({'status': 'ok', 'service': 'mismatch-recruiter', 'version': '1.0'}), 200
+    def health():
+        return {'status': 'healthy', 'message': 'LAMODA Recruiter API is running'}, 200
     
-    # Register blueprints
-    try:
-        from app.routes.auth import auth_bp
-        app.register_blueprint(auth_bp, url_prefix='/api')
-    except:
-        pass
+    # Create tables
+    with app.app_context():
+        db.create_all()
     
-    try:
-        from app.routes.candidates import candidates_bp
-        app.register_blueprint(candidates_bp, url_prefix='/api')
-    except:
-        pass
-    
-    try:
-        from app.routes.jobs import jobs_bp
-        app.register_blueprint(jobs_bp, url_prefix='/api')
-    except:
-        pass
+    return app
+
+if __name__ == '__main__':
+    app = create_app()
+    app.run(host='0.0.0.0', port=5000, debug=True)

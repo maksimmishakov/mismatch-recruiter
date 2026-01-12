@@ -9,7 +9,7 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
-    role = db.Column(db.String(20), default='user')
+    role = db.Column(db.String(20), default='user')  # admin, recruiter, candidate
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
@@ -20,4 +20,10 @@ class User(db.Model):
         return check_password_hash(self.password_hash, password)
     
     def to_dict(self):
-        return {'id': self.id, 'email': self.email, 'username': self.username, 'role': self.role, 'created_at': self.created_at.isoformat()}
+        return {
+            'id': self.id,
+            'email': self.email,
+            'username': self.username,
+            'role': self.role,
+            'created_at': self.created_at.isoformat()
+        }

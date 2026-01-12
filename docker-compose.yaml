@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    container_name: lamoda-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: lamoda
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: lamoda-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    container_name: lamoda-api
+    command: gunicorn --bind 0.0.0.0:5000 --timeout 120 --workers 4 "app:create_app()"
+    ports:
+      - "5000:5000"
+    environment:
+      FLASK_ENV: production
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/lamoda
+      REDIS_URL: redis://redis:6379/0
+      SECRET_KEY: lamoda-secret-key-demo
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./app:/workspaces/mismatch-recruiter/app
+      - ./logs:/workspaces/mismatch-recruiter/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: lamoda-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+    volumes:
+      - ./frontend/src:/app/src
+
+  nginx:
+    image: nginx:alpine
+    container_name: lamoda-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - api
+      - frontend
+
+volumes:
+  postgres_data:

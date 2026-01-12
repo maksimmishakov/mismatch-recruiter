@@ -16,17 +16,17 @@ parts/
 sdist/
 var/
 wheels/
+pip-wheel-metadata/
+share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
 PIPFILE.lock
 
-# Virtual Environment
+# Virtual environments
 venv/
-env/
 ENV/
-env.bak/
-venv.bak/
+env/
 
 # IDE
 .vscode/
@@ -36,31 +36,31 @@ venv.bak/
 *~
 .DS_Store
 
-# Environment variables
+# Frontend
+node_modules/
+*.log
+dist/
+build/
+
+# Database
+*.sqlite
+*.db
+instance/
+
+# Environment
 .env
 .env.local
 .env.*.local
 
-# Node modules
-node_modules/
-npm-debug.log
-yarn-error.log
-.npm
-.yarn
-
-# React
-build/
-.cache/
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
 
 # Logs
 logs/
 *.log
 
-# Database
-*.db
-*.sqlite
-*.sqlite3
-
-# Docker
-.dockerignore
-*.coverage
+# OS
+.DS_Store
+Thumbs.db
