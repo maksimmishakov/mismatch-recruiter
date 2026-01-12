@@ -1,20 +1,15 @@
-project: mismatch-recruiter
-
-env:
-  - name: DATABASE_URL
-    value: postgresql://user:pass@db:5432/mismatch_db
-  - name: REDIS_URL
-    value: redis://redis:6379/0
-  - name: FLASK_ENV
-    value: production
-
-services:
-  - name: backend
-    image: mismatch-recruiter:backend
-    port: 5000
-    healthcheck:
-      path: /health
-      timeout: 10
-    autoscaling:
-      minInstances: 1
-      maxInstances: 3
+---
+app:
+  id: mismatch-recruiter
+  branch: main
+  runtime:
+    language: python
+    version: '3.11'
+  build:
+    installDependencies: true
+  run:
+    cmd: gunicorn -w 4 -b 0.0.0.0:8080 wsgi:app
+  env:
+    DATABASE_URL: sqlite:///mismatch.db
+    FLASK_ENV: production
+    SECRET_KEY: ${SECRET_KEY}
