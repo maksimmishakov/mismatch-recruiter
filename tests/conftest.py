@@ -1,25 +1,23 @@
 import pytest
-import os
 from app import create_app, db
 
-@pytest.fixture(scope='session')
+
+@pytest.fixture(scope='function')
 def app():
-    """Create and configure app for testing"""
-    os.environ['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
-    os.environ['TESTING'] = 'True'
-    app = create_app('testing')
-    
-    with app.app_context():
+    """Create application for testing"""
+    app_instance = create_app('testing')
+    with app_instance.app_context():
         db.create_all()
-        yield app
+        yield app_instance
         db.session.remove()
         db.drop_all()
+
 
 @pytest.fixture(scope='function')
 def client(app):
     """Test client"""
-    with app.app_context():
-        yield app.test_client()
+    return app.test_client()
+
 
 @pytest.fixture(autouse=True)
 def reset_db(app):
@@ -29,3 +27,4 @@ def reset_db(app):
         db.drop_all()
         db.create_all()
         yield
+        db.session.remove()
