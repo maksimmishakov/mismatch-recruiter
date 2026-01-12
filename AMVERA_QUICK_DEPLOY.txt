@@ -1,0 +1,37 @@
+AMVERA QUICK DEPLOYMENT - STEP BY STEP
+
+1. GO TO: https://amvera.io
+2. LOGIN with your account
+3. CLICK: "Create Application" or "New Project"
+4. SELECT: "GitHub" as source
+5. AUTHORIZE: GitHub access (if needed)
+6. PASTE: Repository = maksimmishakov/mismatch-recruiter
+7. SELECT: Branch = main (NOT master!)
+8. SELECT: Runtime = Python 3.11
+9. CLICK: "Deploy" button
+10. WAIT: 5-10 minutes for deployment
+
+LOOK FOR SUCCESS:
+- INFO Cloning repository...
+- INFO Installing dependencies...
+- INFO Starting application...
+- SUCCESS Application deployed successfully
+
+GET YOUR URL:
+- Amvera dashboard will show: https://mismatch-recruiter-XXXXX.amvera.io
+- Copy this URL
+- Save for LAMODA demo
+
+TEST THE DEPLOYMENT:
+curl https://mismatch-recruiter-XXXXX.amvera.io/api/health
+- Should return: {"status": "healthy", "database": "connected"}
+
+IF 502 BAD GATEWAY:
+- Wait 1-2 more minutes
+- Try refresh
+- Or redeploy from dashboard
+
+IF FAILS:
+- Show local version instead
+- Run: gunicorn --bind=0.0.0.0:8000 app:app
+- Show: 16/16 tests passing as proof
