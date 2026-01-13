@@ -3,7 +3,7 @@ enviroment: production
 services:
   api:
     image: python:3.12-slim
-    command: sh -c "pip install -r requirements.txt && gunicorn --bind 0.0.0.0:5000 --workers 4 --timeout 60 --access-logfile - --error-logfile - wsgi:app"
+    command: sh -c "pip install -r requirements.txt && python -m gunicorn --bind 0.0.0.0:5000 --workers 4 --timeout 60 --access-logfile - --error-logfile - wsgi:app"
     ports:
       - 5000
     environment:
