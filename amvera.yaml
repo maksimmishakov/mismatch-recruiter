@@ -1,27 +1,32 @@
-meta:
-<<<<<<< HEAD
-  environment: python
-  toolchain:
-    name: pip
-    version: 3.11
-build:
-  requirementsPath: requirements.txt
-run:
-  scriptName: app.py
-  command: gunicorn app:app --bind 0.0.0.0:80
-  containerPort: 80
-=======
-  environment: python311
-  toolchain: pip
+name: lamoda-recruiter
+environment: production
 
-build:
-  requirements:
-    - requirements.txt
+services:
+  api:
+    image: python:3.12-slim
+    command: pip install -r requirements.txt && gunicorn --bind 0.0.0.0:5000 --workers 4 --timeout 60 --access-logfile - --error-logfile - wsgi:app
+    ports:
+      - 5000
+    environment:
+      FLASK_ENV: production
+      FLASK_DEBUG: 0
+      DATABASE_URL: sqlite:///mismatch.db
+      SECRET_KEY: ${SECRET_KEY}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      CORS_ORIGINS: "*"
+      LOG_LEVEL: INFO
+    healthcheck:
+      test: "curl -f http://localhost:5000/api/health || exit 1"
+      intervals: 30
+      timeout: 10
+      retries: 3
+      start_period: 5
 
-run:
-  cmd: "gunicorn app:app"
-
-volumes:
-  - mount: /data
-    size: 1Gb
->>>>>>> bf92ef7458baa6e02f8b2d24df29d304c808207c
+env_vars:
+  FLASK_ENV: production
+  FLASK_DEBUG: 0
+  DATABASE_URL: sqlite:///mismatch.db
+  SECRET_KEY: lamoda-production-secret-2026
+  JWT_SECRET_KEY: lamoda-jwt-secret-2026
+  CORS_ORIGINS: "*"
+  LOG_LEVEL: INFO
