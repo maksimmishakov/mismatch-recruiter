@@ -37,4 +37,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 EXPOSE 5000
 
 # Run application
-CMD ["python", "-m", "flask", "run", "--host=0.0.0.0"]
+#CMD ["python", "-m", "flask", "run", "--host=0.0.0.0"]
