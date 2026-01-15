@@ -1,4 +1,4 @@
-"""MisMatch Recruitment Bot - Application Package"""
+"""MisMatch Recruiter Bot - Application Package"""
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
@@ -10,16 +10,19 @@ load_dotenv()
 db = SQLAlchemy()
 
 from app.config import MismatchSettings, get_settings
+
 def create_app(config=None):
     """Application factory pattern"""
     app = Flask(__name__)
-        app.config['SQLALCHEMY_DATABASE_URI'] = get_settings().Mismatch_db_connection or 'sqlite:///tmp/mismatch.db'
-            app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    
+    # Load configuration
+    settings = get_settings()
+    app.config['SQLALCHEMY_DATABASE_URI'] = settings.mismatch_db_connection or 'sqlite:////tmp/mismatch.db'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
     # Config
-    
-if config:
-    config.update(config)
+    if config:
+        config.update(config)
     
     # Initialize extensions
     db.init_app(app)
@@ -31,30 +34,11 @@ if config:
     
     # GraphQL API
     from graphene_flask import GraphQLView
+    from app.graphql import schema
     
     app.add_url_rule(
         '/graphql',
         view_func=GraphQLView.as_view('graphql', schema=schema, graphiql=True)
     )
     
-    # Create tables
-    with app.app_context():
-        db.create_all()
-
-        # Error handlers
-    from werkzeug.exceptions import BadRequest
-    
-    @app.errorhandler(BadRequest)
-    def handle_bad_request(error):
-        """Handle bad requests (e.g., invalid JSON)"""
-        return {'error': 'Bad Request', 'message': str(error.description)}, 400
-    
-    @app.errorhandler(422)
-    def handle_unprocessable_entity(error):
-        """Handle unprocessable entities"""
-        return {'error': 'Unprocessable Entity', 'message': str(error.description)}, 422
-    
-        return app
-
-__version__ = '2.0.0'
-__all__ = ['create_app', 'db']
+    return app
