@@ -1,7 +1,6 @@
 """Mismatch Integration Configuration."""
 from typing import Optional, Dict, Any
-from pydantic import SecretStr, AnyU
-from pydantic_settings import BaseSettings
+from pydantic import SecretStr, AnyUrl
 from functools import lru_cache
 
 
