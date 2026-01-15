@@ -5,8 +5,6 @@ from flask_sqlalchemy import SQLAlchemy
 import os
 from dotenv import load_dotenv
 
-from app.graphql.schema import schema
-
 load_dotenv()
 
 db = SQLAlchemy()
@@ -32,7 +30,6 @@ def create_app(config=None):
     
     # GraphQL API
     from graphene_flask import GraphQLView
-    from app.graphql.schema import schema
     
     app.add_url_rule(
         '/graphql',
