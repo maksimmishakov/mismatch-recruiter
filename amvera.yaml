@@ -7,7 +7,7 @@ build:
 
 run:
   scriptName: wsgi.py
-  command: shcd /app &&  -c "pip install -r requirements.txt && python -m gunicorn --bind=0.0.0.0:5000 --workers 4 --timeout 60 --access-logfile - --error-logfile - wsgi:app"
+  command: gunicorn wsgi:app --bind=0.0.0.0:5000 --workers 4
   containerPort: 5000
 
 volumes:
