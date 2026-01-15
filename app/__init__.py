@@ -16,8 +16,7 @@ def create_app(config=None):
     app = Flask(__name__)
     
     # Load configuration
-    settings = get_settings()
-    app.config['SQLALCHEMY_DATABASE_URI'] = settings.mismatch_db_connection or 'sqlite:////tmp/mismatch.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:////tmp/mismatch.db')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
     # Config
