@@ -1,7 +1,6 @@
 """Configuration package."""
 from app.config.mismatch import (
-    MismatchSettings,
-    get_settings,
+    MismatchSettings,    get_settings,
     get_mismatch_config,
 )
 # Import Config from parent config module
