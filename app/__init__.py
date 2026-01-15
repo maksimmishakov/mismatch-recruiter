@@ -9,7 +9,7 @@ load_dotenv()
 
 db = SQLAlchemy()
 
-from app.config import MismatchSettings, get_settings
+from app.config import MismatchSettings
 
 def create_app(config=None):
     """Application factory pattern"""
