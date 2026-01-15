@@ -27,10 +27,11 @@ def create_app(config=None):
     db.init_app(app)
     
     # Register blueprints
-    from app.routes import api_bp, main_bp
-    app.register_blueprint(main_bp)
-    app.register_blueprint(api_bp, url_prefix='/api')
-    
+from app.routes import auth_bp, candidates_bp, jobs_bp, matches_bp
+app.register_blueprint(auth_bp)
+app.register_blueprint(candidates_bp)
+app.register_blueprint(jobs_bp)
+app.register_blueprint(matches_bp)    
     # GraphQL API
     from graphene_flask import GraphQLView
     from app.graphql import schema
