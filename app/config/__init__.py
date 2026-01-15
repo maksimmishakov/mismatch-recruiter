@@ -8,5 +8,4 @@ __all__ = [
     "MismatchSettings",
     "get_settings",
     "get_mismatch_config",
-    "Config",
 ]
