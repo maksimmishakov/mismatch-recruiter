@@ -1,3 +1,4 @@
+85
 """Database Models with Relationships, Indices, and Service Integration"""
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
@@ -53,6 +54,52 @@ db = SQLAlchemy()
     def to_dict(self):
         return {'id': self.id, 'email': self.email, 'name': self.name, 'subscription_plan': self.subscription_plan}
 
+
+
+class Candidate(db.Model):
+    """Candidate model for job matching."""
+    __tablename__ = 'candidates'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, index=True)
+    first_name = db.Column(db.String(255), nullable=False, index=True)
+    last_name = db.Column(db.String(255), nullable=False, index=True)
+    email = db.Column(db.String(255), nullable=False)
+    phone = db.Column(db.String(20))
+    location = db.Column(db.String(255))
+    skills = db.Column(JSON)
+    experience_years = db.Column(db.Integer, index=True)
+    summary = db.Column(db.Text)
+    resume_url = db.Column(db.String(500))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationships
+    matches = db.relationship('Match', backref='candidate', lazy=True, cascade='all, delete-orphan')
+    
+    __table_args__ = (
+        db.Index('idx_candidate_user_created', 'user_id', 'created_at'),
+        db.Index('idx_candidate_name', 'first_name', 'last_name'),
+    )
+    
+    def to_dict(self):
+        """Convert candidate to dictionary for JSON serialization."""
+        return {
+            'id': self.id,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'email': self.email,
+            'phone': self.phone,
+            'location': self.location,
+            'skills': self.skills,
+            'experience_years': self.experience_years,
+            'summary': self.summary,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }
+    
+    def __repr__(self):
+        return f'<Candidate {self.first_name} {self.last_name}>'
 
 class Resume(db.Model):
     __tablename__ = 'resumes'
@@ -112,24 +159,7 @@ class Job(db.Model):
         return {'id': self.id, 'title': self.title, 'company': self.company, 'salary_min': self.salary_min, 'location': self.location}
 
 
-class Match(db.Model):
-    __tablename__ = 'matches'
     
-    id = db.Column(db.Integer, primary_key=True)
-    resume_id = db.Column(db.Integer, db.ForeignKey('resumes.id'), nullable=False, index=True)
-    job_id = db.Column(db.Integer, db.ForeignKey('jobs.id'), nullable=False, index=True)
-    match_score = db.Column(db.Float, index=True)
-    semantic_fit = db.Column(db.String(50))
-    skill_gap_percentage = db.Column(db.Float)
-    match_details = db.Column(JSON)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
-    
-    __table_args__ = (
-        db.UniqueConstraint('resume_id', 'job_id', name='uq_resume_job'),
-        db.Index('idx_match_score_created', 'match_score', 'created_at'),
-    )
-    
-    def to_dict(self):
         return {'id': self.id, 'match_score': self.match_score, 'skill_gap': self.skill_gap_percentage, 'semantic_fit': self.semantic_fit}
 
 
