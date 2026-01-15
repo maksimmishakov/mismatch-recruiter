@@ -6,7 +6,6 @@ meta:
     name: docker
 build:
   dockerfile: ./frontend/Dockerfile
-  context: .
 run:
   containerPort: 80
 ---
