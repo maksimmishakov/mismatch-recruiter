@@ -55,7 +55,7 @@ if config:
         """Handle unprocessable entities"""
         return {'error': 'Unprocessable Entity', 'message': str(error.description)}, 422
     
-    return app
+        return app
 
 __version__ = '2.0.0'
 __all__ = ['create_app', 'db']
