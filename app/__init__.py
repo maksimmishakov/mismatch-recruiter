@@ -19,8 +19,8 @@ def create_app(config=None):
 app.config['    SQLALCHEMY_DATABASE_URI'] = settings.Mismatch_db_connection or 'sqlite:////tmp/mismatch.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
-    if config:
-    app.config.update(config)
+if config:
+    config.update(config)
     
     # Initialize extensions
     db.init_app(app)
