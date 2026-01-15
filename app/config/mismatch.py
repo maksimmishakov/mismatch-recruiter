@@ -101,7 +101,7 @@ def get_settings() -> MismatchSettings:
     return MismatchSettings()
 
 
-def get_Mismatch_config() -> Dict[str, Any]:
+def get_mismatch_config() -> Dict[str, Any]:
     """Get Mismatch configuration as dictionary"""
     settings = get_settings()
     return {
