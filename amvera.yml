@@ -2,7 +2,11 @@
 version: '1.0'
 meta:
   environment: docker
+  toolchain:
+    name: docker
+build:
+  containerPort: 80
 docker:
   dockerfile: ./frontend/Dockerfile
-  port: 80
+  context: .
 ---
