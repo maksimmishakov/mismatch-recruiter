@@ -38,6 +38,7 @@ pytest-asyncio>=0.21.0
 python-docx>=0.8.11
 
 # AI/ML - Embeddings
+PyJWT>=2.8.0
 
 
 
