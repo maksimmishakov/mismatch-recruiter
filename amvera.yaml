@@ -1,27 +1,15 @@
 meta:
-<<<<<<< HEAD
   environment: python
-  toolchain:
-    name: pip
-    version: 3.11
+  version: 3.11
+
 build:
   requirementsPath: requirements.txt
-run:
-  scriptName: app.py
-  command: gunicorn app:app --bind 0.0.0.0:80
-  containerPort: 80
-=======
-  environment: python311
-  toolchain: pip
-
-build:
-  requirements:
-    - requirements.txt
 
 run:
-  cmd: "gunicorn app:app"
+  scriptName: wsgi.py
+  command: python -m gunicorn --bind=0.0.0.0:5000 --workers 4 --timeout 60 --access-logfile - --error-logfile - wsgi:app
+  containerPort: 5000
 
 volumes:
   - mount: /data
     size: 1Gb
->>>>>>> bf92ef7458baa6e02f8b2d24df29d304c808207c
