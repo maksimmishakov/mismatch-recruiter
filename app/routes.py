@@ -154,4 +154,4 @@ def get_dashboard_data():
 
 def register_routes(app):
     app.register_blueprint(api_bp)
-        app.register_blueprint(resume_parsing_bp)
+    app.register_blueprint(resume_parsing_bp)
