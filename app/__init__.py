@@ -14,8 +14,8 @@ def create_app(config=None):
     app = Flask(__name__)
     
     # Config
-    from app.config import Config
-    app.config.from_object(Config)
+    from app.config import MismatchSettings
+#     app.config.from_object(Config)
     
     if config:
         app.config.update(config)
