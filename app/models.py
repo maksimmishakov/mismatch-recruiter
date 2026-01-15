@@ -358,3 +358,71 @@ class ResumeExperience(db.Model):
             'description': self.description,
             'duration_months': self.duration_months
         }
+
+
+
+class Match(db.Model):
+    """Match between candidate and job with ML scores."""
+    __tablename__ = 'matches'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    candidate_id = db.Column(db.Integer, db.ForeignKey('candidates.id'), nullable=False)
+    job_id = db.Column(db.Integer, db.ForeignKey('jobs.id'), nullable=False)
+    
+    # ML Scores
+    overall_score = db.Column(db.Float, default=0.0)
+    score_percentage = db.Column(db.Float, default=0.0)
+    
+    # Score Breakdown (JSON)
+    skills_score = db.Column(db.Float, default=0.0)
+    experience_score = db.Column(db.Float, default=0.0)
+    location_score = db.Column(db.Float, default=0.0)
+    salary_score = db.Column(db.Float, default=0.0)
+    text_similarity_score = db.Column(db.Float, default=0.0)
+    
+    # Full breakdown as JSON
+    score_breakdown = db.Column(JSON, nullable=True)
+    
+    # Match quality classification
+    match_quality = db.Column(db.String(20))  # EXCELLENT, GOOD, FAIR, POOR, UNSUITABLE
+    
+    # Match status
+    status = db.Column(db.String(50), default='PENDING')  # PENDING, VIEWED, APPLIED, REJECTED, HIRED
+    
+    # Recommendations as JSON
+    recommendations = db.Column(JSON, nullable=True)
+    
+    # Timestamps
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationships
+    candidate = db.relationship('Candidate', backref=db.backref('matches', lazy=True))
+    job = db.relationship('Job', backref=db.backref('matches', lazy=True))
+    
+    # Table arguments for indexes
+    __table_args__ = (
+        db.Index('idx_candidate_job_match', 'candidate_id', 'job_id'),
+        db.Index('idx_match_score', 'overall_score'),
+        db.Index('idx_match_status', 'status'),
+        db.Index('idx_match_created', 'created_at'),
+    )
+    
+    def __repr__(self):
+        return f'<Match Candidate:{self.candidate_id} - Job:{self.job_id} Score:{self.overall_score:.2f}>'
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'candidate_id': self.candidate_id,
+            'job_id': self.job_id,
+            'overall_score': self.overall_score,
+            'score_percentage': self.score_percentage,
+            'match_quality': self.match_quality,
+            'status': self.status,
+            'score_breakdown': self.score_breakdown,
+            'recommendations': self.recommendations,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+        }
+
