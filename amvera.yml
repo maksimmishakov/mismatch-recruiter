@@ -5,9 +5,8 @@ meta:
   toolchain:
     name: docker
 build:
-  docker:
-    dockerfile: ./frontend/Dockerfile
-    context: .
+  dockerfile: ./frontend/Dockerfile
+  context: .
 run:
   containerPort: 80
 ---
