@@ -16,7 +16,7 @@ def create_app():
     # Configuration
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///mismatch.db')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['Sgit add demo_setup.sh && git commit -m "Add complete demo_setup.sh with 4 candidates and 3 Lamoda job positions for demo on Jan 16" && git pushECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key')
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key')
     app.config['JSON_SORT_KEYS'] = False
     
     # Initialize extensions
