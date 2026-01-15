@@ -6,7 +6,8 @@ from sqlalchemy.dialects.postgresql import JSON
 db = SQLAlchemy()
 
 
-class User(db.Model):
+34
+(db.Model):
     __tablename__ = 'users'
     
     id = db.Column(db.Integer, primary_key=True)
@@ -30,7 +31,25 @@ class User(db.Model):
         db.Index('idx_user_created_subscription', 'created_at', 'subscription_plan'),
         db.Index('idx_user_active', 'is_active'),
     )
+
+
+    def set_password(self, password):
+        """Hash and set the password with bcrypt 72-byte limit."""
+        # Bcrypt has a max password length of 72 bytes
+        if len(password.encode('utf-8')) > 72:
+            password = password[:72]
+        from passlib.context import CryptContext
+        pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
+        self.password_hash = pwd_context.hash(password)
     
+    def verify_password(self, password):
+        """Verify the password against the stored hash."""
+        # Handle the 72-byte limit for verification too
+        if len(password.encode('utf-8')) > 72:
+            password = password[:72]
+        from passlib.context import CryptContext
+        pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
+        return pwd_context.verify(password, self.password_hash)
     def to_dict(self):
         return {'id': self.id, 'email': self.email, 'name': self.name, 'subscription_plan': self.subscription_plan}
 
