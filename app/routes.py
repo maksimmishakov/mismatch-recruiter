@@ -5,17 +5,17 @@ from datetime import datetime
 import logging
 
 # Service imports
-from services.rate_limiter import RateLimiter
-from services.auth_service import AuthService
-from services.salary_predictor import SalaryPredictor
-from services.embedding_service import EmbeddingService
-from services.skill_gap_analyzer import SkillGapAnalyzer
-from services.cache_optimization_service import CacheOptimizationService
-from services.analytics_service import AnalyticsService
-from services.notification_service import NotificationService
-from services.payment_service import PaymentService
-from services.data_validation_service import DataValidationService
-from services.health_check import HealthCheckService
+from app.services.rate_limiter import RateLimiter
+from app.services.auth_service import AuthService
+from app.services.salary_predictor import SalaryPredictor
+from app.services.embedding_service import EmbeddingService
+from app.services.skill_gap_analyzer import SkillGapAnalyzer
+from app.services.cache_optimization_service import CacheOptimizationService
+from app.services.analytics_service import AnalyticsService
+from app.services.notification_service import NotificationService
+from app.services.payment_service import PaymentService
+from app.services.data_validation_service import DataValidationService
+from app.services.health_check import HealthCheckService
 
 logger = logging.getLogger(__name__)
 api_bp = Blueprint('api', __name__, url_prefix='/api')
