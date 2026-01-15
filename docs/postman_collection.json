@@ -1,0 +1,165 @@
+{
+  "info": {
+    "name": "MisMatch Recruiter API",
+    "description": "Complete API collection for MisMatch Recruiter - AI-powered recruitment platform",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Phase 2: ML Matching",
+      "item": [
+        {
+          "name": "Calculate Match Score",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"candidate_id\": 1,\n    \"job_id\": 1,\n    \"skills\": [\"Python\", \"JavaScript\", \"React\"],\n    \"experience_years\": 5,\n    \"location\": \"San Francisco\",\n    \"salary_expectation\": 120000,\n    \"required_skills\": [\"Python\", \"JavaScript\"],\n    \"experience_required\": 3,\n    \"job_location\": \"San Francisco\",\n    \"salary_range\": {\n        \"min\": 100000,\n        \"max\": 150000\n    }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/matches/calculate-score",
+              "host": ["{{base_url}}"],
+              "path": ["api", "matches", "calculate-score"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Matches",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/matches?min_score=50&status=pending&sort_by=score_desc",
+              "host": ["{{base_url}}"],
+              "path": ["api", "matches"],
+              "query": [
+                {
+                  "key": "min_score",
+                  "value": "50"
+                },
+                {
+                  "key": "status",
+                  "value": "pending"
+                },
+                {
+                  "key": "sort_by",
+                  "value": "score_desc"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Match Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/matches/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "matches", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Match Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"viewed\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/matches/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "matches", "1"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Phase 4: Email & Scheduling",
+      "item": [
+        {
+          "name": "Send Match Notification Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"match_id\": 1,\n    \"candidate_email\": \"john@example.com\",\n    \"candidate_name\": \"John Doe\",\n    \"job_title\": \"Senior Python Developer\",\n    \"match_score\": 85,\n    \"breakdown\": {\n        \"skills\": 90,\n        \"experience\": 80,\n        \"location\": 100,\n        \"salary\": 75\n    }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/notifications/send-match",
+              "host": ["{{base_url}}"],
+              "path": ["api", "notifications", "send-match"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Schedule Interview",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"match_id\": 1,\n    \"candidate_id\": 1,\n    \"job_id\": 1,\n    \"interview_date\": \"2024-02-15\",\n    \"interview_time\": \"10:00\",\n    \"interviewer_email\": \"hiring@example.com\",\n    \"interviewer_name\": \"Jane Smith\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/interviews/schedule",
+              "host": ["{{base_url}}"],
+              "path": ["api", "interviews", "schedule"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5000",
+      "type": "string"
+    }
+  ]
+}
