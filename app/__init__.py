@@ -9,6 +9,7 @@ load_dotenv()
 
 db = SQLAlchemy()
 
+from app.config import MismatchSettings, get_settings
 def create_app(config=None):
     """Application factory pattern"""
     app = Flask(__name__)
@@ -16,7 +17,6 @@ def create_app(config=None):
             app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
     # Config
-    from app.config import MismatchSettings, get_settings
     
 if config:
     config.update(config)
