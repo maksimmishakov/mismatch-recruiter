@@ -1,6 +1,5 @@
 from flask import Blueprint
 from flask import request, jsonify
-from app import db
 
 # Temporary imports - will be replaced after models are created
 try:
@@ -20,6 +19,7 @@ def auth_health():
 
 @auth_bp.route('/register', methods=['POST'])
 def register():
+    from app import db
     try:
         from app.models.user import User
         data = request.get_json()
@@ -64,6 +64,7 @@ def get_candidates():
 
 @candidates_bp.route('', methods=['POST'])
 def create_candidate():
+    from app import db
     try:
         from app.models.candidate import Candidate
         data = request.get_json()
@@ -90,6 +91,7 @@ def get_jobs():
 
 @jobs_bp.route('', methods=['POST'])
 def create_job():
+    from app import db
     try:
         from app.models.job import Job
         data = request.get_json()
@@ -116,6 +118,7 @@ def get_matches():
 
 @matches_bp.route('', methods=['POST'])
 def create_match():
+    from app import db
     try:
         from app.models.match import Match
         data = request.get_json()
