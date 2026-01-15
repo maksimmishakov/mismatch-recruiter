@@ -12,11 +12,11 @@ db = SQLAlchemy()
 def create_app(config=None):
     """Application factory pattern"""
     app = Flask(__name__)
+        app.config['SQLALCHEMY_DATABASE_URI'] = get_settings().Mismatch_db_connection or 'sqlite:///tmp/mismatch.db'
+            app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
     # Config
     from app.config import MismatchSettings, get_settings
-app.config['    SQLALCHEMY_DATABASE_URI'] = get_settings().Mismatch_db_connection or 'sqlite:////tmp/mismatch.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
 if config:
     config.update(config)
