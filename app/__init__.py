@@ -15,7 +15,9 @@ def create_app(config=None):
     
     # Config
     from app.config import MismatchSettings
-#     app.config.from_object(Config)
+settings = get_settings()
+    app.config['SQLALCHEMY_DATABASE_URI'] = settings.Mismatch_db_connection or 'sqlite:////tmp/mismatch.db'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
     if config:
         app.config.update(config)
