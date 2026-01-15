@@ -1,4 +1,4 @@
-enviroment: production
+environment: production
 
 services:
   api:
