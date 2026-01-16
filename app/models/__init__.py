@@ -3,9 +3,9 @@ from app.models.mismatch import MismatchSync
 from app.models.candidates_matches import Resume, Job, Match
 
 __all__ = [
-    "MismatchSync",,
+    "MismatchSync",
     "Resume",
     "Job",
-    "Match"
+    "Match",
 ]
 # Fixed models export
