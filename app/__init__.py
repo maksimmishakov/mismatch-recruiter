@@ -1,5 +1,4 @@
 """MisMatch Recruiter Bot - Application Package"""
-
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import os
@@ -27,14 +26,15 @@ def create_app(config=None):
     db.init_app(app)
     
     # Register blueprints
-from app.routes import auth_bp, candidates_bp, jobs_bp, matches_bp
-app.register_blueprint(auth_bp)
-app.register_blueprint(candidates_bp)
-app.register_blueprint(jobs_bp)
-app.register_blueprint(matches_bp)    
+    from app.routes import auth_bp, candidates_bp, jobs_bp, matches_bp
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(candidates_bp)
+    app.register_blueprint(jobs_bp)
+    app.register_blueprint(matches_bp)
+    
     # GraphQL API
-        from graphene_flask import GraphQLView
-        from app.graphql import schema
+    from graphene_flask import GraphQLView
+    from app.graphql import schema
     
     app.add_url_rule(
         '/graphql',
