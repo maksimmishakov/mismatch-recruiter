@@ -38,3 +38,5 @@ EXPOSE 5000
 
 # Run application
 #CMD ["python", "-m", "flask", "run", "--host=0.0.0.0"]
+
+# Trigger Amvera deployment v2
