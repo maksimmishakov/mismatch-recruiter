@@ -8,3 +8,4 @@ build:
   dockerfile: Dockerfile
 run:
   containerPort: 5000
+  # Force rebuild - salary_predictor fix included
