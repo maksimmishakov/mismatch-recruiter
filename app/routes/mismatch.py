@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException, Query, Depends
 from typing import List, Optional
 from datetime import datetime
 import logging
-from app.services.Mismatch_api_client import MismatchAPIClient, MismatchJob, CandidateProfile, PlacementStatus
+from app.services.Mismatch_api_client import MismatchAPIClient, CandidateProfile, PlacementStatus
 
 logger = logging.getLogger(__name__)
 
