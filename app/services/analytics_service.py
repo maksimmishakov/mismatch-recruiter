@@ -8,8 +8,7 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 from sqlalchemy import func
 from app.database import SessionLocal
-from app.models import Resume, Job, Match
-import logging
+# from app.models import Resume, Job, Match  # TODO: These classes need to be definedimport logging
 
 logger = logging.getLogger(__name__)
 
