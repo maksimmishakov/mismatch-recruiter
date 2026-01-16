@@ -1,3 +1,4 @@
 CI Pipeline trigger - cleanup complete and ready for Phase 2
 Timestamp: 2025-12-25 12:50 MSK
 Status: Phase 1 complete, all endpoints tested
+Workflow dispatch: ШАГ 5-7 CI/CD Pipeline execution with workflow_dispatch trigger
