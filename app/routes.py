@@ -13,8 +13,6 @@ from app.services.skill_gap_analyzer import SkillGapAnalyzer
 from app.services.cache_optimization_service import CacheOptimizationService
 from app.services.analytics_service import AnalyticsService
 from app.services.data_validation_service import DataValidationService
-from app.services.health_check import HealthCheckService
-
 logger = logging.getLogger(__name__)
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 from app.routes.resume_parsing import resume_parsing_bp
@@ -28,8 +26,6 @@ skill_gap_analyzer = SkillGapAnalyzer()
 cache_service = CacheOptimizationService()
 analytics_service = AnalyticsService()
 data_validator = DataValidationService()
-health_check_service = HealthCheckService()
-
 # Auth decorator
 def require_auth(f):
     @wraps(f)
