@@ -33,7 +33,7 @@ app.register_blueprint(candidates_bp)
 app.register_blueprint(jobs_bp)
 app.register_blueprint(matches_bp)    
     # GraphQL API
-    from graphene_flask import GraphQLView
+from graphene_flask import GraphQLView
     from app.graphql import schema
     
     app.add_url_rule(
