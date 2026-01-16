@@ -12,7 +12,6 @@ from app.services.embedding_service import EmbeddingService
 from app.services.skill_gap_analyzer import SkillGapAnalyzer
 from app.services.cache_optimization_service import CacheOptimizationService
 from app.services.analytics_service import AnalyticsService
-from app.services.notification_service import NotificationService
 from app.services.payment_service import PaymentService
 from app.services.data_validation_service import DataValidationService
 from app.services.health_check import HealthCheckService
@@ -29,7 +28,6 @@ embedding_service = EmbeddingService()
 skill_gap_analyzer = SkillGapAnalyzer()
 cache_service = CacheOptimizationService()
 analytics_service = AnalyticsService()
-notification_service = NotificationService()
 payment_service = PaymentService()
 data_validator = DataValidationService()
 health_check_service = HealthCheckService()
