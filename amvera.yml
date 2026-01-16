@@ -1,12 +1,12 @@
 ---
 version: '1.0'
 meta:
-  environment: docker
-  toolchain:
-    name: docker
+environment: docker
+toolchain:
+  name: docker
 build:
-  containerPort: 80
-docker:
-  dockerfile: ./frontend/Dockerfile
-  context: .
+  containerPort: 8080
+run:
+  image: python:3.11
+  command: gunicorn -b 0.0.0.0:8080 wsgi:app --timeout 120
 ---
