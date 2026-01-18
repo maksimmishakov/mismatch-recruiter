@@ -29,8 +29,7 @@ def create_app(config=None):
     from app.routes import candidates_bp, job_enrichment_bp, matches_bp
    app.register_blueprint(candidates_bp)
     app.register_blueprint(job_enrichment_bp)
-    app.register_blueprint(matches_bp)
-    
+app.register_blueprint(matches_bp)    
     # GraphQL API
     from graphene_flask import GraphQLView
     from app.graphql import schema
