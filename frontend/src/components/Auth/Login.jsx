@@ -1,0 +1,55 @@
+import { useState } from 'react';
+import axios from 'axios';
+
+export default function Login() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    
+    try {
+      const response = await axios.post('/api/v1/auth/login', {
+        email,
+        password
+      });
+      
+      if (response.data.access_token) {
+        localStorage.setItem('token', response.data.access_token);
+        window.location.href = '/dashboard';
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Login failed');
+    }
+  };
+
+  return (
+    <div className="login-container">
+      <form onSubmit={handleSubmit} className="login-form">
+        <h2>MisMatch Login</h2>
+        
+        {error && <div className="error-message">{error}</div>}
+        
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+        
+        <button type="submit">Login</button>
+      </form>
+    </div>
+  );
+}

@@ -1,31 +1,23 @@
-"""Test configuration and fixtures for MisMatch Recruiter"""
+"""Test configuration and fixtures."""
 import pytest
 from app import create_app, db
-from app.models import User, Resume, Job, Match, Prediction, Subscription
+from app.models import User
 
-
-@pytest.fixture(scope='session')
+@pytest.fixture
 def app():
-    """Create application for the tests."""
+    """Create application for testing."""
     app = create_app('testing')
+    
     with app.app_context():
         db.create_all()
         yield app
         db.session.remove()
         db.drop_all()
 
-
-@pytest.fixture(scope='function')
+@pytest.fixture
 def client(app):
-    """A test client for the app."""
+    """Get test client."""
     return app.test_client()
-
-
-@pytest.fixture(scope='function')
-def runner(app):
-    """A test runner for the app's CLI."""
-    return app.test_cli_runner()
-
 
 @pytest.fixture
 def test_user(app):
@@ -40,14 +32,15 @@ def test_user(app):
         db.session.commit()
         return user
 
-  @pytest.fixture
+@pytest.fixture
 def auth_token(client, test_user):
     """Get authentication token for test user."""
-    response = client.post('/api/auth/login',
-                          json={
-                              'email': 'test@example.com',
-                              'password': 'TestPassword123!'
-                          })
+    response = client.post('/api/v1/auth/login',
+        json={
+            'email': 'test@example.com',
+            'password': 'TestPassword123!'
+        }
+    )
     if response.status_code == 200:
         return response.json.get('token')
     return None
