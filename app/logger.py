@@ -62,6 +62,196 @@ def setup_logger(app):
     
     # Create logs directory if it doesn't exist
     os.makedirs('logs', exist_ok=True)
+
+
+# Performance Monitoring
+class PerformanceMonitor:
+    """Monitor and log performance metrics."""
+    
+    def __init__(self):
+        self.metrics = {}
+        self.start_times = {}
+    
+    def start_timer(self, operation_name):
+        """Start timing an operation."""
+        from datetime import datetime
+        self.start_times[operation_name] = datetime.utcnow()
+    
+    def end_timer(self, operation_name, logger=None):
+        """End timing an operation and log the duration."""
+        from datetime import datetime
+        if operation_name in self.start_times:
+            duration = (datetime.utcnow() - self.start_times[operation_name]).total_seconds()
+            
+            if operation_name not in self.metrics:
+                self.metrics[operation_name] = []
+            
+            self.metrics[operation_name].append(duration)
+            
+            if logger:
+                logger.info(f"Performance: {operation_name} completed in {duration:.3f}s")
+            
+            del self.start_times[operation_name]
+            return duration
+        return None
+    
+    def get_average(self, operation_name):
+        """Get average execution time for an operation."""
+        if operation_name in self.metrics and self.metrics[operation_name]:
+            return sum(self.metrics[operation_name]) / len(self.metrics[operation_name])
+        return 0
+    
+    def get_stats(self, operation_name):
+        """Get detailed statistics for an operation."""
+        if operation_name in self.metrics and self.metrics[operation_name]:
+            metrics = self.metrics[operation_name]
+            return {
+                'count': len(metrics),
+                'average': sum(metrics) / len(metrics),
+                'min': min(metrics),
+                'max': max(metrics),
+                'total': sum(metrics)
+            }
+        return None
+
+
+# Create global performance monitor
+performance_monitor = PerformanceMonitor()
+
+
+def log_api_request(f):
+    """Decorator to log API requests with timing."""
+    from functools import wraps
+    
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        logger = logging.getLogger(__name__)
+        
+        # Start timer
+        operation = f.__name__
+        performance_monitor.start_timer(operation)
+        
+        try:
+            # Log incoming request
+            if has_request_context():
+                logger.info(f"API Request: {request.method} {request.path}", extra={
+                    'extra_data': {
+                        'endpoint': operation,
+                        'method': request.method,
+                        'path': request.path,
+                        'ip': request.remote_addr
+                    }
+                })
+            
+            # Execute function
+            result = f(*args, **kwargs)
+            
+            # End timer and log duration
+            duration = performance_monitor.end_timer(operation, logger)
+            
+            # Log successful completion
+            if has_request_context():
+                logger.info(f"API Response: {operation} completed successfully", extra={
+                    'extra_data': {
+                        'endpoint': operation,
+                        'duration': duration,
+                        'status': 'success'
+                    }
+                })
+            
+            return result
+            
+        except Exception as e:
+            # End timer
+            performance_monitor.end_timer(operation)
+            
+            # Log error
+            logger.error(f"API Error in {operation}: {str(e)}", extra={
+                'extra_data': {
+                    'endpoint': operation,
+                    'error': str(e),
+                    'error_type': type(e).__name__
+                }
+            }, exc_info=True)
+            
+            raise
+    
+    return decorated_function
+
+
+def log_database_query(query_type, table_name=None):
+    """Decorator to log database queries with performance metrics."""
+    from functools import wraps
+    
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            logger = logging.getLogger(__name__)
+            operation = f"{query_type}_{table_name}" if table_name else f"{query_type}_query"
+            
+            # Start timer
+            performance_monitor.start_timer(operation)
+            
+            try:
+                result = f(*args, **kwargs)
+                duration = performance_monitor.end_timer(operation)
+                
+                # Log query execution
+                logger.debug(f"DB Query: {query_type} on {table_name or 'unknown'} took {duration:.3f}s")
+                
+                # Warn on slow queries
+                if duration and duration > 1.0:  # More than 1 second
+                    logger.warning(f"Slow DB Query detected: {operation} took {duration:.3f}s")
+                
+                return result
+                
+            except Exception as e:
+                performance_monitor.end_timer(operation)
+                logger.error(f"DB Query Error: {query_type} on {table_name}: {str(e)}", exc_info=True)
+                raise
+        
+        return decorated_function
+    return decorator
+
+
+def log_external_api_call(service_name):
+    """Decorator to log external API calls."""
+    from functools import wraps
+    
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            logger = logging.getLogger(__name__)
+            operation = f"{service_name}_api_call"
+            
+            performance_monitor.start_timer(operation)
+            
+            try:
+                logger.info(f"External API Call: {service_name}")
+                result = f(*args, **kwargs)
+                duration = performance_monitor.end_timer(operation)
+                
+                logger.info(f"External API Response: {service_name} completed in {duration:.3f}s")
+                return result
+                
+            except Exception as e:
+                performance_monitor.end_timer(operation)
+                logger.error(f"External API Error: {service_name} - {str(e)}", exc_info=True)
+                raise
+        
+        return decorated_function
+    return decorator
+
+
+def get_performance_report():
+    """Generate a performance report for all monitored operations."""
+    report = {}
+    for operation in performance_monitor.metrics.keys():
+        stats = performance_monitor.get_stats(operation)
+        if stats:
+            report[operation] = stats
+    return report
+
     
     # Clear existing handlers
     app.logger.handlers.clear()
