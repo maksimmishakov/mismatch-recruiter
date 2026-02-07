@@ -1,169 +1,183 @@
-# Phase 4: Analytics System - Deployment Guide
+# MisMatch Recruiter - Deployment Guide
 
-## Quick Start
+## Quick Start with Docker Compose
 
 ### Prerequisites
-- Python 3.8+
-- PostgreSQL 12+
-- Redis (optional, for caching)
-- pip and virtualenv
+- Docker 20.10+
+- Docker Compose 2.0+
+- 2GB RAM minimum
+- 10GB disk space
 
-### Installation Steps
+### Environment Setup
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/maksimmishakov/Mismatch-ai-recruiter.git
-   cd Mismatch-ai-recruiter
-   ```
-
-2. **Create virtual environment**
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
-
-3. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Configure environment**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your configuration
-   ```
-
-5. **Initialize database**
-   ```bash
-   python -m alembic upgrade head
-   ```
-
-6. **Run the application**
-   ```bash
-   python -m app.main
-   # Or with uvicorn
-   uvicorn app.main:app --reload
-   ```
-
-## Environment Configuration
-
-### Required Variables
-```
-DATABASE_URL=postgresql://user:password@localhost/Mismatch_db
-REDIS_URL=redis://localhost:6379/0
-SECRET_KEY=your-secret-key
-DEBUG=True
-LOG_LEVEL=INFO
-```
-
-### Analytics Configuration
-```
-ANALYTICS_ENABLED=True
-REPORT_GENERATION_SCHEDULE=daily
-REPORT_EXPORT_FORMAT=pdf
-MAX_SNAPSHOT_RETENTION_DAYS=90
-```
-
-## Database Setup
-
-### Schema Creation
-The database schema is automatically created by running migrations:
+1. **Create .env file:**
 ```bash
-alembic upgrade head
+cp .env.example .env
 ```
 
-### Key Tables
-- `analytics_snapshots`: Stores analytics data points
-- `reports`: Stores generated reports
-- `user_preferences`: Stores user dashboard settings
+2. **Edit .env with your values:**
+```env
+SECRET_KEY=your-super-secret-key-here
+JWT_SECRET_KEY=your-jwt-secret-key-here
+DATABASE_URL=postgresql://mismatch_user:secure_password@db:5432/mismatch_db
+FLASK_ENV=production
+```
 
-## API Endpoints
+### Build and Run
 
-### Analytics Routes
-- `GET /api/analytics/current` - Current analytics snapshot
-- `GET /api/analytics/history` - Historical analytics data
-- `GET /api/analytics/export` - Export analytics data
+```bash
+# Build all services
+docker-compose build
 
-### Report Routes
-- `GET /api/reports` - List all reports
-- `POST /api/reports/generate` - Generate new report
-- `GET /api/reports/{id}/download` - Download report
+# Start services
+docker-compose up -d
 
-## Dashboard Access
+# Check logs
+docker-compose logs -f
 
-The analytics dashboard is available at:
-- **URL**: `http://localhost:8000/dashboard`
-- **Features**: Real-time KPIs, charts, exports
+# Stop services
+docker-compose down
+```
 
-## Monitoring
+### Access Application
 
-### Logs
-Application logs are stored in `logs/` directory:
-- `app.log`: General application logs
-- `analytics.log`: Analytics-specific logs
-- `error.log`: Error logs
+- **Frontend:** http://localhost
+- **Backend API:** http://localhost:5000
+- **PostgreSQL:** localhost:5432
+- **Redis:** localhost:6379
 
-### Metrics
-Key metrics to monitor:
-- API response times
-- Database query performance
-- Report generation duration
-- Cache hit ratio
+## Manual Deployment
 
-## Troubleshooting
+### Backend Deployment
 
-### Common Issues
+1. **Install dependencies:**
+```bash
+pip install -r requirements.txt
+```
 
-1. **Database Connection Error**
-   - Check DATABASE_URL format
-   - Verify PostgreSQL is running
-   - Check credentials
+2. **Set environment variables:**
+```bash
+export FLASK_ENV=production
+export DATABASE_URL=postgresql://user:pass@localhost/mismatch
+export SECRET_KEY=your-secret-key
+```
 
-2. **Dashboard Not Loading**
-   - Clear browser cache
-   - Check static files path
-   - Verify Flask/FastAPI serving static files
+3. **Initialize database:**
+```bash
+flask db upgrade
+```
 
-3. **Report Generation Fails**
-   - Check write permissions on export directory
-   - Verify required libraries (reportlab, openpyxl)
-   - Check database connectivity
+4. **Run with Gunicorn:**
+```bash
+gunicorn -w 4 -b 0.0.0.0:5000 'app:create_app()'
+```
 
-## Backup & Recovery
+### Frontend Deployment
+
+1. **Install dependencies:**
+```bash
+cd frontend
+npm install
+```
+
+2. **Build for production:**
+```bash
+npm run build
+```
+
+3. **Serve with nginx:**
+```bash
+cp -r dist/* /var/www/html/
+```
+
+## Production Checklist
+
+### Security
+- [ ] Change all default passwords
+- [ ] Set strong SECRET_KEY and JWT_SECRET_KEY
+- [ ] Enable HTTPS with SSL certificates
+- [ ] Configure firewall rules
+- [ ] Set up rate limiting
+- [ ] Enable CORS only for trusted domains
+- [ ] Review and update security headers
+
+### Performance
+- [ ] Enable Redis caching
+- [ ] Configure database connection pooling
+- [ ] Set up CDN for static assets
+- [ ] Enable gzip compression
+- [ ] Configure proper logging levels
+
+### Monitoring
+- [ ] Set up application logging
+- [ ] Configure error tracking (Sentry)
+- [ ] Enable performance monitoring
+- [ ] Set up database backups
+- [ ] Configure health checks
+
+### Scaling
+- [ ] Use load balancer for multiple instances
+- [ ] Set up database replication
+- [ ] Configure Redis Sentinel for HA
+- [ ] Use container orchestration (K8s)
+
+## Database Migrations
+
+```bash
+# Create migration
+flask db migrate -m "Description"
+
+# Apply migration
+flask db upgrade
+
+# Rollback
+flask db downgrade
+```
+
+## Backup & Restore
 
 ### Database Backup
 ```bash
-pg_dump Mismatch_db > backup.sql
+docker-compose exec db pg_dump -U mismatch_user mismatch_db > backup.sql
 ```
 
 ### Database Restore
 ```bash
-psql Mismatch_db < backup.sql
+docker-compose exec -T db psql -U mismatch_user mismatch_db < backup.sql
 ```
 
-## Security Considerations
+## Troubleshooting
 
-1. Always use environment variables for secrets
-2. Enable HTTPS in production
-3. Implement API rate limiting
-4. Regular security updates
-5. Restrict dashboard access with authentication
+### Backend not starting
+```bash
+# Check logs
+docker-compose logs backend
 
-## Performance Tuning
+# Restart service
+docker-compose restart backend
+```
 
-### Database Optimization
-- Add indices on frequently queried columns
-- Enable query caching
-- Regular VACUUM and ANALYZE
+### Database connection issues
+```bash
+# Check database is running
+docker-compose ps db
 
-### Application Optimization
-- Enable Redis caching
-- Implement pagination for large datasets
-- Optimize report generation queries
+# Test connection
+docker-compose exec db psql -U mismatch_user -d mismatch_db
+```
+
+### Frontend not loading
+```bash
+# Check nginx logs
+docker-compose logs frontend
+
+# Rebuild frontend
+cd frontend && npm run build
+docker-compose up -d --build frontend
+```
 
 ## Support
 
 For issues and questions:
-- Create an issue on GitHub
-- Check documentation
-- Review logs for errors
+- GitHub Issues: https://github.com/maksimmishakov/mismatch-recruiter/issues
+- Email: support@mismatch-recruiter.com

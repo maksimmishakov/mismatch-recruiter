@@ -1,37 +1,72 @@
 version: '3.8'
+
 services:
-  app:
-    build: .
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mismatch-backend
     ports:
       - "5000:5000"
     environment:
-      - FLASK_ENV=development
-      - DATABASE_URL=postgresql://postgres:password@db:5432/mismatch
-      - REDIS_URL=redis://redis:6379/0
+      - FLASK_ENV=production
+      - DATABASE_URL=postgresql://mismatch_user:secure_password@db:5432/mismatch_db
+      - SECRET_KEY=${SECRET_KEY}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
     depends_on:
       - db
       - redis
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
     networks:
-      - mismatch_network
+      - mismatch-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: mismatch-frontend
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - mismatch-network
+
   db:
     image: postgres:15-alpine
+    container_name: mismatch-postgres
     environment:
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=mismatch
+      - POSTGRES_USER=mismatch_user
+      - POSTGRES_PASSWORD=secure_password
+      - POSTGRES_DB=mismatch_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./backups:/backups
     ports:
       - "5432:5432"
+    restart: unless-stopped
     networks:
-      - mismatch_network
+      - mismatch-network
+
   redis:
     image: redis:7-alpine
+    container_name: mismatch-redis
     ports:
       - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
     networks:
-      - mismatch_network
+      - mismatch-network
+
 volumes:
   postgres_data:
+  redis_data:
+
 networks:
-  mismatch_network:
+  mismatch-network:
     driver: bridge
