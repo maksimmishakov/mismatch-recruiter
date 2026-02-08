@@ -1,0 +1,16 @@
+# Bandit configuration file
+# https://bandit.readthedocs.io/en/latest/config.html
+
+[bandit]
+# Exclude paths
+exclude_dirs:
+  - /tests/
+  - /.venv/
+  - /venv/
+  - /.git/
+
+# Skip specific test IDs
+skips:
+  - B104  # hardcoded_bind_all_interfaces - OK for development
+  - B403  # import_pickle - Used safely for caching
+  - B301  # pickle usage - Controlled internal use only
