@@ -3,6 +3,73 @@
 ## Overview
 Comprehensive API specification for the MisMatch Recruitment Bot system.
 
+---
+
+## Implemented API Endpoints
+
+The following endpoints are **currently implemented** in the codebase (`main.py`, `app/routes/*`):
+
+### 1. Health Check
+**Endpoint:** `GET /health`  
+**Description:** Checks the health status of the API  
+**Status:** ✅ Implemented
+
+### 2. Analyze Resume (PDF upload)
+**Endpoint:** `POST /api/analyze-resume`  
+**Description:** Upload PDF resume, extract text and parse data  
+**Status:** ✅ Implemented (see `main.py`)
+
+### 3. GraphQL API
+**Endpoint:** `GET/POST /graphql`  
+**Description:** GraphQL endpoint with graphiql interface  
+**Status:** ✅ Implemented (see `app/__init__.py`)
+
+### 4. Candidates CRUD
+**Endpoints:** `/api/candidates/*`  
+**Description:** Candidate management operations  
+**Status:** ✅ Implemented (blueprint registered)
+
+### 5. Matches
+**Endpoints:** `/api/matches/*`  
+**Description:** Match operations  
+**Status:** ✅ Implemented (blueprint registered)
+
+### 6. Job Enrichment
+**Endpoints:** `/api/job-enrichment/*`  
+**Description:** Job enrichment service  
+**Status:** ✅ Implemented (blueprint registered)
+
+### 7. Resume Parsing
+**Endpoints:** `/api/resume-parsing/*`  
+**Description:** Resume parsing operations  
+**Status:** ✅ Implemented (blueprint registered)
+
+---
+
+## Planned / Not Yet Implemented
+
+The following endpoints are **described at the product level** but **not yet implemented** in code:
+
+
+
+### Salary Prediction
+**Endpoint:** `POST /api/salary-prediction`  
+**Description:** ML-based salary prediction based on skills, experience, location  
+**Status:** ❌ Not implemented yet (do not use in production)
+
+### Generate Interview Questions
+**Endpoint:** `POST /api/generate-interview-questions`  
+**Description:** GPT-4o-mini powered personalized interview questions  
+**Status:** ❌ Not implemented yet (do not use in production)
+
+### Admin Dashboard Data
+**Endpoint:** `GET /api/admin/dashboard-data`  
+**Description:** Analytics and business metrics for admin dashboard  
+**Status:** ❌ Not implemented yet (do not use in production)
+
+**Note:** Use this section as a backlog for future development. Do **not** rely on these endpoints in production until they are moved to the "Implemented" section above.
+
+
 ## Base URL
 ```
 https://Mismatch-recruiter-maksmisakov.amvera.io/api
