@@ -37,10 +37,10 @@
 ## 🔄 NEXT STEPS (For You or Future Agent)
 
 ### Task 6: Sync requirements.txt
-- [ ] Remove duplicates (`gunicorn` appears twice, `redis>=5.0.0` and `redis==5.0.1`)
-- [ ] Unify FastAPI vs Flask: `requirements.txt` has both `fastapi>=0.104.0` and `Flask>=2.3.0`
-- [ ] Decide: Flask app (main.py + app/__init__.py) OR FastAPI app? Or both?
 
+- ✅ Removed duplicates (`gunicorn` appears twice, `redis>=5.0.0` and `redis==5.0.1`)
+- ✅ Unified stack: kept Flask app (main.py + app/__init__.py), removed FastAPI-related deps from requirements.txt
+- ✅ Decision: **Flask** is the primary web framework for this repo
 ### Task 7: Run Tests Locally
 ```bash
 make install-dev
