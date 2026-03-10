@@ -9,10 +9,11 @@
 ## Содержание
 
 1. [Что умеет Copilot Workspace vs Coding Agent](#что-умеет-copilot-workspace-vs-coding-agent)
-2. [Включить Copilot Coding Agent (личный аккаунт)](#включить-copilot-coding-agent-личный-аккаунт)
-3. [Как поставить задачу через issue](#как-поставить-задачу-через-issue)
-4. [Полный цикл работы с агентом](#полный-цикл-работы-с-агентом)
-5. [Советы и ограничения](#советы-и-ограничения)
+2. [Текущий статус аккаунта](#текущий-статус-аккаунта)
+3. [Включить Copilot Coding Agent (личный аккаунт)](#включить-copilot-coding-agent-личный-аккаунт)
+4. [Как поставить задачу через issue](#как-поставить-задачу-через-issue)
+5. [Полный цикл работы с агентом](#полный-цикл-работы-с-агентом)
+6. [Советы и ограничения](#советы-и-ограничения)
 
 ---
 
@@ -33,29 +34,45 @@
 
 ---
 
+## Текущий статус аккаунта
+
+> **Проверено на:** аккаунт `maksimmishakov`, март 2026
+
+| Параметр | Статус |
+|---|---|
+| Страница Copilot coding agent | ✅ Существует ([settings/copilot/coding_agent](https://github.com/settings/copilot/coding_agent)) |
+| Подписка Copilot | ❌ Не активна (нет Pro/Pro+/Business/Enterprise) |
+| Repository access | ✅ Настроен на **All repositories** |
+| Partner Agents (Claude, Codex) | ❌ Выключены |
+
+**Вывод:** инфраструктура агента готова, нужно только активировать Copilot-подписку.
+
+---
+
 ## Включить Copilot Coding Agent (личный аккаунт)
 
 Так как `mismatch-recruiter` находится под личным аккаунтом `maksimmishakov`, а не в организации, настройка делается через Settings личного аккаунта.
 
-### Шаг 1 — Убедиться, что Copilot подключён
+### Шаг 1 — Подключить Copilot-подписку
 
 1. Перейдите в [github.com/settings/copilot](https://github.com/settings/copilot).
-2. Убедитесь, что Copilot активен (Individual или Pro-план).
-3. Если не подключён — нажмите **Start free trial** или выберите платный план.
+2. Нажмите **Start using Copilot Free** (бесплатный тариф с ограничениями) или **try Copilot Pro** (платный, ~$10/мес).
 
-### Шаг 2 — Включить Copilot Agents
+   > ⚠️ **Важно:** Copilot coding agent доступен только на планах **Pro, Pro+, Business или Enterprise**. На бесплатном тарифе агент будет видим, но вы не сможете назначать ему задачи.
 
-1. Откройте [github.com/settings/copilot](https://github.com/settings/copilot).
-2. Прокрутите до секции **Copilot agents** (или **Beta features**).
-3. Включите переключатель **Copilot coding agent** (Enable).
-4. Сохраните изменения.
+3. Завершите оформление подписки.
 
-### Шаг 3 — Проверить доступность для репозитория
+### Шаг 2 — Убедиться, что Coding Agent включён
+
+1. Откройте [github.com/settings/copilot/coding_agent](https://github.com/settings/copilot/coding_agent).
+2. В секции **Repository access** должно быть выбрано **All repositories** (уже настроено).
+3. Дополнительно можно включить **Partner Agents** (Claude coding agent, Codex coding agent) — опционально.
+
+### Шаг 3 — Проверить вкладку Agents в репозитории
 
 1. Перейдите в репозиторий `mismatch-recruiter`.
-2. В верхнем меню репозитория найдите вкладку **Agents** (появляется после включения агентов).
-3. Убедитесь, что Copilot coding agent доступен для этого репо.
-4. Если вкладки нет — фича ещё не развёрнута для вашего аккаунта, ждите rolling-out или проверьте раздел Beta в настройках.
+2. В верхнем меню должна появиться вкладка **Agents**.
+3. Если вкладки нет после активации подписки — обновите страницу или подождите несколько минут.
 
 ---
 
@@ -70,34 +87,35 @@
 **Рекомендуемая структура issue для агента:**
 
 ```markdown
-## Задача
-Добавить endpoint /metrics в FastAPI с Prometheus-метриками.
+## Task
+Add /metrics endpoint to Flask app with Prometheus metrics.
 
-## Ожидаемое поведение
-- GET /metrics возвращает метрики в формате Prometheus text exposition
-- Используется библиотека prometheus-client
-- Метрики: количество запросов, время ответа
+## Expected behavior
+- GET /metrics returns metrics in Prometheus text exposition format
+- Uses prometheus-client library
+- Metrics: request count, response time per endpoint
 
-## Технические детали
-- Файл: app/routes/metrics.py (создать)
-- Зарегистрировать blueprint в app/__init__.py
-- Добавить prometheus-client в requirements.txt
+## Technical details
+- Create: app/routes/metrics.py
+- Register blueprint in app/__init__.py
+- Add prometheus-client to requirements.txt
 ```
 
-> **Совет:** чем конкретнее описание, тем точнее будет код агента. Укажите файлы, которые нужно создать/изменить.
+> **Совет:** чем конкретнее описание, тем точнее будет код агента. Пишите на английском — агент лучше понимает технические термины.
 
 ### 2. Назначьте issue агенту
 
-**Вариант A — через вкладку Agents:**
+**Вариант A — прямо из issue:**
+1. Откройте нужный issue.
+2. В правой панели найдите секцию **Assignees**.
+3. Нажмите шестерёнку и выберите **Copilot** в списке.
+4. Агент автоматически начнёт работу.
+
+**Вариант B — через вкладку Agents:**
 1. Откройте вкладку **Agents** в репозитории.
 2. Нажмите **New Task**.
 3. Привяжите нужный issue.
 4. Нажмите **Start**.
-
-**Вариант B — прямо из issue:**
-1. Откройте нужный issue.
-2. На странице issue нажмите **Assign to Copilot** (или аналогичную кнопку в секции Assignees).
-3. Агент автоматически начнёт работу.
 
 ### 3. Дождитесь PR
 
@@ -113,6 +131,8 @@
 
 ```
 Вы пишете issue
+       ↓
+Назначаете issue → Copilot (через Assignees или вкладку Agents)
        ↓
 Агент создаёт ветку copilot/issue-N
        ↓
@@ -134,9 +154,9 @@
 ### Советы для хороших результатов
 
 - **Пишите issue на английском** — агент лучше понимает технические термины на английском.
-- **Разбивайте большие задачи** — одно issue = одна атомарная задача. Например: "Add /metrics endpoint" вместо "Добавить мониторинг и логирование и алёрты".
+- **Разбивайте большие задачи** — одно issue = одна атомарная задача. Например: "Add /metrics endpoint" вместо "Add monitoring, logging and alerts".
 - **Указывайте файлы** — явно назовите файлы, которые нужно изменить/создать.
-- **Добавляйте критерии приёмки** — "endpoint должен вернуть 200 при GET /metrics" помогает агенту написать тесты.
+- **Добавляйте acceptance criteria** — "endpoint should return 200 at GET /metrics" помогает агенту написать тесты.
 
 ### Как давать фидбек в PR
 
@@ -150,4 +170,4 @@
 - Агент **не имеет доступа к секретам** (`.env`, API-ключи) — тестирование с реальными ключами нужно делать вручную в Codespace.
 - Агент **не запускает тесты автоматически** — добавьте CI/CD (GitHub Actions), чтобы тесты прогонялись на каждый PR.
 - Сложные рефакторинги с изменением архитектуры лучше делать через **Workspace** с ручной корректировкой плана, а не через агента напрямую.
-- Фича может быть в **waitlist/beta** — если вкладки Agents нет, проверьте [github.com/features/preview](https://github.com/features/preview).
+- Требуется подписка **Copilot Pro или выше** — бесплатного тарифа недостаточно для назначения задач агенту.
