@@ -111,6 +111,9 @@ npm run build  # outputs to ../static/
 | * | `/api/resume-parsing/*` | Resume parsing (Blueprint) |
 
 > **Note:** Endpoints documented in `docs/API_DOCUMENTATION.md` (e.g. `/api/salary-prediction`, `/api/generate-interview-questions`, `/api/admin/dashboard-data`) are planned/partially implemented. Verify in code before relying on them.
+> 
+**For planned endpoints**, see the "Planned / Not Yet Implemented" section in `docs/API_DOCUMENTATION.md`.
+
 
 ---
 
@@ -119,6 +122,12 @@ npm run build  # outputs to ../static/
 ```bash
 # Run tests
 make test
+
+**All automated checks (lint, tests, coverage) are executed in GitHub Actions.**
+
+Local runs are optional; you can rely on the **CI - Lint, Test & Coverage** workflow as the single source of truth.
+
+
 
 # Run with coverage report
 make coverage
