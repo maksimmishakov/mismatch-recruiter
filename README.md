@@ -245,3 +245,19 @@ MIT License — see LICENSE file for details.
 
 - **GitHub:** [@maksimmishakov](https://github.com/maksimmishakov)
 - **Live Demo:** [Mismatch-recruiter-maksimisakov.amvera.io](https://Mismatch-recruiter-maksimisakov.amvera.io) (may be unavailable)
+
+
+---
+
+## Using GitHub Copilot Workspace
+
+Copilot Workspace — это встроенный в GitHub инструмент для AI-assisted разработки прямо в браузере.
+
+Подробное руководство по работе с Copilot Workspace для этого репозитория находится здесь:
+
+**[docs/copilot-workspace.md](docs/copilot-workspace.md)**
+
+Краткое содержание руководства:
+- Как открыть Workspace через репозиторий или issue
+- Первичная настройка сессии (спецификация, план, реализация)
+- Как зафиксировать изменения через Pull Request
