@@ -447,3 +447,17 @@ The CI pipeline runs:
 3. Open `htmlcov/index.html` locally in any browser
 
 ---
+
+## Current CI Status
+
+As of 2026-03-10:
+
+- **CI workflow:** `CI - Lint, Test & Coverage` is currently **failing**.
+- **Main failure sources:**
+  - Lint / style issues in existing code (flake8 E501 line too long, unused imports, etc.)
+  - Possible failing tests (see the latest CI run logs for details)
+  - Missing or misconfigured dependencies in requirements-dev.txt
+
+**All fixes are done via pull requests and validated exclusively by CI (no local runs required).**
+
+**Check latest CI status:** [Actions → ci.yml](https://github.com/maksimmishakov/mismatch-recruiter/actions/workflows/ci.yml)
