@@ -423,3 +423,27 @@ _____________________________________________
 3. Perform regression testing if changes made
 4. Schedule production deployment
 5. Set up monitoring and alerts
+
+
+---
+
+## How Tests Are Run (CI)
+
+Automated tests and coverage are executed by GitHub Actions:
+
+- **Workflow:** `CI - Lint, Test & Coverage`
+- **Trigger:** every push to `master` and every pull request
+
+The CI pipeline runs:
+
+- `make lint`  (flake8 + black --check + isort --check)
+- `make test`  (pytest suite)
+- `make coverage`  (pytest with coverage, HTML report saved as artifact)
+
+### To inspect coverage:
+
+1. Open the latest CI run in GitHub Actions
+2. Download the `htmlcov` artifact (if available)
+3. Open `htmlcov/index.html` locally in any browser
+
+---
