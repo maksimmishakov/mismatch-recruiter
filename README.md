@@ -2,6 +2,8 @@
 
 **AI-powered resume-job matching for smart hiring decisions**
 
+[![CI - Lint, Test & Coverage](https://github.com/maksimmishakov/mismatch-recruiter/actions/workflows/ci.yml/badge.svg)](https://github.com/maksimmishakov/mismatch-recruiter/actions/workflows/ci.yml)
+
 > **Status:** Work in Progress (MVP / Beta)
 > Backend: Flask + SQLAlchemy | Frontend: React (Vite) | DB: SQLite (dev) / PostgreSQL (prod) | Deploy: Amvera Cloud
 
@@ -84,6 +86,16 @@ cd frontend
 npm run build  # outputs to ../static/
 ```
 
+
+## Quick Demo (HR / Investors)
+
+1. Open the live demo (if available): [https://mismatch-recruiter-maksimisakov.amvera.io/](https://mismatch-recruiter-maksimisakov.amvera.io/)  
+2. Upload a sample resume (PDF) and select a target job description.  
+3. Check:
+   - Match score between candidate and job
+   - Highlighted skill gaps / mismatches
+   - Suggested follow-up actions (invite / reject / nurture)
+4. Use `MISMATCH_DEMO_GUIDE.md` for a step-by-step scenario when presenting to HR teams or investors.
 ---
 
 ## API Endpoints (Implemented)
