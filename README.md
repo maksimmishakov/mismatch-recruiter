@@ -261,3 +261,10 @@ Copilot Workspace — это встроенный в GitHub инструмент
 - Как открыть Workspace через репозиторий или issue
 - Первичная настройка сессии (спецификация, план, реализация)
 - Как зафиксировать изменения через Pull Request
+
+
+Для полной автономной работы (агент сам создаёт PR по issue без вашего участия) см. руководство по Copilot Coding Agent:
+
+**[docs/copilot-agent.md](docs/copilot-agent.md)**
+
+> **Текущий статус:** страница Copilot coding agent существует в аккаунте, Repository access настроен на All repositories. Для активации агента потребуется подписка Copilot Pro или выше.
